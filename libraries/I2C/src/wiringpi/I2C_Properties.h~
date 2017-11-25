@@ -1,0 +1,7 @@
+#pragma once
+
+struct TI2CProperties
+{
+    // No special properties for the Raspberry Pi Wiring Pi Library
+    // I2C interface
+};
