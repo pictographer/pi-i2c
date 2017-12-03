@@ -38,9 +38,10 @@ int main(int argc , char *argv[])
 
     int result;
 
+    // initialization routine for wiringPI
     wiringPiSetup();
+    // indicate i2c interface and target device ID (7 bit address)
     i2c_fd = wiringPiI2CSetupInterface("/dev/i2c-1", 0x70);
-    // i2c_fd = wiringPiI2CSetup(0x70); // XXX bogus I2C address for debugging
     printf("wiringPiI2CSetup() ==> %d\n", i2c_fd);
 
     // channel 0
