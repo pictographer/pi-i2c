@@ -80,11 +80,12 @@ int main(int argc, char **argv)
 {
    int result;
 
-   i2c_fd = wiringPiI2CSetup(0x20); // XXX bogus I2C address for debugging
+   i2c_fd = wiringPiI2CSetup(0x72); // XXX bogus I2C address for debugging
    printf("wiringPiI2CSetup() ==> %d\n", i2c_fd);
 
-   result = wiringPiI2CWrite(i2c_fd, 0xA5);
-   printf("wiringPiI2CWrite(0xA5) ==> %d\n", result);
+   // channel 0
+   result = wiringPiI2CWrite(i2c_fd, 0x08);
+   printf("wiringPiI2CWrite(0x08) ==> %d\n", result);
    if (result != 0) {
       printf("  ERRNO = %d (%s)\n", errno, strerror(errno));
    }

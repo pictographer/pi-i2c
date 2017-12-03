@@ -9,6 +9,7 @@
   #include "samd/I2C_Properties.h"
 #elif defined( _WIRINGPII2C_H_ )
   #include "wiringpi/I2C_Properties.h"
+  using namespace wiringpi;
 #else
   #error "I2C library used on unsupported architecture!"
 #endif
