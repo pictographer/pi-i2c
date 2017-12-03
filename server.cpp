@@ -44,15 +44,13 @@ int main(int argc , char *argv[])
     i2c_fd = wiringPiI2CSetupInterface("/dev/i2c-1", 0x70);
     printf("wiringPiI2CSetup() ==> %d\n", i2c_fd);
 
-    // channel 0
-    while(1) {
+    // set up mux for channel 0
     unsigned char data = wiringPiI2CReadReg8(i2c_fd, 0x00);
     printf("wiringPiI2CReadReg8(0x00) ==> %d\n", data);
     result = wiringPiI2CWriteReg8(i2c_fd, 0x00, 0x08);
     printf("wiringPiI2CWriteReg8(0x00,0x08) ==> %d\n", result);
     if (result != 0) {
        printf("  ERRNO = %d (%s)\n", errno, strerror(errno));
-    }
     }
 
 // Once we're talking through an I2C splitter, we might not need this, but
