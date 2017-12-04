@@ -3,6 +3,7 @@
 // Includes
 #include <Arduino.h>
 #include <cstddef>
+#include <cstring>
 
 // Macros
 #ifndef NORMALIZE_ANGLE
