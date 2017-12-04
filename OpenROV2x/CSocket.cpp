@@ -1,27 +1,124 @@
 /*
-	Socket server with an interface similar to the Arduino Serial class
+        Socket server with an interface similar to the Arduino Serial class
 */
 
-int CSocket::available() { return 0; } 
+#include "CSocket.h"
+#include <limits>
+#include <stdexcept>
 
-void CSocket::begin() { // create the socket and bind
+#if 0
+#include <cstdio>
+#include <sys/socket.h>
+
+#include <stdio.h>
+#include <string.h>    //strlen
+#include <sys/socket.h>
+#include <arpa/inet.h> //inet_addr
+#include <unistd.h>    //write
+#include <errno.h>
+#include <cstddef>
+#endif
+
+CSocket::CSocket() : buf_len(0), buf_start(0) {}
+
+int CSocket::available() {
+   return buf_len;
 }
 
-int CSocket::read() { 
-  // if data is available in the buffer, ,
-  // advance the pointer and return a character.
-  // otherwise, return -1.
-  return 'x'; } 
+// Start the socket listener.
+void CSocket::begin() {
+   const int default_protocol = 0;
+   sockfd = socket(AF_INET, SOCK_STREAM, default_protocol);
+   if (sockfd == -1) {
+      perror("Socket creation failed. Error");
+   }
 
-int CSocket::print(long, format) { // sprintf a long into the buffer
-// if there is space available in the buffer.
+   struct sockaddr_in server;
+
+   //Prepare the sockaddr_in structure
+   server.sin_family = AF_INET;
+   server.sin_addr.s_addr = INADDR_ANY;
+   server.sin_port = htons(5432);
+
+   //Bind
+   if (bind(sockfd, (struct sockaddr *)&server, sizeof(server)) < 0)
+   {
+      //print the error message
+      perror("bind failed. Error");
+      throw;
+   }
+   puts("bind done");
+
+   server_in = server;
+
+   if (listen(sockfd, 3) < 0) {
+      perror("Unable to listen on socket. Error");
+   }
+
+   size_t len = sizeof(struct sockaddr_in);
+
+   int client_sock = accept(sockfd, (struct sockaddr *)&client_in, (socklen_t*)&len);
+   if (client_sock < 0) {
+      perror("Unable to accept socket connection. Error");
+   }
+   if (client_sock != sockfd) {
+      printf("That's interesting. client_sock != sockfd\n");
+   }
+   printf("Socket server awaiting connections.\n");
 }
 
-int CSocket::print(char* s) {
-// sprintf a string into the buffer if there is space available.
+// If data is available in the buffer, advance the pointer and return
+// a character. Otherwise, return -1.
+int CSocket::read() {
+   int result = -1;
+   if (0 < buf_len) {
+      result = buf[buf_start + buf_len - 1];
+      --buf_len;
+   }
+   return result;
+}
+
+int CSocket::print(long n, CSocket_print_t format) {
+   // sprintf a long into the buffer
+   // if there is space available in the buffer.
+   char long_buf[std::numeric_limits<long>::digits10 + 1];
+   snprintf(long_buf, sizeof long_buf, format == DEC ? "%ld" : "%lx", n);
+   int result = write(sockfd, long_buf, sizeof long_buf);
+   if (result < 0) {
+      perror("Unable to print long integer. Error");
+   }
 }
 
 int CSocket::print(char c) {
-// copy a character into the buffer
+   return write(sockfd, &c, 1);
 }
-int CSocket::println(char c);
+
+int CSocket::print(const char* s) {
+   size_t len = strlen(s);
+   ssize_t result = -1;
+   if (len <= CSocket_print_max) {
+      result = write(sockfd, s, len);
+      if (result < 0) {
+         perror("Socket write failed printing string. Error");
+      }
+   }
+   return result;
+}
+
+int CSocket::println(long n, CSocket_print_t format) {
+   return print(n) + print('\n');
+}
+
+int CSocket::println(char c) {
+   print(c);
+   print('\n');
+   return 2;
+}
+
+int CSocket::println(const char* s) {
+   ssize_t result = print(s);
+   if (0 <= result) {
+      print('\n');
+   }
+   return result + 1;
+}

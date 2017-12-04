@@ -20,6 +20,7 @@ all:
 	gcc -DWIRINGPI server.cpp ${CPP} -lwiringPi ${INC} -std=gnu++11 -o server
 
 .phony: clean
+clean:
 	rm server
 	find . -name '*~' -exec rm \{} \;
 	find . -name '.o' -exec rm \{} \;
