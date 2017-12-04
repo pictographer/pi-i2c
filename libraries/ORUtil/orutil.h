@@ -2,6 +2,7 @@
 
 // Includes
 #include <Arduino.h>
+#include <cstddef>
 
 // Macros
 #ifndef NORMALIZE_ANGLE
