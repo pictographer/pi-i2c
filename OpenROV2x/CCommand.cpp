@@ -1,4 +1,11 @@
 #include "CCommand.h"
+#include <cstring>
+#include <cstdlib>
+
+#if defined( WIRINGPI )
+#include "CSocket.h"
+CSocket Serial;
+#endif
 
 // File local variables and methods
 namespace
@@ -176,7 +183,7 @@ bool CCommand::GetCommandString()
 				Serial.print( ',' );
 			}
 
-			Serial.print( m_arguments[i] );
+			Serial.print( (long) m_arguments[i] );
 		}
 
 		m_arguments[0] = c.arguments[0];
