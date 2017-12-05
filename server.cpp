@@ -17,6 +17,8 @@
 #include <wiringPi.h>
 #include <wiringPiI2C.h>
 
+#include "CCommand.h"
+
 int i2c_fd = -1;
 
 void parse_command() {
