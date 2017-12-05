@@ -57,23 +57,40 @@ void CSocket::begin() {
 
    size_t len = sizeof(struct sockaddr_in);
 
-   int client_sock = accept(sockfd, (struct sockaddr *)&client_in, (socklen_t*)&len);
-   if (client_sock < 0) {
+   clientfd = accept(sockfd, (struct sockaddr *)&client_in, (socklen_t*)&len);
+   if (clientfd < 0) {
       perror("Unable to accept socket connection. Error");
    }
-   if (client_sock != sockfd) {
+   if (clientfd != sockfd) {
       printf("That's interesting. client_sock != sockfd\n");
    }
    printf("Socket server awaiting connections.\n");
 }
 
-// If data is available in the buffer, advance the pointer and return
-// a character. Otherwise, return -1.
+// If data is available in the buffer, update start, update length, and return
+// the character previously at start. Otherwise, await data from the socket and
+// return a character when available. Generate an error if the client goes away.
+//
+// TODO: I haven't made a way of distinguishing no client from 0xFF
+// appearing in the input stream.
 int CSocket::read() {
    int result = -1;
    if (0 < buf_len) {
-      result = buf[buf_start + buf_len - 1];
+      result = buf[buf_start];
       --buf_len;
+      ++buf_start;
+   } else {
+      buf_len = recv(clientfd, buf, 2000, 0);
+      buf_start = 0;
+      if (0 < buf_len) {
+         result = buf[0];
+         buf_start = 1;
+      } else if (buf_len == 0) {
+         printf("Socket client disconnected.\n");
+         fflush(stdout);
+      } else if (buf_len == -1) {
+         perror("Socket recv failed. Error");
+      }
    }
    return result;
 }

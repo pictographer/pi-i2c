@@ -44,6 +44,7 @@ class CSocket {
    int println(const char* s);
   protected:
    int sockfd;
+   int clientfd;
    struct sockaddr_in server_in, client_in;
 
    uint8_t buf[2000];
