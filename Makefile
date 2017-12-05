@@ -21,6 +21,6 @@ all:
 
 .phony: clean
 clean:
-	rm server
-	find . -name '*~' -exec rm \{} \;
-	find . -name '.o' -exec rm \{} \;
+	rm -f server
+	find . -name '*~' -exec rm -f \{} \;
+	find . -name '.o' -exec rm -f \{} \;
