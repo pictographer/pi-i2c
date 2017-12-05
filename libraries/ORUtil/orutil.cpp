@@ -1,4 +1,7 @@
 #include "orutil.h"
+#if !defined( ARDUINO_ARCH_AVR )
+#include <wiringPi.h>
+#endif
 
 #if defined( ARDUINO_ARCH_AVR )
     extern unsigned int __heap_start;
