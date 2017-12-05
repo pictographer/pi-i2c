@@ -69,7 +69,8 @@ void CSocket::begin() {
 
 // If data is available in the buffer, update start, update length, and return
 // the character previously at start. Otherwise, await data from the socket and
-// return a character when available. Generate an error if the client goes away.
+// return a character when available. Print a message if the client goes away.
+// Report errors.
 //
 // TODO: I haven't made a way of distinguishing no client from 0xFF
 // appearing in the input stream.
