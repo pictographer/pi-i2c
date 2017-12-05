@@ -57,16 +57,15 @@ int main(int argc, char *argv[])
 // to address a different slave than the one specified in the setup function
 // the ioctl(fd, I2C_SLAVE, devId) function might be useful.
 
-#if 0
 // Here are the rest of the I2C functions in the Wiring Pi library.
-int wiringPiI2CRead(int fd);
-int wiringPiI2CWrite(int fd, int data);
-int wiringPiI2CWriteReg8(int fd, int reg, int data);
-int wiringPiI2CWriteReg16(int fd, int reg, int data);
-int wiringPiI2CReadReg8(int fd, int reg);
-int wiringPiI2CReadReg16(int fd, int reg);
-#endif
+// int wiringPiI2CRead(int fd);
+// int wiringPiI2CWrite(int fd, int data);
+// int wiringPiI2CWriteReg8(int fd, int reg, int data);
+// int wiringPiI2CWriteReg16(int fd, int reg, int data);
+// int wiringPiI2CReadReg8(int fd, int reg);
+// int wiringPiI2CReadReg16(int fd, int reg);
 
+#if 0
     //Create socket
     socket_desc = socket(AF_INET, SOCK_STREAM, 0);
     if (socket_desc == -1)
@@ -123,7 +122,13 @@ int wiringPiI2CReadReg16(int fd, int reg);
     {
         perror("recv failed");
     }
+#else
+    CCommand cmd;
+    bool gotCommand = cmd.GetCommandString();
+    printf(gotCommand ? "Got command.\n" : "Didn't get command.\n");
 
+
+#endif
     return 0;
 }
 
