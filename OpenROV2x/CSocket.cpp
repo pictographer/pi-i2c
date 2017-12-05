@@ -19,7 +19,9 @@
 #include <cstddef>
 #endif
 
-CSocket::CSocket() : buf_len(0), buf_start(0) {}
+CSocket::CSocket() : buf_len(0), buf_start(0) {
+   begin(); // Might be a bad idea to call begin here, but where?
+}
 
 int CSocket::available() {
    return buf_len;
