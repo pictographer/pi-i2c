@@ -24,6 +24,21 @@ CSocket::CSocket() : buf_len(0), buf_start(0) {
 }
 
 int CSocket::available() {
+   if (buf_len == 0) {
+      buf_len = recv(clientfd, buf, 2000, 0);
+
+      buf[buf_len] = 0;
+
+      buf_start = 0;
+      if (0 < buf_len) {
+         buf_start = 0;
+      } else if (buf_len == 0) {
+         printf("Socket client disconnected.\n");
+         fflush(stdout);
+      } else if (buf_len == -1) {
+         perror("Socket recv failed. Error");
+      }
+   }
    return buf_len;
 }
 
@@ -63,9 +78,6 @@ void CSocket::begin() {
    if (clientfd < 0) {
       perror("Unable to accept socket connection. Error");
    }
-   if (clientfd != sockfd) {
-      printf("That's interesting. client_sock != sockfd\n");
-   }
    printf("Socket server awaiting connections.\n");
 }
 
@@ -78,22 +90,10 @@ void CSocket::begin() {
 // appearing in the input stream.
 int CSocket::read() {
    int result = -1;
-   if (0 < buf_len) {
+   if (available()) {
       result = buf[buf_start];
       --buf_len;
       ++buf_start;
-   } else {
-      buf_len = recv(clientfd, buf, 2000, 0);
-      buf_start = 0;
-      if (0 < buf_len) {
-         result = buf[0];
-         buf_start = 1;
-      } else if (buf_len == 0) {
-         printf("Socket client disconnected.\n");
-         fflush(stdout);
-      } else if (buf_len == -1) {
-         perror("Socket recv failed. Error");
-      }
    }
    return result;
 }
@@ -103,21 +103,21 @@ int CSocket::print(long n, CSocket_print_t format) {
    // if there is space available in the buffer.
    char long_buf[std::numeric_limits<long>::digits10 + 1];
    snprintf(long_buf, sizeof long_buf, format == DEC ? "%ld" : "%lx", n);
-   int result = write(sockfd, long_buf, sizeof long_buf);
+   int result = write(clientfd, long_buf, sizeof long_buf);
    if (result < 0) {
       perror("Unable to print long integer. Error");
    }
 }
 
 int CSocket::print(char c) {
-   return write(sockfd, &c, 1);
+   return write(clientfd, &c, 1);
 }
 
 int CSocket::print(const char* s) {
    size_t len = strlen(s);
    ssize_t result = -1;
    if (len <= CSocket_print_max) {
-      result = write(sockfd, s, len);
+      result = write(clientfd, s, len);
       if (result < 0) {
          perror("Socket write failed printing string. Error");
       }
