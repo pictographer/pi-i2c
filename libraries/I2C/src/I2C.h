@@ -7,7 +7,7 @@
   #include "avr/I2C_Properties.h"
 #elif defined( ARDUINO_ARCH_SAMD )
   #include "samd/I2C_Properties.h"
-#elif defined( _WIRINGPII2C_H_ )
+#elif defined( WIRINGPI )
   #include "wiringpi/I2C_Properties.h"
   using namespace wiringpi;
 #else
@@ -40,9 +40,11 @@ public:
   #elif defined( ARDUINO_ARCH_SAMD )
     I2C( SERCOM *sercomInstance, uint8_t pinSDA, uint8_t pinSCL );  // SAMD requires a specific SERCOM interface and pins
     I2C() = delete;                                                 // Delete default constructor
-  #elif defined( _WIRINGPII2C_H_ )
+  #elif defined( WIRINGPI )
     I2C();
-  #endif
+    i2c::EI2CResult StartTransaction();
+    i2c::EI2CResult StopTransaction();
+#endif
 
   i2c::EI2CResult Enable();
   i2c::EI2CResult Disable();
@@ -107,7 +109,7 @@ private:
   #if WIRE_INTERFACES_COUNT > 5
     extern I2C I2C5;
   #endif
-#elif defined( _WIRINGPII2C_H_ )
+#elif defined( WIRINGPI )
   // Raspberry Pi via Wiring Pi Library
   extern I2C I2C0;
   

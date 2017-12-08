@@ -14,9 +14,6 @@
 // The tx channel replaces the serial output of the Arduino.
 
 
-// We need a way to tell where we get I2C stuff, alas wiringPiI2C.h doesn't 
-// define any preprocessor symbols.
-#define _WIRINGPII2C_H_
 // Might not need to include wiringPi.h because all we need is in
 // wiringPiI2C.h.
 #include <wiringPi.h>
@@ -24,7 +21,7 @@
 
 #include <BNO055.h>
 
-// This pipe is read for control (GUI) or supervisory commands. 
+// This pipe is read for control (GUI) or supervisory commands.
 #define RX_FIFO "rx"
 
 // This pipe is written with sensor output and other low-level status.
@@ -145,7 +142,7 @@ int wiringPiI2CReadReg16(int fd, int reg);
       if (rx_fd != -1) {
          const size_t rx_buffer_size = 256;
          unsigned char rx_buffer[rx_buffer_size];
-         int rx_length = 
+         int rx_length =
             read(rx_fd, (void *)rx_buffer, sizeof rx_buffer - 1);
          if (rx_length < 0) {
             printf("FIFO Read error\n");

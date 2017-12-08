@@ -5,19 +5,9 @@
 #include "CSocket.h"
 #include <limits>
 #include <stdexcept>
-
-#if 0
-#include <cstdio>
-#include <sys/socket.h>
-
-#include <stdio.h>
-#include <string.h>    //strlen
-#include <sys/socket.h>
-#include <arpa/inet.h> //inet_addr
-#include <unistd.h>    //write
-#include <errno.h>
 #include <cstddef>
-#endif
+#include <inttypes.h>
+#include <cfloat>
 
 CSocket::CSocket() : buf_len(0), buf_start(0) {
    begin(); // Might be a bad idea to call begin here, but where?
@@ -43,7 +33,7 @@ int CSocket::available() {
 }
 
 // Start the socket listener.
-void CSocket::begin() {
+void CSocket::begin(int) {
    const int default_protocol = 0;
    sockfd = socket(AF_INET, SOCK_STREAM, default_protocol);
    if (sockfd == -1) {
@@ -107,6 +97,22 @@ int CSocket::print(long n, CSocket_print_t format) {
    if (result < 0) {
       perror("Unable to print long integer. Error");
    }
+   return result;
+}
+
+int CSocket::print(uint32_t u, CSocket_print_t format) {
+   char uint32_buf[std::numeric_limits<uint32_t>::digits10 + 1];
+   snprintf(uint32_buf, sizeof uint32_buf,
+            format == DEC ? "%" PRIu32 : "%" PRIx32, u);
+   int result = write(clientfd, uint32_buf, sizeof uint32_buf);
+   if (result < 0) {
+      perror("Unable to print uint32_t integer. Error");
+   }
+   return result;
+}
+
+int CSocket::print(uint8_t u, CSocket_print_t format) {
+   return print(uint32_t(u), format);
 }
 
 int CSocket::print(char c) {
@@ -124,6 +130,24 @@ int CSocket::print(const char* s) {
    }
    return result;
 }
+
+// If we need bug-for-bug compatibility go here:
+// https://github.com/arduino/Arduino/blob/master/hardware/arduino/avr/cores/arduino/Print.cpp
+int CSocket::print(float f) {
+   // Found the answer for doubles. No time to optimize.
+   char float_buf[3 + DBL_MANT_DIG - DBL_MIN_EXP + 1];
+   snprintf(float_buf, sizeof float_buf, "%f", f);
+   int result = write(clientfd, float_buf, sizeof float_buf);
+   if (result < 0) {
+      perror("Unable to print float. Error");
+   }
+   return result;
+}
+
+int CSocket::print(bool b) {
+   return write(clientfd, b ? "1" : "0", 1);
+}
+
 
 int CSocket::println(long n, CSocket_print_t format) {
    return print(n) + print('\n');

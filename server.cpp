@@ -9,9 +9,6 @@
 #include<unistd.h>    //write
 #include <errno.h>
 
-// We need a way to tell where we get I2C stuff, alas wiringPiI2C.h doesn't
-// define any preprocessor symbols.
-#define _WIRINGPII2C_H_
 // Might not need to include wiringPi.h because all we need is in
 // wiringPiI2C.h.
 #include <wiringPi.h>

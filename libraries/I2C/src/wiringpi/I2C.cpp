@@ -1,9 +1,17 @@
-#if( _WIRINGPII2C_H_ )
+#if( WIRINGPI )
 
 #include <I2C.h>
 
 #include <sys/ioctl.h>
 #include <asm/ioctl.h>
+#include <linux/i2c.h>
+#include <linux/i2c-dev.h>
+#include <stdio.h>
+#include <errno.h>
+#include <string.h>
+
+#include <wiringPi.h>
+#include <wiringPiI2C.h>
 
 using namespace i2c;
 
@@ -104,14 +112,13 @@ EI2CResult I2C::SetBaudRate( EI2CBaudRate baudRateIn )
 
 EI2CResult I2C::WriteByte( uint8_t slaveAddressIn, uint8_t dataIn, bool issueRepeatedStart )
 {
-        m_result = ioctl( m_customProperties.m_fileDescriptor, I2C_SLAVE, slaveAddressIn );
-        if (m_result < 0)
+        if ( ioctl( m_customProperties.m_fileDescriptor, I2C_SLAVE, slaveAddressIn ) < 0 )
         {
                 printf( "Unable to select I2C device: %s\n", strerror( errno ) );
                 return HANDLE_RESULT( EI2CResult::RESULT_ERR_FAILED );
         }
-        m_result = wiringPiI2CWrite( m_customProperties.m_fileDescriptor, dataIn );
-        if (m_result < 0)
+        int result = wiringPiI2CWrite( m_customProperties.m_fileDescriptor, dataIn );
+        if (result < 0)
         {
                 printf( "Unable to write I2C device: %s\n", strerror(errno) );
                 return HANDLE_RESULT( EI2CResult::RESULT_ERR_FAILED );
@@ -152,16 +159,18 @@ EI2CResult I2C::WriteRegisterByte( uint8_t slaveAddressIn, uint8_t registerIn, u
         if( m_result ){ return HANDLE_RESULT( m_result ); }
 
         // Send address
-        m_result = ioctl( m_customProperties.m_fileDescriptor, I2C_SLAVE, slaveAddressIn );
-        if( m_result ){ return HANDLE_RESULT( m_result ); }
+        if ( ioctl( m_customProperties.m_fileDescriptor, I2C_SLAVE, slaveAddressIn ) < 0 )
+        {
+                return HANDLE_RESULT( EI2CResult::RESULT_ERR_FAILED );
+        }
 
         // Write Register Address
-        m_result = wiringPiI2CWrite( m_customProperties.m_fileDescriptor, registerIn );
-        if( m_result ){ return HANDLE_RESULT( m_result ); }
+        int result = wiringPiI2CWrite( m_customProperties.m_fileDescriptor, registerIn );
+        if( result ){ return HANDLE_RESULT( m_result ); }
 
         // Write Data byte
-        m_result = wiringPiI2CWrite( m_customProperties.m_fileDescriptor, dataIn );
-        if( m_result ){ return HANDLE_RESULT( m_result ); }
+        result = wiringPiI2CWrite( m_customProperties.m_fileDescriptor, dataIn );
+        if( result ){ return HANDLE_RESULT( EI2CResult::RESULT_ERR_FAILED ); }
 
         // Send stop, if requested
         if( !issueRepeatedStart )
@@ -180,14 +189,14 @@ EI2CResult I2C::WriteBytes( uint8_t slaveAddressIn, uint8_t *dataIn, uint8_t num
         if( m_result ){ return HANDLE_RESULT( m_result ); }
 
         // Send address
-        m_result = ioctl( m_customProperties.m_fileDescriptor, I2C_SLAVE, slaveAddressIn );
-        if( m_result ){ return HANDLE_RESULT( m_result ); }
+        int result = ioctl( m_customProperties.m_fileDescriptor, I2C_SLAVE, slaveAddressIn );
+        if( result ){ return HANDLE_RESULT( EI2CResult::RESULT_ERR_FAILED ); }
 
         // Write multiple bytes
         for( size_t i = 0; i < numberBytesIn; ++i )
         {
-                m_result = wiringPiI2CWrite( m_customProperties.m_fileDescriptor, dataIn[ i ] );
-                if( m_result ){ return HANDLE_RESULT( m_result ); }
+                int result = wiringPiI2CWrite( m_customProperties.m_fileDescriptor, dataIn[ i ] );
+                if( result ){ return HANDLE_RESULT( EI2CResult::RESULT_ERR_FAILED ); }
         }
 
         // Send stop, if requested
@@ -207,18 +216,18 @@ EI2CResult I2C::WriteRegisterBytes( uint8_t slaveAddressIn, uint8_t registerIn, 
         if( m_result ){ return HANDLE_RESULT( m_result ); }
 
         // Send address
-        m_result = ioctl( m_customProperties.m_fileDescriptor, I2C_SLAVE, slaveAddressIn );
-        if( m_result ){ return HANDLE_RESULT( m_result ); }
+        int result = ioctl( m_customProperties.m_fileDescriptor, I2C_SLAVE, slaveAddressIn );
+        if( result ){ return HANDLE_RESULT( EI2CResult::RESULT_ERR_FAILED ); }
 
         // Write Register Address
-        m_result = wiringPiI2CWrite( m_customProperties.m_fileDescriptor, registerIn );
-        if( m_result ){ return HANDLE_RESULT( m_result ); }
+        result = wiringPiI2CWrite( m_customProperties.m_fileDescriptor, registerIn );
+        if( result ){ return HANDLE_RESULT( EI2CResult::RESULT_ERR_FAILED ); }
 
         // Write multiple bytes
         for( size_t i = 0; i < numberBytesIn; ++i )
         {
-                m_result = wiringPiI2CWrite( m_customProperties.m_fileDescriptor, dataIn [ i ] );
-                if( m_result ){ return HANDLE_RESULT( m_result ); }
+                int result = wiringPiI2CWrite( m_customProperties.m_fileDescriptor, dataIn [ i ] );
+                if( result ){ return HANDLE_RESULT( EI2CResult::RESULT_ERR_FAILED ); }
         }
 
         // Send stop, if requested
@@ -259,7 +268,8 @@ EI2CResult I2C::ReadRegisterBytes( uint8_t slaveAddressIn, uint8_t registerIn, u
         // Read in the requested amount of bytes
         for( size_t i = 0; i < numberBytesIn; ++i )
         {
-           dataOut[ i ] = ReadRegisterByte( slaveAddressIn, registerIn );
+                m_result = ReadRegisterByte( slaveAddressIn, registerIn, dataOut + i , issueRepeatedStart );
+                if ( m_result ){ return HANDLE_RESULT( m_result ); }
         }
 
         // Send stop, if requested
