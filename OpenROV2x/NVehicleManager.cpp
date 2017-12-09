@@ -6,7 +6,6 @@
 
 #if !defined( ARDUINO_ARCH_AVR )
 #include "CSocket.h"
-CSocket Serial;
 #endif
 
 namespace NVehicleManager

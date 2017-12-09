@@ -24,7 +24,9 @@ class CSocket {
    int read();
 
    int print(long, CSocket_print_t format=DEC);
+   int print(int, CSocket_print_t format=DEC);
    int print(uint32_t, CSocket_print_t format=DEC);
+   int print(short unsigned int, CSocket_print_t format=DEC);
    int print(uint8_t, CSocket_print_t format=DEC);
    int print(char c);
    int print(const char* s);
@@ -32,7 +34,10 @@ class CSocket {
    int print(bool b);
 
    int println(long, CSocket_print_t format=DEC);
+   int println(int, CSocket_print_t format=DEC);
    int println(char c);
+   int println(uint32_t u, CSocket_print_t format);
+   int println(uint8_t, CSocket_print_t format=DEC);
    int println(const char* s);
   protected:
    int sockfd;

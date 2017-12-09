@@ -100,6 +100,14 @@ int CSocket::print(long n, CSocket_print_t format) {
    return result;
 }
 
+int CSocket::print(int n, CSocket_print_t format) {
+   return print(long(n), format);
+}
+
+//int CSocket::print(int32_t u, CSocket_print_t format) {
+//   return print(long(u), format);
+//}
+
 int CSocket::print(uint32_t u, CSocket_print_t format) {
    char uint32_buf[std::numeric_limits<uint32_t>::digits10 + 1];
    snprintf(uint32_buf, sizeof uint32_buf,
@@ -109,6 +117,10 @@ int CSocket::print(uint32_t u, CSocket_print_t format) {
       perror("Unable to print uint32_t integer. Error");
    }
    return result;
+}
+
+int print(short unsigned int u, CSocket_print_t format=DEC) {
+   return print(uint32_t(u), format);
 }
 
 int CSocket::print(uint8_t u, CSocket_print_t format) {
@@ -150,13 +162,25 @@ int CSocket::print(bool b) {
 
 
 int CSocket::println(long n, CSocket_print_t format) {
-   return print(n) + print('\n');
+   return print(n, format) + print('\n');
+}
+
+int CSocket::println(int n, CSocket_print_t format) {
+   return print(n, format) + print('\n');
 }
 
 int CSocket::println(char c) {
    print(c);
    print('\n');
    return 2;
+}
+
+int CSocket::println(uint32_t u, CSocket_print_t format) {
+   return print(u, format) + print('\n');
+}
+
+int CSocket::println(uint8_t u, CSocket_print_t format) {
+   return println(uint32_t(u), format);
 }
 
 int CSocket::println(const char* s) {

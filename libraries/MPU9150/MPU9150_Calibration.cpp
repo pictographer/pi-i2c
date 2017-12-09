@@ -26,46 +26,48 @@
 
 // AVR version
 
+#if defined( ARDUINO_ARCH_AVR )
 #include <EEPROM.h>
+#endif
 
 void calLibErase( uint8_t device )
 {
-	EEPROM.write( CALLIB_START, 0 ); // just destroy the valid byte
+        EEPROM.write( CALLIB_START, 0 ); // just destroy the valid byte
 }
 
 void calLibWrite( uint8_t device, CALLIB_DATA* calData )
 {
-	uint8_t* ptr = ( uint8_t* )calData;
-	uint8_t length = sizeof( CALLIB_DATA );
-	int eeprom = CALLIB_START;
+        uint8_t* ptr = ( uint8_t* )calData;
+        uint8_t length = sizeof( CALLIB_DATA );
+        int eeprom = CALLIB_START;
 
-	calData->valid = CALLIB_DATA_VALID;
+        calData->valid = CALLIB_DATA_VALID;
 
-	for( uint8_t i = 0; i < length; i++ )
-	{
-		EEPROM.write( eeprom + i, *ptr++ );
-	}
+        for( uint8_t i = 0; i < length; i++ )
+        {
+                EEPROM.write( eeprom + i, *ptr++ );
+        }
 }
 
 bool calLibRead( uint8_t device, CALLIB_DATA* calData )
 {
-	uint8_t* ptr = ( uint8_t* )calData;
-	uint8_t length = sizeof( CALLIB_DATA );
-	int eeprom = CALLIB_START;
+        uint8_t* ptr = ( uint8_t* )calData;
+        uint8_t length = sizeof( CALLIB_DATA );
+        int eeprom = CALLIB_START;
 
-	calData->magValid = false;
-	calData->accelValid = false;
+        calData->magValid = false;
+        calData->accelValid = false;
 
-	if( ( EEPROM.read( eeprom ) != CALLIB_DATA_VALID_LOW ) ||
-	    ( EEPROM.read( eeprom + 1 ) != CALLIB_DATA_VALID_HIGH ) )
-	{
-		return false;    // invalid data
-	}
+        if( ( EEPROM.read( eeprom ) != CALLIB_DATA_VALID_LOW ) ||
+            ( EEPROM.read( eeprom + 1 ) != CALLIB_DATA_VALID_HIGH ) )
+        {
+                return false;    // invalid data
+        }
 
-	for( uint8_t i = 0; i < length; i++ )
-	{
-		*ptr++ = EEPROM.read( eeprom + i );
-	}
+        for( uint8_t i = 0; i < length; i++ )
+        {
+                *ptr++ = EEPROM.read( eeprom + i );
+        }
 
-	return true;
+        return true;
 }
