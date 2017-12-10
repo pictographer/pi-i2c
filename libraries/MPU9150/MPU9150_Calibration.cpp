@@ -32,11 +32,14 @@
 
 void calLibErase( uint8_t device )
 {
+#if defined( ARDUINO_ARCH_AVR )
         EEPROM.write( CALLIB_START, 0 ); // just destroy the valid byte
+#endif
 }
 
 void calLibWrite( uint8_t device, CALLIB_DATA* calData )
 {
+#if defined( ARDUINO_ARCH_AVR )
         uint8_t* ptr = ( uint8_t* )calData;
         uint8_t length = sizeof( CALLIB_DATA );
         int eeprom = CALLIB_START;
@@ -47,10 +50,12 @@ void calLibWrite( uint8_t device, CALLIB_DATA* calData )
         {
                 EEPROM.write( eeprom + i, *ptr++ );
         }
+#endif
 }
 
 bool calLibRead( uint8_t device, CALLIB_DATA* calData )
 {
+#if defined( ARDUINO_ARCH_AVR )
         uint8_t* ptr = ( uint8_t* )calData;
         uint8_t length = sizeof( CALLIB_DATA );
         int eeprom = CALLIB_START;
@@ -68,6 +73,6 @@ bool calLibRead( uint8_t device, CALLIB_DATA* calData )
         {
                 *ptr++ = EEPROM.read( eeprom + i );
         }
-
+#endif
         return true;
 }

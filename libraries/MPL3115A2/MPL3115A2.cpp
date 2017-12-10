@@ -1,9 +1,9 @@
-/* 
+/*
  MPL3115A2 Barometric Pressure Sensor Library
 
  Get pressure, altitude and temperature from the MPL3115A2 sensor.
- 
- September 6, 2016: Modified for use in OpenROV's Software 
+
+ September 6, 2016: Modified for use in OpenROV's Software
 
 */
 
@@ -19,7 +19,7 @@ MPL3115A2::MPL3115A2( I2C *i2cInterfaceIn )
 
 }
 
-ERetCode MPL3115A2::Initialize() 
+ERetCode MPL3115A2::Initialize()
 {
     m_isInitialized = false;
 
@@ -33,7 +33,7 @@ ERetCode MPL3115A2::Initialize()
     }
 
     m_isInitialized = true;
-    return ERetCode::SUCCESS;    
+    return ERetCode::SUCCESS;
 }
 
 ERetCode MPL3115A2::SetMode( EMode modeIn )
@@ -64,7 +64,7 @@ ERetCode MPL3115A2::SetMode( EMode modeIn )
 }
 
 //Call with a rate from 0 to 7. See page 33 for table of ratios.
-//Sets the over sample rate. Datasheet calls for 128 but you can set it 
+//Sets the over sample rate. Datasheet calls for 128 but you can set it
 //from 1 to 128 samples. The higher the oversample rate the greater
 //the time between data samples.
 ERetCode MPL3115A2::SetOversampleRatio( EOversampleRatio osrIn )
@@ -84,7 +84,7 @@ ERetCode MPL3115A2::SetOversampleRatio( EOversampleRatio osrIn )
     }
 
     //Clear out old Oversample bits
-    tempSetting &= B11000111;
+    tempSetting &= 0b11000111;
 
     //Mask new sample rate
     tempSetting |= sampleRate;
@@ -95,7 +95,7 @@ ERetCode MPL3115A2::SetOversampleRatio( EOversampleRatio osrIn )
     {
         return ERetCode::FAILED;
     }
-    
+
     return ERetCode::SUCCESS;
 }
 
@@ -103,13 +103,13 @@ ERetCode MPL3115A2::SetOversampleRatio( EOversampleRatio osrIn )
 //test against them. This is recommended in datasheet during setup.
 ERetCode MPL3115A2::EnableEventFlags()
 {
-    // Enable all three pressure and temp event flags 
+    // Enable all three pressure and temp event flags
     auto ret = WriteByte( MPL3115A2_REGISTER::PT_DATA_CFG, 0x07);
     if( ret != i2c::EI2CResult::RESULT_SUCCESS )
     {
         return ERetCode::FAILED;
     }
-    
+
     return ERetCode::SUCCESS;
 }
 
@@ -127,7 +127,7 @@ ERetCode MPL3115A2::ReadPressure( float& pressureOut )
     {
         return ERetCode::FAILED;
     }
-    
+
     if( ( status & ( 1<<2 ) ) == 0 )
     {
         auto ret = ToggleOneShot();
@@ -183,7 +183,7 @@ ERetCode MPL3115A2::ReadPressure( float& pressureOut )
 
     //Bits 5/4 represent the fractional component
     lsb &= 0x30; //B00110000
-    
+
     //Get it right aligned
     lsb >>= 4;
 
@@ -240,12 +240,12 @@ ERetCode MPL3115A2::ReadAltitude( float& altitudeOut )
     auto lsb = buffer[2];
 
     // The least significant bytes l_altitude and l_temp are 4-bit,
-	// fractional values, so you must cast the calulation in (float),
-	// shift the value over 4 spots to the right and divide by 16 (since 
-	// there are 16 values in 4-bits). 
-	float tempCSB = (lsb>>4)/16.0;
+        // fractional values, so you must cast the calulation in (float),
+        // shift the value over 4 spots to the right and divide by 16 (since
+        // there are 16 values in 4-bits).
+        float tempCSB = (lsb>>4)/16.0;
 
-	altitudeOut = (float)( (msb << 8) | csb) + tempCSB;
+        altitudeOut = (float)( (msb << 8) | csb) + tempCSB;
 
     return ERetCode::SUCCESS;
 }
@@ -262,7 +262,7 @@ ERetCode MPL3115A2::ReadPressureAndTemp( float& pressureOut, float& tempOut )
     {
         return ERetCode::FAILED;
     }
-    
+
     if( ( status & ( 1<<2 ) ) == 0 )
     {
         auto ret = ToggleOneShot();
@@ -327,7 +327,7 @@ ERetCode MPL3115A2::ReadPressureAndTemp( float& pressureOut, float& tempOut )
 
     //Bits 5/4 represent the fractional component
     pressureLSB &= 0x30; //B00110000
-    
+
     //Get it right aligned
     pressureLSB >>= 4;
 
@@ -342,7 +342,7 @@ ERetCode MPL3115A2::ReadPressureAndTemp( float& pressureOut, float& tempOut )
     auto tempLSB = tempBuffer[1];
 
     // Get temperature, the 12-bit temperature measurement in °C is comprised of a signed integer component and a fractional component.
-    // The signed 8-bit integer component is located in OUT_T_MSB. 
+    // The signed 8-bit integer component is located in OUT_T_MSB.
     // The fractional component is located in bits 7-4 of OUT_T_LSB.
     // Bits 3-0 of OUT_T_LSB are not used.
 
@@ -380,7 +380,7 @@ ERetCode MPL3115A2::VerifyChipId()
 ERetCode MPL3115A2::SetModeBarometer()
 {
     int32_t returnCode;
-    
+
     //Read the current settings
     uint8_t setting;
 
@@ -406,7 +406,7 @@ ERetCode MPL3115A2::SetModeBarometer()
 ERetCode MPL3115A2::SetModeAltimeter()
 {
     int32_t returnCode;
-    
+
     //Read the current settings
     uint8_t tempSetting;
     returnCode = ReadByte( MPL3115A2_REGISTER::CONTROL_REGISTER_1, tempSetting );
@@ -433,7 +433,7 @@ ERetCode MPL3115A2::SetModeAltimeter()
 ERetCode MPL3115A2::SetModeStandby()
 {
     int32_t returnCode;
-    
+
     //Read the current settings
     uint8_t tempSetting;
     returnCode = ReadByte( MPL3115A2_REGISTER::CONTROL_REGISTER_1, tempSetting );
@@ -452,7 +452,7 @@ ERetCode MPL3115A2::SetModeStandby()
         return ERetCode::FAILED;
     }
 
-    return ERetCode::SUCCESS; 
+    return ERetCode::SUCCESS;
 }
 
 //Puts the sensor in active mode
@@ -460,7 +460,7 @@ ERetCode MPL3115A2::SetModeStandby()
 ERetCode MPL3115A2::SetModeActive()
 {
     int32_t returnCode;
-    
+
     //Read the current settings
     uint8_t tempSetting;
     returnCode = ReadByte( MPL3115A2_REGISTER::CONTROL_REGISTER_1, tempSetting );
@@ -496,7 +496,7 @@ ERetCode MPL3115A2::ToggleOneShot()
     {
         return ERetCode::FAILED_ONESHOT;
     }
-    
+
     //Clear the one shot bit
     tempSetting &= ~(1<<1);
     returnCode = WriteByte( MPL3115A2_REGISTER::CONTROL_REGISTER_1, tempSetting );
@@ -520,17 +520,17 @@ ERetCode MPL3115A2::ToggleOneShot()
         return ERetCode::FAILED_ONESHOT;
     }
 
-    return ERetCode::SUCCESS;    
+    return ERetCode::SUCCESS;
 }
 
 int32_t MPL3115A2::WriteByte( MPL3115A2_REGISTER addressIn, uint8_t dataIn )
 {
-	return (int32_t)m_pI2C->WriteRegisterByte( m_i2cAddress, (uint8_t)addressIn, dataIn );
+        return (int32_t)m_pI2C->WriteRegisterByte( m_i2cAddress, (uint8_t)addressIn, dataIn );
 }
 
 int32_t MPL3115A2::ReadByte( MPL3115A2_REGISTER addressIn, uint8_t &dataOut )
 {
-	return (int32_t)m_pI2C->ReadRegisterByte( m_i2cAddress, (uint8_t)addressIn, &dataOut );
+        return (int32_t)m_pI2C->ReadRegisterByte( m_i2cAddress, (uint8_t)addressIn, &dataOut );
 }
 int32_t MPL3115A2::ReadNBytes( MPL3115A2_REGISTER addressIn, uint8_t* dataOut, uint8_t byteCountIn )
 {

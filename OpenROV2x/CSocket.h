@@ -38,7 +38,7 @@ class CSocket {
    int println(char c);
    int println(uint32_t u, CSocket_print_t format);
    int println(uint8_t, CSocket_print_t format=DEC);
-   int println(const char* s);
+   int println(const char* s="");
   protected:
    int sockfd;
    int clientfd;

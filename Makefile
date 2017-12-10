@@ -16,11 +16,15 @@ CPP:=./OpenROV2x/CLights.cpp\
 ./OpenROV2x/CExternalLights.cpp\
 ./OpenROV2x/NVehicleManager.cpp\
 ./OpenROV2x/CMS5837_30BA.cpp\
+./OpenROV2x/CPin.cpp\
+./OpenROV2x/CCameraServo.cpp\
+./OpenROV2x/CControllerBoard.cpp\
 ./libraries/ORUtil/orutil.cpp\
 ./libraries/MS5837_30BA/MS5837_30BA.cpp\
 ./libraries/MS5803_14BA/MS5803_14BA.cpp\
 ./libraries/MPU9150/MPU9150_Vector3.cpp\
 ./libraries/MPU9150/MPU9150.cpp\
+./libraries/MPU9150/MPU9150_Calibration.cpp\
 ./libraries/MPU9150/MPU9150_DMPDriver.cpp\
 ./libraries/MPU9150/MPU9150_Quaternion.cpp\
 ./libraries/MPU9150/MPU9150_DriverLayer.cpp\
@@ -29,30 +33,14 @@ CPP:=./OpenROV2x/CLights.cpp\
 ./libraries/PCA9539/PCA9539.cpp\
 ./libraries/I2C/src/I2C_Shared.cpp\
 ./libraries/I2C/src/samd/I2C.cpp\
-./libraries/I2C/src/wiringpi/I2C.cpp
+./libraries/I2C/src/wiringpi/I2C.cpp\
+OpenROV2x.cpp
 
 BROKEN:=\
-./OpenROV2x/CPin.cpp\
-./OpenROV2x/CCameraServo.cpp\
-./OpenROV2x/CControllerBoard.cpp\
-./libraries/MPU9150/MPU9150_Calibration.cpp\
 ./libraries/Servo/src/avr/Servo.cpp\
 ./libraries/Servo/src/samd/Servo.cpp\
 ./libraries/I2C/src/avr/I2C.cpp\
 ./libraries/I2C/src/avr/I2C_Driver.cpp
-
-
-
-OLD_CPP:=./libraries/ORUtil/orutil.cpp\
-./libraries/I2C/src/wiringpi/I2C.cpp\
-./libraries/I2C/src/I2C_Shared.cpp\
-./OpenROV2x/CCommand.cpp\
-./OpenROV2x/CSocket.cpp\
-./OpenROV2x/NArduinoManager.cpp\
-./OpenROV2x/NCommManager.cpp\
-./OpenROV2x/NDataManager.cpp\
-./OpenROV2x/NModuleManager.cpp\
-./OpenROV2x/NVehicleManager.cpp
 
 INC:=-Ilibraries\
 -Ilibraries/BNO055\
@@ -70,10 +58,10 @@ CC=g++
 
 .phony: all
 all:
-	$(CC) -DWIRINGPI server.cpp ${CPP} -lwiringPi ${INC} -std=gnu++11 -o server
+	$(CC) -DWIRINGPI ${CPP} -lwiringPi ${INC} -std=gnu++11 -o rovdrv
 
 .phony: clean
 clean:
-	rm -f server
+	rm -f rovdrv
 	find . -name '*~' -exec rm -f \{} \;
 	find . -name '.o' -exec rm -f \{} \;

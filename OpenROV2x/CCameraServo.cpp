@@ -3,11 +3,18 @@
 
 // Includes
 #include <Arduino.h>
+#if defined( ARDUINO_ARCH_AVR )
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#else
+#warning Faking out AVR stuff
+#include <cstdlib> // abs()
+#endif
 
 #include "CCameraServo.h"
+#if defined( ARDUINO_ARCH_AVR )
 #include <Servo.h>
+#endif
 #include "CPin.h"
 #include "NDataManager.h"
 #include "NModuleManager.h"
@@ -80,24 +87,29 @@ namespace
 
     void SetServoPosition( uint32_t microsecondsIn )
     {
+#if defined( ARDUINO_ARCH_AVR )
         // Set to 90° --> pulsewdith = 1.5ms
         OCR1A = microsecondsIn * 2;
+#endif
     }
 }
 
 void CCameraServo::Initialize()
 {
+#if defined ( ARDUINO_ARCH_AVR )
     // Set up the pin for the camera servo
     pinMode( PIN_CAMERA_MOUNT, OUTPUT );
 
     // Set up the timers driving the PWM for the servo (AVR specific)
     TCCR1A = 0;
     TCCR1B = 0;
-    TCCR1A |= ( 1 << COM1A1 ) | ( 1 << WGM11 );					// non-inverting mode for OC1A
-    TCCR1B |= ( 1 << WGM13 ) | ( 1 << WGM12 ) | ( 1 << CS11 );	// Mode 14, Prescaler 8
+    TCCR1A |= ( 1 << COM1A1 ) | ( 1 << WGM11 );                                 // non-inverting mode for OC1A
+    TCCR1B |= ( 1 << WGM13 ) | ( 1 << WGM12 ) | ( 1 << CS11 );  // Mode 14, Prescaler 8
 
     ICR1 = 40000; // 320000 / 8 = 40000
-
+#else
+#warning No timer on rpi yet
+#endif
     // Set initial position
     SetServoPosition( kNeutralPosition_us );
 
@@ -119,7 +131,7 @@ void CCameraServo::Update( CCommand& command )
             Serial.print( F( "camServ_tpos:" ) );
             Serial.print( static_cast<int32_t>( command.m_arguments[1] ) );
             Serial.println( ';' );
-            
+
             // Update the target position
             m_targetPos_deg = Decode( static_cast<int32_t>( command.m_arguments[1] ) );
 
@@ -193,7 +205,7 @@ void CCameraServo::Update( CCommand& command )
                 // Cast the floating point servo command to an integer
                 m_currentPos_us = static_cast<uint32_t>( m_fCurrentPos_us );
             }
-            
+
             // Set the servo to this target
             SetServoPosition( m_currentPos_us );
 

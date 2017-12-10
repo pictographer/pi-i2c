@@ -8,7 +8,16 @@
 #define HIGH 1
 #define LOW 0
 
-// int digitalRead(int);
-// void digitalWrite(int, int);
-// int analogRead(int);
-// void analogWrite(int, int);
+#define PROGMEM
+
+#define A0 0
+#define A1 1
+#define A2 2
+#define A3 3
+#define A4 4
+#define A5 5
+#define A6 6
+#define A7 7
+#define A8 8
+#define A9 9
+

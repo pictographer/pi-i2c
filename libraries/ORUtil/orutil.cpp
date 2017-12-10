@@ -5,7 +5,7 @@
 
 #if defined( ARDUINO_ARCH_AVR )
     extern unsigned int __heap_start;
-    extern void*		__brkval;
+    extern void*                __brkval;
 
     // The free list structure as maintained by the avr-libc memory allocation routines.
     struct __freelist
@@ -60,9 +60,9 @@ namespace orutil
         m_lastTime_ms = Now();
     }
 
-    #if defined( ARDUINO_ARCH_AVR )
         int FreeMemory()
         {
+#if defined( ARDUINO_ARCH_AVR )
             int free_memory;
 
             if( ( int )__brkval == 0 )
@@ -76,8 +76,10 @@ namespace orutil
             }
 
             return free_memory;
+#else
+            return 424242;
+#endif
         }
 
-    #endif
 
 }
