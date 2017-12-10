@@ -21,3 +21,6 @@
 #define A8 8
 #define A9 9
 
+long map(long x, long in_min, long in_max, long out_min, long out_max);
+
+

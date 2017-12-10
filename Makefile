@@ -1,10 +1,12 @@
 
 # This makefile is for Raspberry Pi with Wiring Pi, not AVR, not SAMD.
 
-CPP:=./OpenROV2x/CLights.cpp\
+CPP:=./OpenROV2x/CAutopilot_STD.cpp\
+./OpenROV2x/CLights.cpp\
 ./OpenROV2x/CCalibrationLaser.cpp\
 ./OpenROV2x/CMPU9150.cpp\
 ./OpenROV2x/CModule.cpp\
+./OpenROV2x/CMotor.cpp\
 ./OpenROV2x/NDataManager.cpp\
 ./OpenROV2x/NCommManager.cpp\
 ./OpenROV2x/NModuleManager.cpp\
@@ -19,6 +21,9 @@ CPP:=./OpenROV2x/CLights.cpp\
 ./OpenROV2x/CPin.cpp\
 ./OpenROV2x/CCameraServo.cpp\
 ./OpenROV2x/CControllerBoard.cpp\
+./OpenROV2x/CThrusters_2X1.cpp\
+./OpenROV2x/CThrusters_2Xv2.cpp\
+./OpenROV2x/CThrusters_v2X1Xv2.cpp\
 ./libraries/ORUtil/orutil.cpp\
 ./libraries/MS5837_30BA/MS5837_30BA.cpp\
 ./libraries/MS5803_14BA/MS5803_14BA.cpp\
