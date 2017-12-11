@@ -2,12 +2,26 @@
 #if( THRUSTER_CONFIGURATION == THRUSTER_CONFIG_2Xv2 )
 
 // Includes
+#include <cmath>
+
 #include "CThrusters.h"
 #include "NVehicleManager.h"
 #include "NDataManager.h"
 #include "CMotor.h"
 #include <orutil.h>
 #include "CPin.h"
+
+template<class T>
+const T& constrain(const T& x, const T& a, const T& b) {
+    if(x < a) {
+        return a;
+    }
+    else if(b < x) {
+        return b;
+    }
+    else
+        return x;
+}
 
 // Static variable initialization
 const int CThrusters::kMotorCount = 4;
@@ -187,12 +201,12 @@ void CThrusters::Update( CCommand& command )
         // deadzon calculation in the motor code.
         if( trg_throttle >= 0 )
         {
-            p = 1500 + ( 500.0 / abs( port_motor.m_positiveModifier ) ) * trg_throttle;
+            p = 1500 + ( 500.0 / std::abs( port_motor.m_positiveModifier ) ) * trg_throttle;
             s = p;
         }
         else
         {
-            p = 1500 + ( 500.0 / abs( port_motor.m_negativeModifier ) ) * trg_throttle;
+            p = 1500 + ( 500.0 / std::abs( port_motor.m_negativeModifier ) ) * trg_throttle;
             s = p;
         }
 
@@ -202,7 +216,7 @@ void CThrusters::Update( CCommand& command )
 
         if( trg_throttle >= 0 )
         {
-            int offset = ( abs( turn ) + trg_motor_power ) - 2000;
+            int offset = ( std::abs( turn ) + trg_motor_power ) - 2000;
 
             if( offset < 0 )
             {
@@ -214,7 +228,7 @@ void CThrusters::Update( CCommand& command )
         }
         else
         {
-            int offset = 1000 - ( trg_motor_power - abs( turn ) );
+            int offset = 1000 - ( trg_motor_power - std::abs( turn ) );
 
             if( offset < 0 )
             {
@@ -267,9 +281,9 @@ void CThrusters::Update( CCommand& command )
           //strafe (side motion) is limited to whatever thrust is still available
           //from the vertical thruster range.  If vertical is full power,
           //the strafe will be zero.
-          maxVtransDelta = abs((500.0/abs(port_vertical_motor.m_negativeModifier))*(1.0-abs(trg_lift)));
+          maxVtransDelta = std::abs((500.0/std::abs(port_vertical_motor.m_negativeModifier))*(1.0-std::abs(trg_lift)));
           Serial.print("THR2XV2.mvd:");Serial.print(maxVtransDelta);Serial.println(";");
-          st = constrain( (500.0/abs(port_vertical_motor.m_negativeModifier))*trg_strafe,-maxVtransDelta,maxVtransDelta);
+          st = constrain( (int) ((500.0/std::abs(port_vertical_motor.m_negativeModifier))*trg_strafe),-maxVtransDelta,maxVtransDelta);
           Serial.print("THR2XV2.st:");Serial.print(st);Serial.println(";");
           //Adjust the vertrans thrusters with the ideal translate value
           //if we go the wrong way... switch these.
