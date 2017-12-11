@@ -4,16 +4,16 @@
 
 #include <sys/ioctl.h>
 #include <asm/ioctl.h>
-#include <linux/i2c.h>
-#include <linux/i2c-dev.h>
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include <linux/i2c-dev.h>
+
+using namespace i2c;
 
 #include <wiringPi.h>
 #include <wiringPiI2C.h>
 
-using namespace i2c;
 
 #define ENABLE_I2C_DEBUG 1
 

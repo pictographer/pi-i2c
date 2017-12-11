@@ -10,7 +10,7 @@
 #include <cfloat>
 
 CSocket::CSocket() : buf_len(0), buf_start(0) {
-   begin(); // Might be a bad idea to call begin here, but where?
+   // begin(); // Might be a bad idea to call begin here, but where?
 }
 
 int CSocket::available() {
@@ -59,16 +59,19 @@ void CSocket::begin(int) {
    server_in = server;
 
    if (listen(sockfd, 3) < 0) {
+      puts("listen error");
       perror("Unable to listen on socket. Error");
    }
 
    size_t len = sizeof(struct sockaddr_in);
 
+   puts("Waiting for incoming connections...");
+
    clientfd = accept(sockfd, (struct sockaddr *)&client_in, (socklen_t*)&len);
    if (clientfd < 0) {
       perror("Unable to accept socket connection. Error");
    }
-   printf("Socket server awaiting connections.\n");
+   printf("Socket server connection accepted.\n");
 }
 
 // If data is available in the buffer, update start, update length, and return
