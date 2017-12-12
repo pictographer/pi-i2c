@@ -42,7 +42,7 @@ namespace pca9547
     class PCA9547
     {
         public:
-            PCA9547( I2C* i2cInterfaceIn );
+            PCA9547( I2C* i2cInterfaceIn, uint8_t slaveAddress );
 
             ERetCode DigitalWrite( uint8_t channel );
 

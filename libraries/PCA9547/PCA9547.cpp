@@ -52,5 +52,5 @@ int32_t PCA9547::WriteByte( uint8_t dataIn )
 
 int32_t PCA9547::ReadByte( void )
 {
-	return (int32_t)m_pI2C->ReadByte( m_i2cAddress );
+	return (int32_t) 0; //m_pI2C->ReadByte( m_i2cAddress );
 }
