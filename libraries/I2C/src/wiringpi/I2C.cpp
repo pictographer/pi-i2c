@@ -2,9 +2,11 @@
 
 #include <I2C.h>
 
+#include <fcntl.h>
 #include <sys/ioctl.h>
 #include <asm/ioctl.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <string.h>
 #include <linux/i2c-dev.h>
@@ -26,7 +28,7 @@ using namespace i2c;
 
 I2C::I2C()
 {
-        m_customProperties.m_fileDescriptor = -1;
+        m_customProperties.m_fileDescriptor = open("/dev/i2c-1", O_RDWR);
         m_customProperties.m_issuedTransactionUnsupportedWarning = false;
 }
 
@@ -178,7 +180,6 @@ EI2CResult I2C::WriteRegisterByte( uint8_t slaveAddressIn, uint8_t registerIn, u
                 m_result = StopTransaction();
                 if( m_result ){ return HANDLE_RESULT( m_result ); }
         }
-
         return HANDLE_RESULT( EI2CResult::RESULT_SUCCESS );
 }
 
@@ -205,7 +206,6 @@ EI2CResult I2C::WriteBytes( uint8_t slaveAddressIn, uint8_t *dataIn, uint8_t num
                 m_result = StopTransaction();
                 if( m_result ){ return HANDLE_RESULT( m_result ); }
         }
-
         return HANDLE_RESULT( EI2CResult::RESULT_SUCCESS );
 }
 
@@ -236,7 +236,6 @@ EI2CResult I2C::WriteRegisterBytes( uint8_t slaveAddressIn, uint8_t registerIn, 
                 m_result = StopTransaction();
                 if( m_result ){ return HANDLE_RESULT( m_result ); }
         }
-
         return HANDLE_RESULT( EI2CResult::RESULT_SUCCESS );
 }
 
@@ -255,7 +254,6 @@ EI2CResult I2C::ReadRegisterByte( uint8_t slaveAddressIn, uint8_t registerIn, ui
                 m_result = StopTransaction();
                 if( m_result ){ return HANDLE_RESULT( m_result ); }
         }
-
         return HANDLE_RESULT( EI2CResult::RESULT_SUCCESS );
 }
 
@@ -278,7 +276,6 @@ EI2CResult I2C::ReadRegisterBytes( uint8_t slaveAddressIn, uint8_t registerIn, u
                 m_result = StopTransaction();
                 if( m_result ){ return HANDLE_RESULT( m_result ); }
         }
-
         return HANDLE_RESULT( EI2CResult::RESULT_SUCCESS );
 }
 
