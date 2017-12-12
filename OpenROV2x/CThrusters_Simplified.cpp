@@ -32,17 +32,27 @@ namespace
 
     // motor controller
     // A - port horizontal
+    // 0x72 CH0
     // B - starboard horizontal
+    // 0x72 CH1
     // C - port vertical
+    // 0x72 CH2
     // D - starboard vertical
+    // 0x72 CH3
     // motor enable signals
     // AB enable
+    // 0x72 CH7 then 0x74 PO0 low
     // CD enable
+    // 0x72 CH7 then 0x74 PO3 low
     // motor direction signals
     // A forward/backward (PWM high or low)
+    // 0x72 CH6 then 0x40 LED1 low (forward) high (reverse)
     // B forward/backward (PWM high or low)
+    // 0x72 CH6 then 0x40 LED3 low (forward) high (reverse)
     // C forward/backward (PWM high or low)
+    // 0x72 CH6 then 0x40 LED5 low (forward) high (reverse)
     // D forward/backward (PWM high or low)
+    // 0x72 CH6 then 0x40 LED7 low (forward) high (reverse)
 
     CMotor port_motor( PIN_PORT_MOTOR );
     CMotor port_vertical_motor( PIN_PORT_VERTICAL_MOTOR );
