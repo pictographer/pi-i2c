@@ -55,6 +55,6 @@ void loop()
 
 int main(int, char**) {
    setup();
-   loop();
+   while (1) loop();
    return 0; // not reached
 }
