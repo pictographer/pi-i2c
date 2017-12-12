@@ -39,6 +39,19 @@ namespace pca9547
         NO_CHAN 
     };
 
+    enum PCA9547_SELECT : uint8_t
+    {
+        NO_CHANNEL = 0x00, //
+        CHANNEL_0  = 0x08, //
+        CHANNEL_1  = 0x09, //
+        CHANNEL_2  = 0x0A, //
+        CHANNEL_3  = 0x0B, //
+        CHANNEL_4  = 0x0C, //
+        CHANNEL_5  = 0x0D, //
+        CHANNEL_6  = 0x0E, //
+        CHANNEL_7  = 0x0F, //
+    };
+
     class PCA9547
     {
         public:
@@ -51,19 +64,6 @@ namespace pca9547
 
 
         private:
-
-            enum class PCA9547_REGISTER : uint8_t
-            {
-                NO_CHANNEL = 0x00, //
-                CHANNEL_0  = 0x08, //
-                CHANNEL_1  = 0x09, //
-                CHANNEL_2  = 0x0A, //
-                CHANNEL_3  = 0x0B, //
-                CHANNEL_4  = 0x0C, //
-                CHANNEL_5  = 0x0D, //
-                CHANNEL_6  = 0x0E, //
-                CHANNEL_7  = 0x0F, //
-            };
 
 
             //Private member functions            
