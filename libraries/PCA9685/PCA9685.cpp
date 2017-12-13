@@ -8,6 +8,12 @@
 
 using namespace pca9685;
 
+// map pins to registers
+#define GET_ON_L(pin) static_cast<PCA9685_REGISTER>(static_cast<uint8_t>(PCA9685_REGISTER::LED0_ON_L)+pin)
+#define GET_ON_H(pin) static_cast<PCA9685_REGISTER>(static_cast<uint8_t>(PCA9685_REGISTER::LED0_ON_H)+pin)
+#define GET_OFF_L(pin) static_cast<PCA9685_REGISTER>(static_cast<uint8_t>(PCA9685_REGISTER::LED0_OFF_L)+pin)
+#define GET_OFF_H(pin) static_cast<PCA9685_REGISTER>(static_cast<uint8_t>(PCA9685_REGISTER::LED0_OFF_H)+pin)
+
 PCA9685::PCA9685( I2C* i2cInterfaceIn )
     : m_i2cAddress( pca9685::PCA9685_ADDRESS )
     , m_pI2C( i2cInterfaceIn )
@@ -22,25 +28,132 @@ ERetCode PCA9685::Initialize()
     return ERetCode::SUCCESS;
 }
 
+ERetCode PCA9685::Sleep()
+{
+    auto ret = WriteByte( PCA9685_REGISTER::MODE1, 0x11);
+    if( ret != i2c::EI2CResult::RESULT_SUCCESS )
+    {
+         return ERetCode::FAILED_DIGITAL_WRITE;
+    }
+
+    return ERetCode::SUCCESS;
+}
+
+ERetCode PCA9685::UnSleep()
+{
+    // clear the sleep bit
+    auto ret = WriteByte( PCA9685_REGISTER::MODE1, 0x01);
+    if( ret != i2c::EI2CResult::RESULT_SUCCESS )
+    {
+         return ERetCode::FAILED_DIGITAL_WRITE;
+    }
+
+    // clear the restart bit by writing a one to it
+    ret = WriteByte( PCA9685_REGISTER::MODE1, 0x81);
+    if( ret != i2c::EI2CResult::RESULT_SUCCESS )
+    {
+         return ERetCode::FAILED_DIGITAL_WRITE;
+    }
+
+
+    return ERetCode::SUCCESS;
+}
+
 ERetCode PCA9685::DigitalWrite( uint8_t pin, uint16_t on_value, uint16_t off_value )
 {
-    //Pins 0..7 are r/w capable pins
     if( pin > LED_ALL )
     {
         return ERetCode::FAILED_DIGITAL_WRITE;
     }
 
     //Write it
-    // auto ret = WriteByte( PCA9685_REGISTER::OUTPUT_PORT, m_gpioState);
-    // if( ret != i2c::EI2CResult::RESULT_SUCCESS )
-    // {
-    //     return ERetCode::FAILED_DIGITAL_WRITE;
-    // }
+    auto ret = WriteByte( GET_ON_L(pin), on_value&0xFF);
+    if( ret != i2c::EI2CResult::RESULT_SUCCESS )
+    {
+         return ERetCode::FAILED_DIGITAL_WRITE;
+    }
+    ret = WriteByte( GET_ON_H(pin), (on_value>>8)&0xFF);
+    if( ret != i2c::EI2CResult::RESULT_SUCCESS )
+    {
+         return ERetCode::FAILED_DIGITAL_WRITE;
+    }
+    ret = WriteByte( GET_OFF_L(pin), off_value&0xFF);
+    if( ret != i2c::EI2CResult::RESULT_SUCCESS )
+    {
+         return ERetCode::FAILED_DIGITAL_WRITE;
+    }
+    ret = WriteByte( GET_OFF_H(pin), (off_value>>8)&0xFF);
+    if( ret != i2c::EI2CResult::RESULT_SUCCESS )
+    {
+         return ERetCode::FAILED_DIGITAL_WRITE;
+    }
 
     return ERetCode::SUCCESS;
-
 }
 
+ERetCode PCA9685::DigitalWriteHigh( uint8_t pin )
+{
+    if( pin > LED_ALL )
+    {
+        return ERetCode::FAILED_DIGITAL_WRITE;
+    }
+
+    //Write it
+    auto ret = WriteByte( GET_ON_L(pin), 0x00);
+    if( ret != i2c::EI2CResult::RESULT_SUCCESS )
+    {
+         return ERetCode::FAILED_DIGITAL_WRITE;
+    }
+    ret = WriteByte( GET_ON_H(pin), 0x10);
+    if( ret != i2c::EI2CResult::RESULT_SUCCESS )
+    {
+         return ERetCode::FAILED_DIGITAL_WRITE;
+    }
+    ret = WriteByte( GET_OFF_L(pin), 0x00);
+    if( ret != i2c::EI2CResult::RESULT_SUCCESS )
+    {
+         return ERetCode::FAILED_DIGITAL_WRITE;
+    }
+    ret = WriteByte( GET_OFF_H(pin), 0x00);
+    if( ret != i2c::EI2CResult::RESULT_SUCCESS )
+    {
+         return ERetCode::FAILED_DIGITAL_WRITE;
+    }
+
+    return ERetCode::SUCCESS;
+}
+
+ERetCode PCA9685::DigitalWriteLow( uint8_t pin )
+{
+    if( pin > LED_ALL )
+    {
+        return ERetCode::FAILED_DIGITAL_WRITE;
+    }
+
+    //Write it
+    auto ret = WriteByte( GET_ON_L(pin), 0x00 );
+    if( ret != i2c::EI2CResult::RESULT_SUCCESS )
+    {
+         return ERetCode::FAILED_DIGITAL_WRITE;
+    }
+    ret = WriteByte( GET_ON_H(pin), 0x00);
+    if( ret != i2c::EI2CResult::RESULT_SUCCESS )
+    {
+         return ERetCode::FAILED_DIGITAL_WRITE;
+    }
+    ret = WriteByte( GET_OFF_L(pin), 0x00);
+    if( ret != i2c::EI2CResult::RESULT_SUCCESS )
+    {
+         return ERetCode::FAILED_DIGITAL_WRITE;
+    }
+    ret = WriteByte( GET_OFF_H(pin), 0x10);
+    if( ret != i2c::EI2CResult::RESULT_SUCCESS )
+    {
+         return ERetCode::FAILED_DIGITAL_WRITE;
+    }
+
+    return ERetCode::SUCCESS;
+}
 /***************************************************************************
     PRIVATE FUNCTIONS
  ***************************************************************************/

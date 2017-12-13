@@ -249,6 +249,9 @@ void CThrusters::Update( CCommand& command )
             if( command.m_arguments[1] >= -100 && command.m_arguments[1] <= 100 )
             {
                 trg_throttle = command.m_arguments[1] / 100.0;
+                // adjust throttle here
+                // -backwards +forwards
+                // both vertical motors drive in the same direction
             }
         }
 
@@ -258,8 +261,12 @@ void CThrusters::Update( CCommand& command )
             if( command.m_arguments[1] >= -100 && command.m_arguments[1] <= 100 ) //percent of max turn
             {
                 trg_yaw = command.m_arguments[1] / 100.0;
+                // adjust yaw here
+                // -left +right
+                // drive one vertical motor only
             }
         }
+
 
         // The code below spreads the throttle spectrum over the possible range
         // of the motor. Not sure this belongs here or should be placed with
@@ -319,6 +326,9 @@ void CThrusters::Update( CCommand& command )
       if (command.Equals("lift")){
         if (command.m_arguments[1]>=-100 && command.m_arguments[1]<=100) {
           trg_lift = command.m_arguments[1]/100.0;
+          // drive horizontal motors here
+          // -up +down
+          // drive both motors together in the same direction
 
           //the vertical component of the thrust factor is
           //vThrust = sin(65)*thrust

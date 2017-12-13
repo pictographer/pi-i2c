@@ -26,7 +26,7 @@ namespace pca9685
 
     enum EPin : uint8_t
     {
-        LED_0,
+        LED_0 = 0x00,
         LED_1,
         LED_2,
         LED_3,
@@ -51,13 +51,17 @@ namespace pca9685
             PCA9685( I2C* i2cInterfaceIn );
 
             ERetCode DigitalWrite( uint8_t pin, uint16_t on_value, uint16_t off_value );
+            ERetCode DigitalWriteHigh( uint8_t pin );
+            ERetCode DigitalWriteLow( uint8_t pin );
 
             ERetCode Initialize();
+            ERetCode Sleep();
+            ERetCode UnSleep();
             bool IsInitialized() const { return m_isInitialized; };
 
         private:
 
-            enum class PCA9685_REGISTER : uint8_t
+            enum PCA9685_REGISTER : uint8_t
             {
                 MODE1 = 0x00, //  mode1 register
                 MODE2 = 0x01, //  mode2 register
@@ -141,7 +145,6 @@ namespace pca9685
             int32_t ReadByte( PCA9685_REGISTER addressIn, uint8_t& dataOut );
             int32_t ReadNBytes( PCA9685_REGISTER addressIn, uint8_t* dataOut, uint8_t byteCountIn );
             int32_t WriteByte( PCA9685_REGISTER addressIn, uint8_t dataIn );
-
 
             //Private member attributes
             uint8_t m_i2cAddress;
