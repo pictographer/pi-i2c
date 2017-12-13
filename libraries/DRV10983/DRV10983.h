@@ -67,6 +67,7 @@ namespace drv10983
         ERetCode Cmd_ReadSystemError(uint8_t *error);  //
 
         ERetCode Cmd_SetSpeed( uint16_t speed );
+        ERetCode Cmd_SetConfig( uint8_t *params, uint8_t size );
 
     private:
         // I2C info

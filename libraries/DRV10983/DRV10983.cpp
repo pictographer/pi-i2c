@@ -64,6 +64,17 @@ ERetCode DRV10983::Cmd_SetSpeed(uint16_t speed)
 	return ERetCode::SUCCESS;
 }
 
+ERetCode DRV10983::Cmd_SetConfig( uint8_t *params, uint8_t size ) 
+{
+        uint8_t i = 0;
+        WriteRegisterByte( DRV10983_REGISTER::EECTRL, 0xC0 );
+        for (i = 0; i < size; i++) {
+            WriteRegisterByte( DRV10983_REGISTER::MOTORPARAM1 + i, params[i] );
+        }
+	return ERetCode::SUCCESS;
+}
+
+
 // I2C call wrappers
 i2c::EI2CResult DRV10983::WriteRegisterByte( uint8_t registerIn, uint8_t dataIn )
 {

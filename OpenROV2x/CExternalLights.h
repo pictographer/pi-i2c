@@ -1,6 +1,8 @@
 #pragma once
 
 // Includes
+#include "PCA9539.h"
+#include "PCA9685.h"
 #include "CModule.h"
 #include "CPin.h"
 #include <orutil.h>
@@ -15,6 +17,8 @@ public:
 private:
     orutil::CTimer      m_controlTimer;
     orutil::CTimer      m_telemetryTimer;
+    pca9539::PCA9539   *m_monitors;
+    pca9685::PCA9685   *m_led_pwm;
     CPin        m_pin;
 
     float       m_targetPower = 0.0f;

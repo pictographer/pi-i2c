@@ -39,6 +39,20 @@ const int CThrusters::kMotorCount = 4;
 namespace
 {
 
+    uint8_t params[12] = {
+	0xEA,
+	0xC9,
+	0x2A,
+	0x04,
+	0x40,
+	0xFA,
+	0x1F,
+	0xB0,
+	0x0F,
+	0xA8,
+	0x0E,
+	0x0C
+   };
 
     // motor controller
     // A - port horizontal
@@ -126,12 +140,17 @@ void CThrusters::Initialize()
     // enable the motors
     g_SystemMuxes.SetPath(SCL_MA);
     motor_a->Cmd_SetSpeed(0x0000);
+    motor_a->Cmd_SetConfig(params, sizeof(params));
+    // intialize the motor parameters
     g_SystemMuxes.SetPath(SCL_MB);
     motor_b->Cmd_SetSpeed(0x0000);
+    motor_b->Cmd_SetConfig(params, sizeof(params));
     g_SystemMuxes.SetPath(SCL_MC);
     motor_c->Cmd_SetSpeed(0x0000);
+    motor_c->Cmd_SetConfig(params, sizeof(params));
     g_SystemMuxes.SetPath(SCL_MD);
     motor_d->Cmd_SetSpeed(0x0000);
+    motor_d->Cmd_SetConfig(params, sizeof(params));
     g_SystemMuxes.SetPath(SCL_PWM);
     // get the PWM alive
     motor_signals->UnSleep();
