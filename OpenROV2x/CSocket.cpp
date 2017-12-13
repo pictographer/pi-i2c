@@ -96,7 +96,7 @@ int CSocket::print(long n, CSocket_print_t format) {
    // if there is space available in the buffer.
    char long_buf[std::numeric_limits<long>::digits10 + 1];
    snprintf(long_buf, sizeof long_buf, format == DEC ? "%ld" : "%lx", n);
-   int result = write(clientfd, long_buf, sizeof long_buf);
+   int result = write(clientfd, long_buf, strlen(long_buf));
    if (result < 0) {
       perror("Unable to print long integer. Error");
    }
@@ -115,7 +115,7 @@ int CSocket::print(uint32_t u, CSocket_print_t format) {
    char uint32_buf[std::numeric_limits<uint32_t>::digits10 + 1];
    snprintf(uint32_buf, sizeof uint32_buf,
             format == DEC ? "%" PRIu32 : "%" PRIx32, u);
-   int result = write(clientfd, uint32_buf, sizeof uint32_buf);
+   int result = write(clientfd, uint32_buf, strlen(uint32_buf));
    if (result < 0) {
       perror("Unable to print uint32_t integer. Error");
    }
@@ -152,7 +152,7 @@ int CSocket::print(float f) {
    // Found the answer for doubles. No time to optimize.
    char float_buf[3 + DBL_MANT_DIG - DBL_MIN_EXP + 1];
    snprintf(float_buf, sizeof float_buf, "%f", f);
-   int result = write(clientfd, float_buf, sizeof float_buf);
+   int result = write(clientfd, float_buf, strlen(float_buf));
    if (result < 0) {
       perror("Unable to print float. Error");
    }
