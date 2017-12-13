@@ -8,6 +8,7 @@
 #include "NDataManager.h"
 #include "NCommManager.h"
 #include "NModuleManager.h"
+#include "CMuxes.h"
 
 #if defined( WIRINGPI )
 #include "CSocket.h"
@@ -18,6 +19,11 @@ long map(long x, long in_min, long in_max, long out_min, long out_max)
 }
 #endif
 
+//
+// Make the high level system muxes accessible all over
+//
+CMuxes g_SystemMuxes;
+
 void setup()
 {
         // Initialize main subsystems
@@ -26,6 +32,8 @@ void setup()
         NVehicleManager::Initialize();
         NModuleManager::Initialize();
         NDataManager::Initialize();
+
+        g_SystemMuxes.Initialize();
 
         // Set timer 5 divisor to 8 for PWM frequency of 3921.16Hz (D44, D45, D46)
         // TCCR5B = ( TCCR5B & B11111000 ) | B00000010;

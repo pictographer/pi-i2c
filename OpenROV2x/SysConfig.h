@@ -48,10 +48,10 @@
 #define HAS_ALT_SERVO (0)
 
 // MS5803_14BA Depth Sensor
-#define HAS_MS5803_14BA (1)
+#define HAS_MS5803_14BA (0)
 
 // MS5837_30BA Depth Sensor
-#define HAS_MS5837_30BA (1)
+#define HAS_MS5837_30BA (0)
 
 // MPU9150
 #define HAS_MPU9150 (1)

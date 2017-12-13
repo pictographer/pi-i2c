@@ -24,38 +24,32 @@ namespace pca9539
         UNKNOWN
     };
 
-    enum EPin : uint8_t
-    {
-        LED_0,
-        LED_1,
-        LED_2,
-        LED_3,
-        LED_4
-    };
-
     class PCA9539
     {
         public:
             PCA9539( I2C* i2cInterfaceIn );
 
-            ERetCode DigitalWrite( uint8_t pin, bool value );
-            ERetCode DigitalWriteHex( uint8_t value );
-            ERetCode DigitalWriteDecimal( uint8_t value );
+            ERetCode DigitalWrite( uint8_t pin, uint8_t value );
+            ERetCode PinMode( uint8_t pin, uint16_t mode );
+            ERetCode PinMode( uint16_t mode );
+            ERetCode DigitalWriteHex( uint16_t value );
+            ERetCode DigitalWriteDecimal( uint16_t value );
 
             ERetCode Initialize();
             bool IsInitialized() const { return m_isInitialized; };
-
-            ERetCode PinMode( uint16_t mode );
-            ERetCode PinMode( uint8_t pin, bool mode );
 
         private:
 
             enum class PCA9539_REGISTER : uint8_t
             {
-                INPUT_PORT = 0x00, //Input port registers
-                OUTPUT_PORT = 0x01, //Output port registers
-                POLARITY_INVERSION = 0x02, //Polarity inversion registers
-                CONFIG = 0x03 //Configuration registers
+                INPUT_PORT0 = 0x00, //Input port registers
+                INPUT_PORT1 = 0x01, //Input port registers
+                OUTPUT_PORT0 = 0x02, //Output port registers
+                OUTPUT_PORT1 = 0x03, //Output port registers
+                POLARITY_INVERSION0 = 0x04, //Polarity inversion registers
+                POLARITY_INVERSION1 = 0x05, //Polarity inversion registers
+                CONFIG0 = 0x06, //Configuration registers
+                CONFIG1 = 0x07 //Configuration registers
             };
 
 
@@ -69,8 +63,8 @@ namespace pca9539
             uint8_t m_i2cAddress;
             I2C* m_pI2C;
 
-            uint8_t m_gpioDirection;
-            uint8_t m_gpioState;
+            uint16_t m_gpioDirection;
+            uint16_t m_gpioState;
 
             bool m_isInitialized = false;
 

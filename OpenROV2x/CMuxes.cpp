@@ -4,6 +4,8 @@
 #include "PCA9547.h"
 #include "CMuxes.h"
 
+extern I2C I2C0;
+
 using namespace pca9547;
 
 namespace
@@ -12,9 +14,9 @@ namespace
 
 CMuxes::CMuxes()
 {
-    m_device0 = new pca9547::PCA9547( i2cInterface0, pca9547::PCA9547_0_ADDRESS );
-    m_device1 = new pca9547::PCA9547( i2cInterface1, pca9547::PCA9547_1_ADDRESS );
-    m_device2 = new pca9547::PCA9547( i2cInterface2, pca9547::PCA9547_2_ADDRESS );
+    m_device0 = new pca9547::PCA9547( &I2C0, pca9547::PCA9547_0_ADDRESS );
+    m_device1 = new pca9547::PCA9547( &I2C0, pca9547::PCA9547_1_ADDRESS );
+    m_device2 = new pca9547::PCA9547( &I2C0, pca9547::PCA9547_2_ADDRESS );
 }
 
 void CMuxes::Initialize()

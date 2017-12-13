@@ -3,13 +3,21 @@
 
 // Includes
 #include <cmath>
+#include <I2C.h>
 
 #include "CThrusters.h"
 #include "NVehicleManager.h"
 #include "NDataManager.h"
 #include "CMotor.h"
+#include "CMuxes.h"
 #include <orutil.h>
 #include "CPin.h"
+#include "DRV10983.h"
+#include "PCA9539.h"
+#include "PCA9685.h"
+
+extern CMuxes g_SystemMuxes;
+extern I2C I2C0;
 
 template<class T>
 const T& constrain(const T& x, const T& a, const T& b) {
@@ -32,19 +40,25 @@ namespace
 
     // motor controller
     // A - port horizontal
+    drv10983::DRV10983 *motor_a;
     // 0x72 CH0
     // B - starboard horizontal
+    drv10983::DRV10983 *motor_b;
     // 0x72 CH1
     // C - port vertical
+    drv10983::DRV10983 *motor_c;
     // 0x72 CH2
     // D - starboard vertical
+    drv10983::DRV10983 *motor_d;
     // 0x72 CH3
     // motor enable signals
     // AB enable
+    pca9539::PCA9539  *motor_monitors;
     // 0x72 CH7 then 0x74 PO0 low
     // CD enable
     // 0x72 CH7 then 0x74 PO3 low
     // motor direction signals
+    pca9685::PCA9685 *motor_signals;
     // A forward/backward (PWM high or low)
     // 0x72 CH6 then 0x40 LED1 low (forward) high (reverse)
     // B forward/backward (PWM high or low)
@@ -94,6 +108,19 @@ namespace
 
 void CThrusters::Initialize()
 {
+    motor_a = new drv10983::DRV10983( &I2C0 );
+    motor_b = new drv10983::DRV10983( &I2C0 );
+    motor_c = new drv10983::DRV10983( &I2C0 );
+    motor_d = new drv10983::DRV10983( &I2C0 );
+    motor_monitors = new pca9539::PCA9539( &I2C0 );
+    motor_signals = new pca9685::PCA9685( &I2C0 );
+    // enable the motors
+    // setup the IO expander inputs and output directions
+    g_SystemMuxes.SetPath(SCL_DIO1);
+    motor_monitors->PinMode( 0x1AF6 );
+    motor_monitors->DigitalWrite( 0, LOW );
+    motor_monitors->DigitalWrite( 3, LOW );
+
     port_motor.m_negativeDeadzoneBuffer = NVehicleManager::m_deadZoneMin;
     port_motor.m_positiveDeadzoneBuffer = NVehicleManager::m_deadZoneMax;
     port_motor.Activate();
