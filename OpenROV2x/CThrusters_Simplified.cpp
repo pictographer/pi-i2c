@@ -19,6 +19,8 @@
 extern CMuxes g_SystemMuxes;
 extern I2C I2C0;
 
+#define SCALE_SPEED(speed) ((std::abs(speed)*0x1FF)/100)
+
 template<class T>
 const T& constrain(const T& x, const T& a, const T& b) {
     if(x < a) {
@@ -87,6 +89,7 @@ namespace
     int st;
 
     float trg_throttle,trg_yaw,trg_lift,trg_strafe;
+    float p_trg_throttle = 0.0, p_trg_yaw = 0.0, p_trg_lift = 0.0, p_trg_strafe = 0.0;
     int trg_motor_power;
     int maxVtransDelta;
 
@@ -114,12 +117,21 @@ void CThrusters::Initialize()
     motor_d = new drv10983::DRV10983( &I2C0 );
     motor_monitors = new pca9539::PCA9539( &I2C0 );
     motor_signals = new pca9685::PCA9685( &I2C0 );
-    // enable the motors
     // setup the IO expander inputs and output directions
+    // and power the motor controllers
     g_SystemMuxes.SetPath(SCL_DIO1);
     motor_monitors->PinMode( 0x1AF6 );
     motor_monitors->DigitalWrite( 0, LOW );
     motor_monitors->DigitalWrite( 3, LOW );
+    // enable the motors
+    g_SystemMuxes.SetPath(SCL_MA);
+    motor_a->Cmd_SetSpeed(0x0000);
+    g_SystemMuxes.SetPath(SCL_MB);
+    motor_b->Cmd_SetSpeed(0x0000);
+    g_SystemMuxes.SetPath(SCL_MC);
+    motor_c->Cmd_SetSpeed(0x0000);
+    g_SystemMuxes.SetPath(SCL_MD);
+    motor_d->Cmd_SetSpeed(0x0000);
     g_SystemMuxes.SetPath(SCL_PWM);
     // get the PWM alive
     motor_signals->UnSleep();
@@ -256,10 +268,38 @@ void CThrusters::Update( CCommand& command )
         {
             if( command.m_arguments[1] >= -100 && command.m_arguments[1] <= 100 )
             {
-                trg_throttle = command.m_arguments[1] / 100.0;
+                trg_throttle = command.m_arguments[1] / 1.0;
                 // adjust throttle here
+                // direction change
+                if ((p_trg_throttle < 0.0) && (trg_throttle > 0.0)) {
+                   g_SystemMuxes.SetPath(SCL_MA);
+                   motor_a->Cmd_SetSpeed(0x0000);
+                   g_SystemMuxes.SetPath(SCL_MB);
+                   motor_b->Cmd_SetSpeed(0x0000);
+                } else {
+                   if ((trg_throttle < 0.0) && (p_trg_throttle > 0.0)) {
+                      g_SystemMuxes.SetPath(SCL_MA);
+                      motor_a->Cmd_SetSpeed(0x0000);
+                      g_SystemMuxes.SetPath(SCL_MB);
+                      motor_b->Cmd_SetSpeed(0x0000);
+                   }
+                }
+                if (trg_throttle >= 0.0) {
+                   g_SystemMuxes.SetPath(SCL_PWM);
+                   motor_signals->DigitalWriteHigh(pca9685::LED_1);
+                   motor_signals->DigitalWriteHigh(pca9685::LED_3);
+                } else {
+                   g_SystemMuxes.SetPath(SCL_PWM);
+                   motor_signals->DigitalWriteLow(pca9685::LED_1);
+                   motor_signals->DigitalWriteLow(pca9685::LED_3);
+                }
                 // -backwards +forwards
+                g_SystemMuxes.SetPath(SCL_MA);
+                motor_a->Cmd_SetSpeed(SCALE_SPEED(trg_throttle));
+                g_SystemMuxes.SetPath(SCL_MB);
+                motor_b->Cmd_SetSpeed(SCALE_SPEED(trg_throttle));
                 // both vertical motors drive in the same direction
+                p_trg_throttle = trg_throttle;
             }
         }
 
@@ -268,9 +308,40 @@ void CThrusters::Update( CCommand& command )
             //ignore corrupt data
             if( command.m_arguments[1] >= -100 && command.m_arguments[1] <= 100 ) //percent of max turn
             {
-                trg_yaw = command.m_arguments[1] / 100.0;
+                trg_yaw = command.m_arguments[1] / 1.0;
+                if ((p_trg_yaw < 0.0) && (trg_yaw > 0.0)) {
+                   // direction change
+                   g_SystemMuxes.SetPath(SCL_MA);
+                   motor_a->Cmd_SetSpeed(0x0000);
+                   g_SystemMuxes.SetPath(SCL_MB);
+                   motor_b->Cmd_SetSpeed(0x0000);
+                } else {
+                   if ((trg_yaw < 0.0) && (p_trg_yaw > 0.0)) {
+                      g_SystemMuxes.SetPath(SCL_MA);
+                      motor_a->Cmd_SetSpeed(0x0000);
+                      g_SystemMuxes.SetPath(SCL_MB);
+                      motor_b->Cmd_SetSpeed(0x0000);
+                   }
+                }
                 // adjust yaw here
                 // -left +right
+                if (trg_yaw >= 0.0) {
+                   g_SystemMuxes.SetPath(SCL_PWM);
+                   motor_signals->DigitalWriteHigh(pca9685::LED_1);
+                   motor_signals->DigitalWriteLow(pca9685::LED_3);
+                   g_SystemMuxes.SetPath(SCL_MA);
+                   motor_a->Cmd_SetSpeed(SCALE_SPEED(trg_yaw));
+                   g_SystemMuxes.SetPath(SCL_MB);
+                   motor_b->Cmd_SetSpeed(0x0000);
+                } else {
+                   g_SystemMuxes.SetPath(SCL_PWM);
+                   motor_signals->DigitalWriteLow(pca9685::LED_1);
+                   motor_signals->DigitalWriteHigh(pca9685::LED_3);
+                   g_SystemMuxes.SetPath(SCL_MA);
+                   motor_a->Cmd_SetSpeed(0x0000);
+                   g_SystemMuxes.SetPath(SCL_MB);
+                   motor_b->Cmd_SetSpeed(SCALE_SPEED(trg_yaw));
+                }
                 // drive one vertical motor only
             }
         }
@@ -320,22 +391,54 @@ void CThrusters::Update( CCommand& command )
         }
 
     }
-
+#if 0
     else if( command.Equals( "lift" ) )
     {
         if( command.m_arguments[1] >= -100 && command.m_arguments[1] <= 100 )
         {
-            trg_lift = command.m_arguments[1] / 100.0;
+            trg_lift = command.m_arguments[1] / 1.0;
             vp = 1500 + 500 * trg_lift;
             vs = vp;
         }
     }
+#endif
     else if (command.Equals("lift") || command.Equals("strafe")  ){
       if (command.Equals("lift")){
         if (command.m_arguments[1]>=-100 && command.m_arguments[1]<=100) {
-          trg_lift = command.m_arguments[1]/100.0;
+          trg_lift = command.m_arguments[1]/1.0;
           // drive horizontal motors here
+          if ((p_trg_lift < 0.0) && (trg_lift > 0.0)) {
+              // direction change
+              g_SystemMuxes.SetPath(SCL_MC);
+              motor_c->Cmd_SetSpeed(0x0000);
+              g_SystemMuxes.SetPath(SCL_MD);
+              motor_d->Cmd_SetSpeed(0x0000);
+          } else {
+              if ((trg_lift < 0.0) && (p_trg_lift > 0.0)) {
+                  g_SystemMuxes.SetPath(SCL_MC);
+                  motor_c->Cmd_SetSpeed(0x0000);
+                  g_SystemMuxes.SetPath(SCL_MD);
+                  motor_d->Cmd_SetSpeed(0x0000);
+              }
+          }
           // -up +down
+          if (trg_lift >= 0.0) {
+              g_SystemMuxes.SetPath(SCL_PWM);
+              motor_signals->DigitalWriteHigh(pca9685::LED_5);
+              motor_signals->DigitalWriteHigh(pca9685::LED_7);
+              g_SystemMuxes.SetPath(SCL_MC);
+              motor_c->Cmd_SetSpeed(SCALE_SPEED(trg_lift));
+              g_SystemMuxes.SetPath(SCL_MD);
+              motor_d->Cmd_SetSpeed(SCALE_SPEED(trg_lift));
+          } else {
+              g_SystemMuxes.SetPath(SCL_PWM);
+              motor_signals->DigitalWriteLow(pca9685::LED_5);
+              motor_signals->DigitalWriteLow(pca9685::LED_7);
+              g_SystemMuxes.SetPath(SCL_MC);
+              motor_c->Cmd_SetSpeed(SCALE_SPEED(trg_lift));
+              g_SystemMuxes.SetPath(SCL_MD);
+              motor_d->Cmd_SetSpeed(SCALE_SPEED(trg_lift));
+          }
           // drive both motors together in the same direction
 
           //the vertical component of the thrust factor is
@@ -360,7 +463,43 @@ void CThrusters::Update( CCommand& command )
 
       else if (command.Equals("strafe")){
         if (command.m_arguments[1]>=-100 && command.m_arguments[1]<=100) {
-          trg_strafe = command.m_arguments[1]/100.0;
+          trg_strafe = command.m_arguments[1]/1.0;
+          // drive horizontal motors here
+          if ((p_trg_strafe < 0.0) && (trg_strafe > 0.0)) {
+              // direction change
+              g_SystemMuxes.SetPath(SCL_MC);
+              motor_c->Cmd_SetSpeed(0x0000);
+              g_SystemMuxes.SetPath(SCL_MD);
+              motor_d->Cmd_SetSpeed(0x0000);
+          } else {
+              if ((trg_strafe < 0.0) && (p_trg_strafe > 0.0)) {
+                  g_SystemMuxes.SetPath(SCL_MC);
+                  motor_c->Cmd_SetSpeed(0x0000);
+                  g_SystemMuxes.SetPath(SCL_MD);
+                  motor_d->Cmd_SetSpeed(0x0000);
+              }
+          }
+          // -up +down
+          // one motor drives the other is off
+          if (trg_strafe >= 0.0) {
+              g_SystemMuxes.SetPath(SCL_PWM);
+              motor_signals->DigitalWriteHigh(pca9685::LED_5);
+              motor_signals->DigitalWriteLow(pca9685::LED_7);
+              g_SystemMuxes.SetPath(SCL_MC);
+              motor_c->Cmd_SetSpeed(SCALE_SPEED(trg_strafe));
+              g_SystemMuxes.SetPath(SCL_MD);
+              motor_d->Cmd_SetSpeed(0x0000);
+          } else {
+              g_SystemMuxes.SetPath(SCL_PWM);
+              motor_signals->DigitalWriteLow(pca9685::LED_5);
+              motor_signals->DigitalWriteHigh(pca9685::LED_7);
+              g_SystemMuxes.SetPath(SCL_MC);
+              motor_c->Cmd_SetSpeed(0x0000);
+              g_SystemMuxes.SetPath(SCL_MD);
+              motor_d->Cmd_SetSpeed(SCALE_SPEED(trg_strafe));
+          }
+          p_trg_strafe = trg_strafe;
+
           //strafe (side motion) is limited to whatever thrust is still available
           //from the vertical thruster range.  If vertical is full power,
           //the strafe will be zero.

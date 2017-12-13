@@ -58,6 +58,9 @@ ERetCode DRV10983::Cmd_ReadSystemError(uint8_t *error)
 
 ERetCode DRV10983::Cmd_SetSpeed(uint16_t speed)
 {
+        WriteRegisterByte( DRV10983_REGISTER::SPEEDCTRL1, speed&0xFF );
+        WriteRegisterByte( DRV10983_REGISTER::SPEEDCTRL2, ((0x80)|(speed>>8)&0x01) );
+      
 	return ERetCode::SUCCESS;
 }
 
