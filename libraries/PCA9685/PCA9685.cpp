@@ -9,10 +9,10 @@
 using namespace pca9685;
 
 // map pins to registers
-#define GET_ON_L(pin) static_cast<PCA9685_REGISTER>(static_cast<uint8_t>(PCA9685_REGISTER::LED0_ON_L)+pin)
-#define GET_ON_H(pin) static_cast<PCA9685_REGISTER>(static_cast<uint8_t>(PCA9685_REGISTER::LED0_ON_H)+pin)
-#define GET_OFF_L(pin) static_cast<PCA9685_REGISTER>(static_cast<uint8_t>(PCA9685_REGISTER::LED0_OFF_L)+pin)
-#define GET_OFF_H(pin) static_cast<PCA9685_REGISTER>(static_cast<uint8_t>(PCA9685_REGISTER::LED0_OFF_H)+pin)
+#define GET_ON_L(pin) static_cast<PCA9685_REGISTER>(static_cast<uint8_t>(PCA9685_REGISTER::LED0_ON_L)+(pin*4))
+#define GET_ON_H(pin) static_cast<PCA9685_REGISTER>(static_cast<uint8_t>(PCA9685_REGISTER::LED0_ON_H)+(pin*4))
+#define GET_OFF_L(pin) static_cast<PCA9685_REGISTER>(static_cast<uint8_t>(PCA9685_REGISTER::LED0_OFF_L)+(pin*4))
+#define GET_OFF_H(pin) static_cast<PCA9685_REGISTER>(static_cast<uint8_t>(PCA9685_REGISTER::LED0_OFF_H)+(pin*4))
 
 PCA9685::PCA9685( I2C* i2cInterfaceIn )
     : m_i2cAddress( pca9685::PCA9685_ADDRESS )

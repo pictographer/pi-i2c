@@ -120,6 +120,14 @@ void CThrusters::Initialize()
     motor_monitors->PinMode( 0x1AF6 );
     motor_monitors->DigitalWrite( 0, LOW );
     motor_monitors->DigitalWrite( 3, LOW );
+    g_SystemMuxes.SetPath(SCL_PWM);
+    // get the PWM alive
+    motor_signals->UnSleep();
+    // initialize all directions LOW (forward)
+    motor_signals->DigitalWriteLow(pca9685::LED_1);
+    motor_signals->DigitalWriteLow(pca9685::LED_3);
+    motor_signals->DigitalWriteLow(pca9685::LED_5);
+    motor_signals->DigitalWriteLow(pca9685::LED_7);
 
     port_motor.m_negativeDeadzoneBuffer = NVehicleManager::m_deadZoneMin;
     port_motor.m_positiveDeadzoneBuffer = NVehicleManager::m_deadZoneMax;
