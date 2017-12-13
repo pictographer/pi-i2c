@@ -167,12 +167,8 @@ EI2CResult I2C::WriteRegisterByte( uint8_t slaveAddressIn, uint8_t registerIn, u
         }
 
         // Write Register Address
-        int result = wiringPiI2CWrite( m_customProperties.m_fileDescriptor, registerIn );
+        int result = wiringPiI2CWriteReg8( m_customProperties.m_fileDescriptor, registerIn, dataIn );
         if( result ){ return HANDLE_RESULT( m_result ); }
-
-        // Write Data byte
-        result = wiringPiI2CWrite( m_customProperties.m_fileDescriptor, dataIn );
-        if( result ){ return HANDLE_RESULT( EI2CResult::RESULT_ERR_FAILED ); }
 
         // Send stop, if requested
         if( !issueRepeatedStart )

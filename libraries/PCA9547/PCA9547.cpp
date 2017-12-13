@@ -26,7 +26,7 @@ ERetCode PCA9547::Initialize()
 ERetCode PCA9547::DigitalWrite( uint8_t channel )
 {
     //Pins 0..7 are r/w capable pins
-    if( channel > NO_CHAN )
+    if( channel > CHANNEL_7 )
     {
         return ERetCode::FAILED_DIGITAL_WRITE;
     }

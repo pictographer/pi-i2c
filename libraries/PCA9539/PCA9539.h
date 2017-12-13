@@ -12,7 +12,7 @@
 namespace pca9539
 {
     //Unshifted 7-bit I2C address for device
-    const uint8_t PCA9539_ADDRESS = 0x70; //b1110000
+    const uint8_t PCA9539_ADDRESS = 0x74; //b1110100
 
     enum ERetCode : int32_t
     {
