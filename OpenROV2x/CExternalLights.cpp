@@ -109,13 +109,13 @@ void CExternalLights::Update( CCommand& commandIn )
                         // range 0-255 m_targetPower
                         // for now, all lights are driven together
                         // top
-                        m_led_pwm->DigitalWrite(pca9685::LED_10, ON_TIME(m_targetPower), OFF_TIME(m_targetPower));
+                        m_led_pwm->DigitalWrite(pca9685::LED_10, ON_TIME(m_currentPower_an), OFF_TIME(m_currentPower_an));
                         // front
-                        m_led_pwm->DigitalWrite(pca9685::LED_11, ON_TIME(m_targetPower), OFF_TIME(m_targetPower));
+                        m_led_pwm->DigitalWrite(pca9685::LED_11, ON_TIME(m_currentPower_an), OFF_TIME(m_currentPower_an));
                         // bottom
-                        m_led_pwm->DigitalWrite(pca9685::LED_12, ON_TIME(m_targetPower), OFF_TIME(m_targetPower));
+                        m_led_pwm->DigitalWrite(pca9685::LED_12, ON_TIME(m_currentPower_an), OFF_TIME(m_currentPower_an));
                         // side
-                        m_led_pwm->DigitalWrite(pca9685::LED_13, ON_TIME(m_targetPower), OFF_TIME(m_targetPower));
+                        m_led_pwm->DigitalWrite(pca9685::LED_13, ON_TIME(m_currentPower_an), OFF_TIME(m_currentPower_an));
 
 			// Emit current power
 			Serial.print( F( "elights_pow:" ) );
