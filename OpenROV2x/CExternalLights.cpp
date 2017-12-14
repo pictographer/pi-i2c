@@ -11,6 +11,11 @@
 extern CMuxes g_SystemMuxes;
 extern I2C I2C0;
 
+// delay to OFF time
+#define OFF_TIME( value ) ((4095/255)*value)
+// delay to ON time
+#define ON_TIME( value )  ((4095/255)*(255-value))
+
 namespace
 {
 	// 1% per 10ms
@@ -45,7 +50,7 @@ CExternalLights::CExternalLights( uint32_t pinIn )
 void CExternalLights::Initialize()
 {
     // enable power to LEDs
-    g_SystemMuxes.SetPath(SCL_CHG);
+    g_SystemMuxes.SetPath(SCL_DIO2);
     m_monitors->PinMode( 0xFF00 );
     m_monitors->DigitalWrite( 0, LOW );
     // get the PWM ready
@@ -102,6 +107,15 @@ void CExternalLights::Update( CCommand& commandIn )
 			// m_pin.Write( m_currentPower_an );
                         g_SystemMuxes.SetPath(SCL_PWM);
                         // range 0-255 m_targetPower
+                        // for now, all lights are driven together
+                        // top
+                        m_led_pwm->DigitalWrite(pca9685::LED_10, ON_TIME(m_targetPower), OFF_TIME(m_targetPower));
+                        // front
+                        m_led_pwm->DigitalWrite(pca9685::LED_11, ON_TIME(m_targetPower), OFF_TIME(m_targetPower));
+                        // bottom
+                        m_led_pwm->DigitalWrite(pca9685::LED_12, ON_TIME(m_targetPower), OFF_TIME(m_targetPower));
+                        // side
+                        m_led_pwm->DigitalWrite(pca9685::LED_13, ON_TIME(m_targetPower), OFF_TIME(m_targetPower));
 
 			// Emit current power
 			Serial.print( F( "elights_pow:" ) );

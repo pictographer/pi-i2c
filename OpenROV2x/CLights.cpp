@@ -3,8 +3,13 @@
 
 // Includes
 #include <Arduino.h>
+#include <wiringPi.h>
 #include "CLights.h"
+#include "CMuxes.h"
 #include "NCommManager.h"
+
+extern I2C I2C0;
+extern CMuxes g_SystemMuxes;
 
 namespace
 {
@@ -37,19 +42,22 @@ namespace
 }
 
 CLights::CLights( uint32_t pinIn )
-	: m_pin( pinIn, CPin::kAnalog, CPin::kOutput )
+	: m_pin( pinIn, CPin::kDigital, CPin::kOutput )
 {
+    m_power = new pca9539::PCA9539( &I2C0 );
 }
 
 void CLights::Initialize()
 {
-	// Reset pin
-	m_pin.Reset();
-	m_pin.Write( 0 );
+   // Reset pin
+   m_pin.Reset();
+   m_pin.Write( 0 );
 
-	// Reset timers
-    m_controlTimer.Reset();
-    m_telemetryTimer.Reset();
+   m_power->PinMode(0xFF00);
+
+   // Reset timers
+   m_controlTimer.Reset();
+   m_telemetryTimer.Reset();
 }
 
 void CLights::Update( CCommand& commandIn )
@@ -86,13 +94,26 @@ void CLights::Update( CCommand& commandIn )
 		m_currentPower_an 	= m_targetPower_an;
 
 		// Write the power value to the pin
-		m_pin.Write( m_currentPower_an );
+		// m_pin.Write( m_currentPower_an );
+                if (m_targetPower > 0) {
+                    // Go through power disarm sequence
+                    // SCL_DIO2
+                    g_SystemMuxes.SetPath(SCL_DIO2);
+                    // CH1 write 0 - write 1 - wait 1 second - write 0
+                    m_power->DigitalWrite(1, 0x00);
+                    m_power->DigitalWrite(1, 0x01);
+                    delay(1000);
+                    m_power->DigitalWrite(1, 0x00);
+	            m_pin.Write( 1 );
+                }
+
 
 		// Emit current power
 		Serial.print( F( "lights_pow:" ) );
 		Serial.print( orutil::Encode1K( m_currentPower ) );
 		Serial.print( ';' );
 	}
+#if 0
 	else if( commandIn.Equals( "wake" ) )
     {
         // Set greeting state to true and reset timer
@@ -132,6 +153,8 @@ void CLights::Update( CCommand& commandIn )
 		   }
         }
     }
+#endif
+
 }
 
 #endif

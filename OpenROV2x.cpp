@@ -11,6 +11,7 @@
 #include "CMuxes.h"
 
 #if defined( WIRINGPI )
+#include <wiringPi.h>
 #include "CSocket.h"
 CSocket Serial;
 long map(long x, long in_min, long in_max, long out_min, long out_max)
@@ -34,6 +35,7 @@ void setup()
         NDataManager::Initialize();
 
         g_SystemMuxes.Initialize();
+        wiringPiSetup();
 
         // Set timer 5 divisor to 8 for PWM frequency of 3921.16Hz (D44, D45, D46)
         // TCCR5B = ( TCCR5B & B11111000 ) | B00000010;

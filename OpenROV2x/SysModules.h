@@ -18,6 +18,7 @@
 CControllerBoard m_controllerBoard;
 #endif
 
+// this is repurposed for power
 #if(HAS_STD_LIGHTS)
 #include "CLights.h"
 CLights m_lights( PIN_STANDARD_LIGHTS );
