@@ -305,11 +305,11 @@ void CThrusters::Update( CCommand& command )
                 }
                 if (trg_throttle >= 0.0) {
                    g_SystemMuxes.SetPath(SCL_PWM);
-                   motor_signals->DigitalWriteHigh(pca9685::LED_1);
+                   motor_signals->DigitalWriteLow(pca9685::LED_1);
                    motor_signals->DigitalWriteHigh(pca9685::LED_3);
                 } else {
                    g_SystemMuxes.SetPath(SCL_PWM);
-                   motor_signals->DigitalWriteLow(pca9685::LED_1);
+                   motor_signals->DigitalWriteHigh(pca9685::LED_1);
                    motor_signals->DigitalWriteLow(pca9685::LED_3);
                 }
                 // -backwards +forwards
@@ -443,7 +443,7 @@ void CThrusters::Update( CCommand& command )
           // -up +down
           if (trg_lift >= 0.0) {
               g_SystemMuxes.SetPath(SCL_PWM);
-              motor_signals->DigitalWriteHigh(pca9685::LED_5);
+              motor_signals->DigitalWriteLow(pca9685::LED_5);
               motor_signals->DigitalWriteHigh(pca9685::LED_7);
               g_SystemMuxes.SetPath(SCL_MC);
               motor_c->Cmd_SetSpeed(SCALE_SPEED(trg_lift));
@@ -451,7 +451,7 @@ void CThrusters::Update( CCommand& command )
               motor_d->Cmd_SetSpeed(SCALE_SPEED(trg_lift));
           } else {
               g_SystemMuxes.SetPath(SCL_PWM);
-              motor_signals->DigitalWriteLow(pca9685::LED_5);
+              motor_signals->DigitalWriteHigh(pca9685::LED_5);
               motor_signals->DigitalWriteLow(pca9685::LED_7);
               g_SystemMuxes.SetPath(SCL_MC);
               motor_c->Cmd_SetSpeed(SCALE_SPEED(trg_lift));
