@@ -1,18 +1,24 @@
 // Includes
+#include <I2C.h>
 #include "NVehicleManager.h"
 #include "NCommManager.h"
 #include "CCommand.h"
 #include "CompileOptions.h"
+#include "CMuxes.h"
 
 #if !defined( ARDUINO_ARCH_AVR )
 #include "CSocket.h"
 #endif
+
+extern CMuxes g_SystemMuxes;
+extern I2C I2C0;
 
 namespace NVehicleManager
 {
         // ---------------------------------------------------------
         // Variable initialization
         // ---------------------------------------------------------
+        pca9539::PCA9539  *m_power;
 
         // TODO: Move
         uint32_t m_throttleSmoothingIncrement   = 40;
@@ -25,6 +31,17 @@ namespace NVehicleManager
 
         void Initialize()
         {
+            m_power = new pca9539::PCA9539( &I2C0 );
+            // Power System Arm
+            // '9539 low -> high (1 second) -> low
+            g_SystemMuxes.SetPath(SCL_DIO2);
+            m_power->PinMode(0xFF00);
+            m_power->DigitalWrite(2, 0x00);
+            delay(1000);
+            m_power->DigitalWrite(2, 0x01);
+            delay(1000);
+            m_power->DigitalWrite(2, 0x00);
+
         }
 
         void HandleMessages( CCommand &commandIn )
