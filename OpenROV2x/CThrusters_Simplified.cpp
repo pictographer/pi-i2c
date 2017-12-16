@@ -38,15 +38,15 @@ const int CThrusters::kMotorCount = 4;
 
 namespace
 {
-
+    // source: nsr1215_2.csv
     uint8_t params[12] = {
 	0xEA,
 	0xC9,
 	0x2A,
 	0x04,
-	0x40,
+	0xC0,
 	0xFA,
-	0x1F,
+	0x16,
 	0xB0,
 	0x0F,
 	0xA8,
@@ -137,6 +137,7 @@ void CThrusters::Initialize()
     motor_monitors->PinMode( 0x1AF6 );
     motor_monitors->DigitalWrite( 0, LOW );
     motor_monitors->DigitalWrite( 3, LOW );
+    delay(1000);
     // enable the motors
     g_SystemMuxes.SetPath(SCL_MA);
     motor_a->Cmd_SetSpeed(0x0000);
@@ -347,21 +348,21 @@ void CThrusters::Update( CCommand& command )
                 if (trg_yaw >= 0.0) {
                    g_SystemMuxes.SetPath(SCL_PWM);
                    motor_signals->DigitalWriteHigh(pca9685::LED_1);
+                   motor_signals->DigitalWriteHigh(pca9685::LED_3);
+                   g_SystemMuxes.SetPath(SCL_MA);
+                   motor_a->Cmd_SetSpeed(SCALE_SPEED(trg_yaw));
+                   g_SystemMuxes.SetPath(SCL_MB);
+                   motor_b->Cmd_SetSpeed(SCALE_SPEED(trg_yaw));
+                } else {
+                   g_SystemMuxes.SetPath(SCL_PWM);
+                   motor_signals->DigitalWriteLow(pca9685::LED_1);
                    motor_signals->DigitalWriteLow(pca9685::LED_3);
                    g_SystemMuxes.SetPath(SCL_MA);
                    motor_a->Cmd_SetSpeed(SCALE_SPEED(trg_yaw));
                    g_SystemMuxes.SetPath(SCL_MB);
-                   motor_b->Cmd_SetSpeed(0x0000);
-                } else {
-                   g_SystemMuxes.SetPath(SCL_PWM);
-                   motor_signals->DigitalWriteLow(pca9685::LED_1);
-                   motor_signals->DigitalWriteHigh(pca9685::LED_3);
-                   g_SystemMuxes.SetPath(SCL_MA);
-                   motor_a->Cmd_SetSpeed(0x0000);
-                   g_SystemMuxes.SetPath(SCL_MB);
                    motor_b->Cmd_SetSpeed(SCALE_SPEED(trg_yaw));
                 }
-                // drive one vertical motor only
+                p_trg_yaw = trg_yaw;
             }
         }
 
@@ -459,6 +460,7 @@ void CThrusters::Update( CCommand& command )
               motor_d->Cmd_SetSpeed(SCALE_SPEED(trg_lift));
           }
           // drive both motors together in the same direction
+          p_trg_lift = trg_lift;
 
           //the vertical component of the thrust factor is
           //vThrust = sin(65)*thrust
@@ -503,17 +505,17 @@ void CThrusters::Update( CCommand& command )
           if (trg_strafe >= 0.0) {
               g_SystemMuxes.SetPath(SCL_PWM);
               motor_signals->DigitalWriteHigh(pca9685::LED_5);
-              motor_signals->DigitalWriteLow(pca9685::LED_7);
+              motor_signals->DigitalWriteHigh(pca9685::LED_7);
               g_SystemMuxes.SetPath(SCL_MC);
               motor_c->Cmd_SetSpeed(SCALE_SPEED(trg_strafe));
               g_SystemMuxes.SetPath(SCL_MD);
-              motor_d->Cmd_SetSpeed(0x0000);
+              motor_d->Cmd_SetSpeed(SCALE_SPEED(trg_strafe));
           } else {
               g_SystemMuxes.SetPath(SCL_PWM);
               motor_signals->DigitalWriteLow(pca9685::LED_5);
-              motor_signals->DigitalWriteHigh(pca9685::LED_7);
+              motor_signals->DigitalWriteLow(pca9685::LED_7);
               g_SystemMuxes.SetPath(SCL_MC);
-              motor_c->Cmd_SetSpeed(0x0000);
+              motor_c->Cmd_SetSpeed(SCALE_SPEED(trg_strafe));
               g_SystemMuxes.SetPath(SCL_MD);
               motor_d->Cmd_SetSpeed(SCALE_SPEED(trg_strafe));
           }
