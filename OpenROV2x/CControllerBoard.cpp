@@ -29,8 +29,6 @@ namespace
 
         float celsiusTempRead;
 
-        CPin i2cpower( PIN_ENABLE_I2C, CPin::kDigital, CPin::kOutput );
-
         float mapf( long x, long in_min, long in_max, long out_min, long out_max )
         {
                 return ( float )( x - in_min ) * ( out_max - out_min ) / ( float )( in_max - in_min ) + out_min;
@@ -97,11 +95,6 @@ void CControllerBoard::Initialize()
         time.Reset();
         statustime2.Reset();
         onesecondtimer.Reset();
-
-        i2cpower.Reset();
-        i2cpower.Write( 0 );
-        delay( 10 );
-        i2cpower.Write( 1 );
 
         // Initialize all the readings to 0:
         for( int thisReading = 0; thisReading < numReadings; ++thisReading )

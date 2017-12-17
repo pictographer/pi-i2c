@@ -4,7 +4,6 @@
 #include "CModule.h"
 #include "CPin.h"
 #include <orutil.h>
-#include "PCA9539.h"
 
 class CLights : public CModule
 {
@@ -18,7 +17,6 @@ private:
     orutil::CTimer      m_telemetryTimer;
     CPin        m_pin;
 
-    pca9539::PCA9539   *m_power;
     float       m_targetPower = 0.0f;
     float       m_currentPower = 0.0f;
 

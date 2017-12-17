@@ -15,6 +15,7 @@ namespace
 
 CMuxes::CMuxes()
 {
+    m_Initialized = 0;
     m_device0 = new pca9547::PCA9547( &I2C0, pca9547::PCA9547_0_ADDRESS );
     m_device1 = new pca9547::PCA9547( &I2C0, pca9547::PCA9547_1_ADDRESS );
     m_device2 = new pca9547::PCA9547( &I2C0, pca9547::PCA9547_2_ADDRESS );
@@ -24,26 +25,29 @@ CMuxes::CMuxes()
 
 void CMuxes::Initialize()
 {
-    m_device0->Initialize();
-    m_device1->Initialize();
-    m_device2->Initialize();
-    SetPath(SCL_DIO1);
-    m_dio1->PinMode(0xEAF6);
-    m_dio1->DigitalWrite(0,0x01);
-    m_dio1->DigitalWrite(3,0x01);
-    m_dio1->DigitalWrite(8,0x01);
-    m_dio1->DigitalWrite(10,0x01);
-    m_dio1->DigitalWrite(12,0x01);
-    SetPath(SCL_DIO2);
-    m_dio2->PinMode(0xFF00);
-    m_dio2->DigitalWrite(0,0x01);
-    m_dio2->DigitalWrite(1,0x00);
-    m_dio2->DigitalWrite(2,0x00);
-    m_dio2->DigitalWrite(3,0x00);
-    m_dio2->DigitalWrite(4,0x00);
-    m_dio2->DigitalWrite(5,0x00);
-    m_dio2->DigitalWrite(6,0x00);
-    m_dio2->DigitalWrite(7,0x00);
+    if (m_Initialized == 0) {
+        m_device0->Initialize();
+        m_device1->Initialize();
+        m_device2->Initialize();
+        SetPath(SCL_DIO1);
+        m_dio1->PinMode(0xEAF6);
+        m_dio1->DigitalWrite(0,0x01);
+        m_dio1->DigitalWrite(3,0x01);
+        m_dio1->DigitalWrite(8,0x01);
+        m_dio1->DigitalWrite(10,0x01);
+        m_dio1->DigitalWrite(12,0x01);
+        SetPath(SCL_DIO2);
+        m_dio2->PinMode(0xFF00);
+        m_dio2->DigitalWrite(0,0x01);
+        m_dio2->DigitalWrite(1,0x00);
+        m_dio2->DigitalWrite(2,0x00);
+        m_dio2->DigitalWrite(3,0x00);
+        m_dio2->DigitalWrite(4,0x00);
+        m_dio2->DigitalWrite(5,0x00);
+        m_dio2->DigitalWrite(6,0x00);
+        m_dio2->DigitalWrite(7,0x00);
+        m_Initialized = 1;
+    }
 }
 
 void CMuxes::Update( CCommand &commandIn )

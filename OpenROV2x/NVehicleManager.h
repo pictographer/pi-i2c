@@ -2,7 +2,6 @@
 
 // Includes
 #include <Arduino.h>
-#include "PCA9539.h"
 
 // Forward declarations
 class CCommand;

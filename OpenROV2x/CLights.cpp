@@ -44,7 +44,6 @@ namespace
 CLights::CLights( uint32_t pinIn )
 	: m_pin( pinIn, CPin::kDigital, CPin::kOutput )
 {
-    m_power = new pca9539::PCA9539( &I2C0 );
 }
 
 void CLights::Initialize()
@@ -52,8 +51,6 @@ void CLights::Initialize()
    // Reset pin
    m_pin.Reset();
    m_pin.Write( 0 );
-
-   m_power->PinMode(0xFF00);
 
    // Reset timers
    m_controlTimer.Reset();
@@ -98,13 +95,13 @@ void CLights::Update( CCommand& commandIn )
                 if (m_targetPower > 0) {
                     // Go through power disarm sequence
                     // SCL_DIO2
-                    g_SystemMuxes.SetPath(SCL_DIO2);
+                    g_SystemMuxes.WriteExtendedGPIO(RLY_SAF,LOW);
                     // CH1 write 0 - write 1 - wait 1 second - write 0
-                    m_power->DigitalWrite(2, 0x00);
                     delay(1000);
-                    m_power->DigitalWrite(2, 0x01);
+                    g_SystemMuxes.WriteExtendedGPIO(RLY_SAF,HIGH);
                     delay(1000);
-                    m_power->DigitalWrite(2, 0x00);
+                    g_SystemMuxes.WriteExtendedGPIO(RLY_SAF,LOW);
+                    delay(1000);
 	            m_pin.Write( 1 );
                 }
 

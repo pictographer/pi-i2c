@@ -93,6 +93,7 @@ private:
 	pca9547::PCA9547 *m_device2;
         pca9539::PCA9539 *m_dio1;
         pca9539::PCA9539 *m_dio2;
+        uint8_t m_Initialized;
 
 };
 

@@ -27,16 +27,24 @@ CMuxes g_SystemMuxes;
 
 void setup()
 {
-        wiringPiSetup();
-        g_SystemMuxes.Initialize();
 
         // Initialize main subsystems
         NArduinoManager::Initialize();
         NCommManager::Initialize();
         NVehicleManager::Initialize();
+
+        wiringPiSetup();
+        g_SystemMuxes.Initialize();
         NModuleManager::Initialize();
         NDataManager::Initialize();
 
+        // Power System Arm
+        // '9539 low -> high (1 second) -> low
+        g_SystemMuxes.WriteExtendedGPIO(RLY_ARM, LOW);
+        delay(1000);
+        g_SystemMuxes.WriteExtendedGPIO(RLY_ARM, HIGH);
+        delay(1000);
+        g_SystemMuxes.WriteExtendedGPIO(RLY_ARM, LOW);
 
         // Set timer 5 divisor to 8 for PWM frequency of 3921.16Hz (D44, D45, D46)
         // TCCR5B = ( TCCR5B & B11111000 ) | B00000010;

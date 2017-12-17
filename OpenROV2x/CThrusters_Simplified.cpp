@@ -13,7 +13,6 @@
 #include <orutil.h>
 #include "CPin.h"
 #include "DRV10983.h"
-#include "PCA9539.h"
 #include "PCA9685.h"
 
 extern CMuxes g_SystemMuxes;
@@ -67,7 +66,6 @@ namespace
     // 0x72 CH3
     // motor enable signals
     // AB enable
-    pca9539::PCA9539  *motor_monitors;
     // 0x72 CH7 then 0x74 PO0 low
     // CD enable
     // 0x72 CH7 then 0x74 PO3 low
@@ -127,14 +125,11 @@ void CThrusters::Initialize()
     motor_b = new drv10983::DRV10983( &I2C0 );
     motor_c = new drv10983::DRV10983( &I2C0 );
     motor_d = new drv10983::DRV10983( &I2C0 );
-    motor_monitors = new pca9539::PCA9539( &I2C0 );
     motor_signals = new pca9685::PCA9685( &I2C0 );
     // setup the IO expander inputs and output directions
     // and power the motor controllers
-    g_SystemMuxes.SetPath(SCL_DIO1);
-    motor_monitors->PinMode( 0x1AF6 );
-    motor_monitors->DigitalWrite( 0, LOW );
-    motor_monitors->DigitalWrite( 3, LOW );
+    g_SystemMuxes.WriteExtendedGPIO(MAB_EN,LOW);
+    g_SystemMuxes.WriteExtendedGPIO(MCD_EN,LOW);
     delay(1000);
     // enable the motors
     g_SystemMuxes.SetPath(SCL_MA);
