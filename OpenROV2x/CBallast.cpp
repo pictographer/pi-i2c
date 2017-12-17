@@ -35,7 +35,7 @@ void CBallast::Initialize()
     g_SystemMuxes.WriteExtendedGPIO( BAL_LEDS_EN, LOW );
     // get the valves ready
     // only valve 1 is active now
-    g_SystemMuxes.WriteExtendedGPIO( VALVE_1_EN, LOW );
+    g_SystemMuxes.WriteExtendedGPIO( VALVE_1_EN, HIGH );
 
     // get the PWM ready
     delay(1000);
@@ -62,9 +62,9 @@ void CBallast::Update( CCommand& commandIn )
 
 			m_valveState = commandIn.m_arguments[1];
                         if (m_valveState > 0 )
-                            g_SystemMuxes.WriteExtendedGPIO( VALVE_1_EN, HIGH );
-                        else
                             g_SystemMuxes.WriteExtendedGPIO( VALVE_1_EN, LOW );
+                        else
+                            g_SystemMuxes.WriteExtendedGPIO( VALVE_1_EN, HIGH );
 
 
 		} else 
@@ -84,9 +84,9 @@ void CBallast::Update( CCommand& commandIn )
                              }
                           }
                           if (m_ballast == 0) {
-                            g_SystemMuxes.WriteExtendedGPIO( VALVE_1_EN, LOW );
+                            g_SystemMuxes.WriteExtendedGPIO( VALVE_1_EN, HIGH );
                           } else {
-                             g_SystemMuxes.WriteExtendedGPIO( VALVE_1_EN, HIGH );
+                             g_SystemMuxes.WriteExtendedGPIO( VALVE_1_EN, LOW );
                              if (m_ballast >= 0) {
                                 g_SystemMuxes.SetPath(SCL_PWM);
                                 m_ballast_pwm->DigitalWriteLow(pca9685::LED_9);
