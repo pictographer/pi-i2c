@@ -1,7 +1,10 @@
 #pragma once
 
 // Driver definitions and helpers
+#include <cmath>
 #include "DRV10983_Def.h"
+
+#define SCALE_SPEED(speed) ((std::abs(speed)*0x1FF)/100)
 
 namespace drv10983
 {

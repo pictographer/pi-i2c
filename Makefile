@@ -20,6 +20,7 @@ CPP:=./OpenROV2x/CAutopilot_STD.cpp\
 ./OpenROV2x/CMS5837_30BA.cpp\
 ./OpenROV2x/CPin.cpp\
 ./OpenROV2x/CMuxes.cpp\
+./OpenROV2x/CBallast.cpp\
 ./OpenROV2x/CCameraServo.cpp\
 ./OpenROV2x/CControllerBoard.cpp\
 ./OpenROV2x/CThrusters_2X1.cpp\

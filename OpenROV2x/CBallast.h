@@ -18,6 +18,7 @@ private:
     pca9539::PCA9539   *m_power_blow;
     pca9539::PCA9539   *m_valves;
     pca9685::PCA9685   *m_ballast_pwm;
+    drv10983::DRV10983 *m_motor_e;
     // source: nsr1215_2.csv
     uint8_t params[12] = {
         0xEA,
@@ -34,9 +35,9 @@ private:
         0x0C
    };
 
-    // motor controller
-    // E - ballast system
-    drv10983::DRV10983 *motor_e;
+    int32_t     m_valveState;
+    int32_t     m_ballast;
+    int32_t     m_ballast_pre;
 
     float       m_targetPower = 0.0f;
     float       m_currentPower = 0.0f;

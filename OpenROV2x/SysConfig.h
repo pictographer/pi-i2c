@@ -41,6 +41,9 @@
 // After Market Modules
 // ---------------------------------------------------------
 
+// Ballast Pump and Valve
+#define HAS_BALLAST (1)
+
 // External Lights
 #define HAS_EXT_LIGHTS (1)
 

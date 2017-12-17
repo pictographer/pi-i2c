@@ -18,6 +18,11 @@
 CControllerBoard m_controllerBoard;
 #endif
 
+#if(HAS_STD_LIGHTS)
+#include "CBallast.h"
+CBallast m_ballast( );
+#endif
+
 // this is repurposed for power
 #if(HAS_STD_LIGHTS)
 #include "CLights.h"

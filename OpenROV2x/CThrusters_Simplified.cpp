@@ -19,8 +19,6 @@
 extern CMuxes g_SystemMuxes;
 extern I2C I2C0;
 
-#define SCALE_SPEED(speed) ((std::abs(speed)*0x1FF)/100)
-
 template<class T>
 const T& constrain(const T& x, const T& a, const T& b) {
     if(x < a) {
