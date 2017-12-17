@@ -94,6 +94,39 @@ ERetCode PCA9539::PinMode( uint8_t pin, uint16_t mode )
 }
     
 
+ERetCode PCA9539::DigitalRead( uint8_t pin, uint8_t *value )
+{
+    uint8_t low, high;
+
+    //Pins 0..15 are r/w capable pins
+    if( pin > 15 )
+    {
+        return ERetCode::FAILED_DIGITAL_WRITE;
+    }
+
+    //Read it
+    auto ret = ReadByte( PCA9539_REGISTER::INPUT_PORT0, low);
+    if( ret != i2c::EI2CResult::RESULT_SUCCESS )
+    {
+        return ERetCode::FAILED_DIGITAL_READ;
+    }
+
+    //Read it
+    ret = ReadByte( PCA9539_REGISTER::INPUT_PORT1, high);
+    if( ret != i2c::EI2CResult::RESULT_SUCCESS )
+    {
+        return ERetCode::FAILED_DIGITAL_READ;
+    }
+
+    if (pin > 7) {
+      *value = (high >> (pin%8)) & 0x01;
+    } else {
+      *value = (low >> (pin%8)) & 0x01;
+    }
+
+    return ERetCode::SUCCESS;
+}
+
 ERetCode PCA9539::DigitalWrite( uint8_t pin, uint8_t value )
 {
     //Pins 0..15 are r/w capable pins

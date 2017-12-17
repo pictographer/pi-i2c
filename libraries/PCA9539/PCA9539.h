@@ -20,6 +20,7 @@ namespace pca9539
         FAILED,
         FAILED_PIN_MODE,
         FAILED_DIGITAL_WRITE,
+        FAILED_DIGITAL_READ,
         TIMED_OUT,
         UNKNOWN
     };
@@ -30,6 +31,7 @@ namespace pca9539
             PCA9539( I2C* i2cInterfaceIn );
 
             ERetCode DigitalWrite( uint8_t pin, uint8_t value );
+            ERetCode DigitalRead( uint8_t pin, uint8_t *value );
             ERetCode PinMode( uint8_t pin, uint16_t mode );
             ERetCode PinMode( uint16_t mode );
             ERetCode DigitalWriteHex( uint16_t value );

@@ -22,8 +22,6 @@ namespace
 
 CBallast::CBallast()
 {
-        m_power_blow = new pca9539::PCA9539( &I2C0 );
-        m_valves = new pca9539::PCA9539( &I2C0 );
         m_ballast_pwm = new pca9685::PCA9685( &I2C0 );
         m_motor_e = new drv10983::DRV10983( &I2C0 );
         m_valveState = 0;
@@ -34,14 +32,10 @@ CBallast::CBallast()
 void CBallast::Initialize()
 {
     // enable power to BALLAST
-    g_SystemMuxes.SetPath(SCL_DIO2);
-    m_power_blow->PinMode( 0xFF00 );
-    m_power_blow->DigitalWrite( 0, LOW );
+    g_SystemMuxes.WriteExtendedGPIO( BAL_LEDS_EN, LOW );
     // get the valves ready
     // only valve 1 is active now
-    g_SystemMuxes.SetPath(SCL_DIO1);
-    m_valves->PinMode( 0xEAF6 );
-    m_valves->DigitalWrite( 8, LOW );
+    g_SystemMuxes.WriteExtendedGPIO( VALVE_1_EN, LOW );
 
     // get the PWM ready
     delay(1000);
@@ -67,11 +61,10 @@ void CBallast::Update( CCommand& commandIn )
 			// Update the target position
 
 			m_valveState = commandIn.m_arguments[1];
-                        g_SystemMuxes.SetPath(SCL_DIO1);
                         if (m_valveState > 0 )
-                            m_valves->DigitalWrite( 8, HIGH );
+                            g_SystemMuxes.WriteExtendedGPIO( VALVE_1_EN, HIGH );
                         else
-                            m_valves->DigitalWrite( 8, LOW );
+                            g_SystemMuxes.WriteExtendedGPIO( VALVE_1_EN, LOW );
 
 
 		} else 
@@ -91,9 +84,9 @@ void CBallast::Update( CCommand& commandIn )
                              }
                           }
                           if (m_ballast == 0) {
-                            m_valves->DigitalWrite( 8, LOW );
+                            g_SystemMuxes.WriteExtendedGPIO( VALVE_1_EN, LOW );
                           } else {
-                             m_valves->DigitalWrite( 8, HIGH );
+                             g_SystemMuxes.WriteExtendedGPIO( VALVE_1_EN, HIGH );
                              if (m_ballast >= 0) {
                                 g_SystemMuxes.SetPath(SCL_PWM);
                                 m_ballast_pwm->DigitalWriteLow(pca9685::LED_9);

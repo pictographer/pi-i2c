@@ -17,7 +17,6 @@ public:
 private:
     orutil::CTimer      m_controlTimer;
     orutil::CTimer      m_telemetryTimer;
-    pca9539::PCA9539   *m_monitors;
     pca9685::PCA9685   *m_led_pwm;
     CPin        m_pin;
 

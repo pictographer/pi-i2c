@@ -27,6 +27,9 @@ CMuxes g_SystemMuxes;
 
 void setup()
 {
+        wiringPiSetup();
+        g_SystemMuxes.Initialize();
+
         // Initialize main subsystems
         NArduinoManager::Initialize();
         NCommManager::Initialize();
@@ -34,8 +37,6 @@ void setup()
         NModuleManager::Initialize();
         NDataManager::Initialize();
 
-        g_SystemMuxes.Initialize();
-        wiringPiSetup();
 
         // Set timer 5 divisor to 8 for PWM frequency of 3921.16Hz (D44, D45, D46)
         // TCCR5B = ( TCCR5B & B11111000 ) | B00000010;

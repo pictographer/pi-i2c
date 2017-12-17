@@ -14,8 +14,6 @@ public:
     void Update( CCommand& commandIn );
 
 private:
-    pca9539::PCA9539   *m_power_blow;
-    pca9539::PCA9539   *m_valves;
     pca9685::PCA9685   *m_ballast_pwm;
     drv10983::DRV10983 *m_motor_e;
     // source: nsr1215_2.csv

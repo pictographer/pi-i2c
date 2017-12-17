@@ -43,16 +43,13 @@ namespace
 CExternalLights::CExternalLights( uint32_t pinIn )
 	: m_pin( pinIn, CPin::kAnalog, CPin::kOutput )
 {
-        m_monitors = new pca9539::PCA9539( &I2C0 );
         m_led_pwm = new pca9685::PCA9685( &I2C0 );
 }
 
 void CExternalLights::Initialize()
 {
     // enable power to LEDs
-    g_SystemMuxes.SetPath(SCL_DIO2);
-    m_monitors->PinMode( 0xFF00 );
-    m_monitors->DigitalWrite( 0, LOW );
+    g_SystemMuxes.WriteExtendedGPIO(BAL_LEDS_EN, LOW);
     // get the PWM ready
     // top
     m_led_pwm->DigitalWriteLow(pca9685::LED_10);
