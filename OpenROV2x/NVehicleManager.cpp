@@ -36,11 +36,11 @@ namespace NVehicleManager
             // '9539 low -> high (1 second) -> low
             g_SystemMuxes.SetPath(SCL_DIO2);
             m_power->PinMode(0xFF00);
-            m_power->DigitalWrite(2, 0x00);
+            m_power->DigitalWrite(1, 0x00);
             delay(1000);
-            m_power->DigitalWrite(2, 0x01);
+            m_power->DigitalWrite(1, 0x01);
             delay(1000);
-            m_power->DigitalWrite(2, 0x00);
+            m_power->DigitalWrite(1, 0x00);
 
         }
 

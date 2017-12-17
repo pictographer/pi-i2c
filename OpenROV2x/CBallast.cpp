@@ -79,24 +79,28 @@ void CBallast::Update( CCommand& commandIn )
                 {
                      if( commandIn.m_arguments[1] >= -100 && commandIn.m_arguments[1] <= 100 )
                      {
-                        if (m_valveState == 0) return;
 
                         m_ballast = commandIn.m_arguments[1];
-                        if ((m_ballast_pre < 0.0) && (m_ballast > 0.0)) {
+                        if ((m_ballast_pre < 0) && (m_ballast > 0)) {
                              g_SystemMuxes.SetPath(SCL_ME);
                              m_motor_e->Cmd_SetSpeed(0x0000);
                           } else {
-                             if ((m_ballast < 0.0) && (m_ballast_pre > 0.0)) {
+                             if ((m_ballast < 0) && (m_ballast_pre > 0)) {
                                 g_SystemMuxes.SetPath(SCL_ME);
                                 m_motor_e->Cmd_SetSpeed(0x0000);
                              }
                           }
-                          if (m_ballast >= 0.0) {
-                             g_SystemMuxes.SetPath(SCL_PWM);
-                             m_ballast_pwm->DigitalWriteLow(pca9685::LED_9);
+                          if (m_ballast == 0) {
+                            m_valves->DigitalWrite( 8, LOW );
                           } else {
-                             g_SystemMuxes.SetPath(SCL_PWM);
-                             m_ballast_pwm->DigitalWriteHigh(pca9685::LED_9);
+                             m_valves->DigitalWrite( 8, HIGH );
+                             if (m_ballast >= 0) {
+                                g_SystemMuxes.SetPath(SCL_PWM);
+                                m_ballast_pwm->DigitalWriteLow(pca9685::LED_9);
+                             } else {
+                                g_SystemMuxes.SetPath(SCL_PWM);
+                                m_ballast_pwm->DigitalWriteHigh(pca9685::LED_9);
+                             }
                           }
                           // -backwards +forwards
                           g_SystemMuxes.SetPath(SCL_ME);

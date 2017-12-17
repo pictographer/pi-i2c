@@ -4,7 +4,7 @@
 #include "CModule.h"
 
 // Defines
-#define MAX_MODULES 15
+#define MAX_MODULES 32
 
 // TODO: CCommand sucks, going to be replaced by a packet format (Mavlink) with intentional message registration and distribution
 

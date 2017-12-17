@@ -100,11 +100,11 @@ void CLights::Update( CCommand& commandIn )
                     // SCL_DIO2
                     g_SystemMuxes.SetPath(SCL_DIO2);
                     // CH1 write 0 - write 1 - wait 1 second - write 0
-                    m_power->DigitalWrite(1, 0x00);
+                    m_power->DigitalWrite(2, 0x00);
                     delay(1000);
-                    m_power->DigitalWrite(1, 0x01);
+                    m_power->DigitalWrite(2, 0x01);
                     delay(1000);
-                    m_power->DigitalWrite(1, 0x00);
+                    m_power->DigitalWrite(2, 0x00);
 	            m_pin.Write( 1 );
                 }
 

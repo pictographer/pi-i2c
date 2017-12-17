@@ -18,11 +18,6 @@
 CControllerBoard m_controllerBoard;
 #endif
 
-#if(HAS_STD_LIGHTS)
-#include "CBallast.h"
-CBallast m_ballast( );
-#endif
-
 // this is repurposed for power
 #if(HAS_STD_LIGHTS)
 #include "CLights.h"
@@ -86,4 +81,9 @@ CBNO055 m_bno055( &I2C0, bno055::EAddress::ADDRESS_A );
 CMS5837_30BA m_ms5837( &I2C0, ms5837_30ba::EAddress::ADDRESS_A );
 #endif
 
+#if(HAS_BALLAST)
+#warning ballast
+#include "CBallast.h"
+CBallast m_ballast;
+#endif
 
