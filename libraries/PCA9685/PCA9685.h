@@ -57,6 +57,7 @@ namespace pca9685
             ERetCode Initialize();
             ERetCode Sleep();
             ERetCode UnSleep();
+            ERetCode SetPreScale( uint8_t value );
             bool IsInitialized() const { return m_isInitialized; };
 
         private:

@@ -82,7 +82,6 @@ CMS5837_30BA m_ms5837( &I2C0, ms5837_30ba::EAddress::ADDRESS_A );
 #endif
 
 #if(HAS_BALLAST)
-#warning ballast
 #include "CBallast.h"
 CBallast m_ballast;
 #endif

@@ -154,6 +154,16 @@ ERetCode PCA9685::DigitalWriteLow( uint8_t pin )
 
     return ERetCode::SUCCESS;
 }
+
+ERetCode PCA9685::SetPreScale( uint8_t value )
+{
+    auto ret = WriteByte( PRESCALE, value);
+    if( ret != i2c::EI2CResult::RESULT_SUCCESS )
+    {
+         return ERetCode::FAILED_DIGITAL_WRITE;
+    }
+    return ERetCode::SUCCESS;
+}
 /***************************************************************************
     PRIVATE FUNCTIONS
  ***************************************************************************/
