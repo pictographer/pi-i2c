@@ -46,7 +46,7 @@ ERetCode INA260::Cmd_ReadVoltage( uint32_t *volts ) {
        ReadRegisterWord( BUS_VOLTAGE, &raw_volts );
        // each unit is 1.25mV
        // return a value in millivolts
-       *volts = (raw_volts * 125)/100;
+       *volts = (BSWAP16(raw_volts) * 125)/100;
        return ERetCode::SUCCESS;
 }
 
@@ -55,7 +55,7 @@ ERetCode INA260::Cmd_ReadCurrent( uint32_t *current ) {
        ReadRegisterWord( BUS_VOLTAGE, &raw_amps );
        // each unit is 1.25mA
        // return a value in milliamps
-       *current = (raw_amps * 125)/100;
+       *current = (BSWAP16(raw_amps) * 125)/100;
        return ERetCode::SUCCESS;
 }
 
@@ -64,6 +64,7 @@ ERetCode INA260::Cmd_ReadPower( uint32_t *watts ) {
 }
 
 ERetCode INA260::Cmd_SetConfig( uint16_t param ) {
+       WriteRegisterWord( CONFIGURATION, param );
        return ERetCode::SUCCESS;
 }
 

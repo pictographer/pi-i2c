@@ -71,6 +71,7 @@ void CControllerBoard::Initialize()
         onesecondtimer.Reset();
 
         m_powerSense = new INA260( &I2C0 );
+        m_powerSense->Cmd_SetConfig( 0x6727 );
 
         // Initialize all the readings to 0:
         for( int thisReading = 0; thisReading < numReadings; ++thisReading )
@@ -93,8 +94,7 @@ float CControllerBoard::read20Volts()
              uint32_t volts =  5000;
              g_SystemMuxes.SetPath(SCL_12V_RPA);
              m_powerSense->Cmd_ReadVoltage(&volts);
-             f_volts = (1.0f * volts)/ 1000.0f;
-             f_volts = f_volts/1000.0f;
+             f_volts = (1.0f * volts)/1000.0f;
              return(f_volts);
 }
 

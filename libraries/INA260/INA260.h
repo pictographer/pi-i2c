@@ -6,6 +6,7 @@
 #include <I2C.h>
 #include <orutil.h>
 
+#define BSWAP16(value) (((value & 0x00FF) << 8) | ((value & 0xFF00) >> 8))
 
 namespace ina260
 {
