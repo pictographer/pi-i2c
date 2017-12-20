@@ -23,7 +23,7 @@ namespace
 
 	inline uint32_t PercentToAnalog( float x )
 	{	
-              return static_cast<uint32_t> (x*25);
+              return static_cast<uint32_t> (x*MAX_ALLOWED_POWER);
 	}
 }
 
@@ -79,9 +79,9 @@ void CExternalLights::Update( CCommand& commandIn )
 			m_targetPower_an = PercentToAnalog( m_targetPower );
 
 			// Apply ceiling
-			if( m_targetPower_an > 25 )
+			if( m_targetPower_an > MAX_ALLOWED_POWER )
 			{
-				m_targetPower_an = 25;
+				m_targetPower_an = MAX_ALLOWED_POWER;
 			}
 
 			// Directly move to target power

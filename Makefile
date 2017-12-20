@@ -39,6 +39,7 @@ CPP:=./OpenROV2x/CAutopilot_STD.cpp\
 ./libraries/BNO055/BNO055.cpp\
 ./libraries/PCA9547/PCA9547.cpp\
 ./libraries/PCA9685/PCA9685.cpp\
+./libraries/INA260/INA260.cpp\
 ./libraries/DRV10983/DRV10983.cpp\
 ./libraries/MPL3115A2/MPL3115A2.cpp\
 ./libraries/PCA9539/PCA9539.cpp\
@@ -65,6 +66,7 @@ INC:=-Ilibraries\
 -Ilibraries/PCA9547\
 -Ilibraries/PCA9685\
 -Ilibraries/DRV10983\
+-Ilibraries/INA260\
 -Ilibraries/Servo\
 -IOpenROV2x
 

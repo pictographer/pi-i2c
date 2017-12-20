@@ -39,14 +39,14 @@ namespace
     uint8_t params[12] = {
 	0xEA,
 	0xC9,
-	0x2A,
+	0x3A,
 	0x04,
 	0xC0,
-	0xFA,
-	0x16,
+	0xFB,
+	0x7E,
 	0xB0,
 	0x0F,
-	0xA8,
+	0x88,
 	0x0E,
 	0x0C
    };
@@ -297,7 +297,7 @@ void CThrusters::Update( CCommand& command )
                       motor_b->Cmd_SetSpeed(0x0000);
                    }
                 }
-                if (trg_throttle >= 0.0) {
+                if (trg_throttle < 0.0) {
                    g_SystemMuxes.SetPath(SCL_PWM);
                    motor_signals->DigitalWriteLow(pca9685::LED_1);
                    motor_signals->DigitalWriteHigh(pca9685::LED_3);

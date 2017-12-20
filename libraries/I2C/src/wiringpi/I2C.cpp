@@ -179,6 +179,31 @@ EI2CResult I2C::WriteRegisterByte( uint8_t slaveAddressIn, uint8_t registerIn, u
         return HANDLE_RESULT( EI2CResult::RESULT_SUCCESS );
 }
 
+EI2CResult I2C::WriteRegisterWord( uint8_t slaveAddressIn, uint8_t registerIn, uint16_t dataIn, bool issueRepeatedStart )
+{
+        // Start transaction
+        m_result = StartTransaction();
+        if( m_result ){ return HANDLE_RESULT( m_result ); }
+
+        // Send address
+        if ( ioctl( m_customProperties.m_fileDescriptor, I2C_SLAVE, slaveAddressIn ) < 0 )
+        {
+                return HANDLE_RESULT( EI2CResult::RESULT_ERR_FAILED );
+        }
+
+        // Write Register Address
+        int result = wiringPiI2CWriteReg16( m_customProperties.m_fileDescriptor, registerIn, dataIn );
+        if( result ){ return HANDLE_RESULT( m_result ); }
+
+        // Send stop, if requested
+        if( !issueRepeatedStart )
+        {
+                m_result = StopTransaction();
+                if( m_result ){ return HANDLE_RESULT( m_result ); }
+        }
+        return HANDLE_RESULT( EI2CResult::RESULT_SUCCESS );
+}
+
 EI2CResult I2C::WriteBytes( uint8_t slaveAddressIn, uint8_t *dataIn, uint8_t numberBytesIn,  bool issueRepeatedStart )
 {
         // Start transaction
@@ -242,7 +267,33 @@ EI2CResult I2C::ReadRegisterByte( uint8_t slaveAddressIn, uint8_t registerIn, ui
         m_result = StartTransaction();
         if( m_result ){ return HANDLE_RESULT( m_result ); }
 
-        *dataOut = wiringPiI2CReadReg8( m_customProperties.m_fileDescriptor, slaveAddressIn );
+        // Send address
+        int result = ioctl( m_customProperties.m_fileDescriptor, I2C_SLAVE, slaveAddressIn );
+        if( result ){ return HANDLE_RESULT( EI2CResult::RESULT_ERR_FAILED ); }
+
+        *dataOut = wiringPiI2CReadReg8( m_customProperties.m_fileDescriptor, registerIn );
+
+        // Send stop, if requested
+        if( !issueRepeatedStart )
+        {
+                m_result = StopTransaction();
+                if( m_result ){ return HANDLE_RESULT( m_result ); }
+        }
+        return HANDLE_RESULT( EI2CResult::RESULT_SUCCESS );
+}
+
+// Read operations
+EI2CResult I2C::ReadRegisterWord( uint8_t slaveAddressIn, uint8_t registerIn, uint16_t *dataOut, bool issueRepeatedStart )
+{
+        // Start transaction
+        m_result = StartTransaction();
+        if( m_result ){ return HANDLE_RESULT( m_result ); }
+
+        // Send address
+        int result = ioctl( m_customProperties.m_fileDescriptor, I2C_SLAVE, slaveAddressIn );
+        if( result ){ return HANDLE_RESULT( EI2CResult::RESULT_ERR_FAILED ); }
+
+        *dataOut = wiringPiI2CReadReg16( m_customProperties.m_fileDescriptor, registerIn );
 
         // Send stop, if requested
         if( !issueRepeatedStart )

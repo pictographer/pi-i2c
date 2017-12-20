@@ -6,6 +6,9 @@
 #include "CPin.h"
 #include <orutil.h>
 
+// Out of 255 maximum swing
+#define MAX_ALLOWED_POWER 16
+
 class CExternalLights : public CModule
 {
 public:

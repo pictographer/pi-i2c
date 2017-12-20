@@ -7,6 +7,12 @@
 #include "CControllerBoard.h"
 #include <orutil.h>
 #include "CPin.h"
+#include "CMuxes.h"
+
+extern I2C I2C0;
+extern CMuxes g_SystemMuxes;
+
+using namespace ina260;
 
 // File local variables and methods
 namespace
@@ -45,48 +51,16 @@ namespace
                 return mapf( (float)analogRead( pin ), 0.0f, 1023.0f, 0.0f, 10.0f );
         }
 
-        float read20Volts( int pin )
-        {
-                return mapf( (float)analogRead( pin ), 0.0f, 1023.0f, 0.0f, 20.0f );
-        }
-
         float readBrdCurrent( int pin )
         {
                 return mapf( (float)analogRead( pin ), 0.0f, 1023.0f, 0.0f, 2.0f );
         }
 
-        long readVcc()
-        {
-#if ! defined( WIRINGPI )
-                // Read 1.1V reference against AVcc
-                // set the reference to Vcc and the measurement to the internal 1.1V reference
-#if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-                ADMUX = _BV( REFS0 ) | _BV( MUX4 ) | _BV( MUX3 ) | _BV( MUX2 ) | _BV( MUX1 );
-#elif defined (__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
-                ADMUX = _BV( MUX5 ) | _BV( MUX0 );
-#elif defined (__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
-                ADMUX = _BV( MUX3 ) | _BV( MUX2 );
-#else
-                ADMUX = _BV( REFS0 ) | _BV( MUX3 ) | _BV( MUX2 ) | _BV( MUX1 );
-#endif
+}
 
-                delay( 2 ); // Wait for Vref to settle
-                ADCSRA |= _BV( ADSC ); // Start conversion
-
-                while( bit_is_set( ADCSRA, ADSC ) ); // measuring
-
-                uint8_t low  = ADCL; // must read ADCL first - it then locks ADCH
-                uint8_t high = ADCH; // unlocks both
-
-                long result = ( high << 8 ) | low;
-
-                result = 1125300L / result; // Calculate Vcc (in mV); 1125300 = 1.1*1023*1000
-                return result; // Vcc in millivolts
-#else
-#warning Faking readVcc
-                return 4321;
-#endif
-        }
+CControllerBoard::CControllerBoard()
+{
+    m_powerSense = NULL;
 }
 
 void CControllerBoard::Initialize()
@@ -96,11 +70,32 @@ void CControllerBoard::Initialize()
         statustime2.Reset();
         onesecondtimer.Reset();
 
+        m_powerSense = new INA260( &I2C0 );
+
         // Initialize all the readings to 0:
         for( int thisReading = 0; thisReading < numReadings; ++thisReading )
         {
                 readings[ thisReading ] = 0;
         }
+}
+
+long CControllerBoard::readVcc()
+{
+             uint32_t volts =  5000;
+             g_SystemMuxes.SetPath(SCL_5V_SYS);
+             m_powerSense->Cmd_ReadVoltage(&volts);
+             return(volts);
+}
+
+float CControllerBoard::read20Volts()
+{
+             float f_volts = 0.0f;
+             uint32_t volts =  5000;
+             g_SystemMuxes.SetPath(SCL_12V_RPA);
+             m_powerSense->Cmd_ReadVoltage(&volts);
+             f_volts = (1.0f * volts)/ 1000.0f;
+             f_volts = f_volts/1000.0f;
+             return(f_volts);
 }
 
 void CControllerBoard::Update( CCommand& commandIn )
@@ -153,7 +148,7 @@ void CControllerBoard::Update( CCommand& commandIn )
                 Serial.print( readCurrent( A5 ) );
                 Serial.print( ';' );
                 Serial.print( F( "BRDV:" ) );
-                Serial.print( read20Volts( A4 ) );
+                Serial.print( read20Volts() );
                 Serial.print( ';' );
                 Serial.print( F( "AVCC:" ) );
                 Serial.print( readVcc() );
@@ -164,7 +159,7 @@ void CControllerBoard::Update( CCommand& commandIn )
         // Update Cape Data voltages and currents
         if( statustime2.HasElapsed( 100 ) )
         {
-                NDataManager::m_capeData.VOUT = read20Volts( A4 );
+                NDataManager::m_capeData.VOUT = read20Volts();
 
                 // #315: deprecated: this is the same thing as BRDI:
                 NDataManager::m_capeData.IOUT = readBrdCurrent( A0 );

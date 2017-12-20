@@ -11,15 +11,15 @@
 namespace NDataManager
 {
         // Default initialize all data
-        TNavData                        m_navData;
+        TNavData                m_navData;
         TEnvironmentData        m_environmentData;
-        TCapeData                       m_capeData;
+        TCapeData               m_capeData;
         TThrusterData           m_thrusterData;
 
         orutil::CTimer          m_timer_1hz;
         orutil::CTimer          m_timer_10hz;
 
-        uint32_t                        m_loopsPerSec = 0;
+        uint32_t                m_loopsPerSec = 0;
 
         // Called during Setup() to initialize any DataManager members to specific values
         void Initialize()
