@@ -326,6 +326,49 @@ EI2CResult I2C::ReadRegisterBytes( uint8_t slaveAddressIn, uint8_t registerIn, u
         return HANDLE_RESULT( EI2CResult::RESULT_SUCCESS );
 }
 
+EI2CResult I2C::ReadByte( uint8_t slaveAddressIn, uint8_t *dataOut, bool issueRepeatedStart )
+{
+        // Start transaction
+        m_result = StartTransaction();
+        if( m_result ){ return HANDLE_RESULT( m_result ); }
+
+        // Send address
+        int result = ioctl( m_customProperties.m_fileDescriptor, I2C_SLAVE, slaveAddressIn );
+        if( result ){ return HANDLE_RESULT( EI2CResult::RESULT_ERR_FAILED ); }
+
+        *dataOut = wiringPiI2CRead( m_customProperties.m_fileDescriptor );
+
+        // Send stop, if requested
+        if( !issueRepeatedStart )
+        {
+                m_result = StopTransaction();
+                if( m_result ){ return HANDLE_RESULT( m_result ); }
+        }
+
+}
+
+EI2CResult I2C::ReadBytes( uint8_t slaveAddressIn, uint8_t *dataOut, uint8_t numberBytesIn, bool issueRepeatedStart )
+{
+        // Start write transaction
+        m_result = StartTransaction();
+        if( m_result ){ return HANDLE_RESULT( m_result ); }
+
+        // Read in the requested amount of bytes
+        for( size_t i = 0; i < numberBytesIn; ++i )
+        {
+                m_result = ReadByte( slaveAddressIn, dataOut + i , issueRepeatedStart );
+                if ( m_result ){ return HANDLE_RESULT( m_result ); }
+        }
+
+        // Send stop, if requested
+        if( !issueRepeatedStart )
+        {
+                m_result = StopTransaction();
+                if( m_result ){ return HANDLE_RESULT( m_result ); }
+        }
+        return HANDLE_RESULT( EI2CResult::RESULT_SUCCESS );
+}
+
 // -------------------------------------------------------
 // Instantiation - Only support one I2C interface
 

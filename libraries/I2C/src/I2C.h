@@ -66,14 +66,16 @@ public:
   // Write operations
   i2c::EI2CResult WriteByte(           uint8_t slaveAddressIn,                     uint8_t dataIn,                             bool issueRepeatedStart = false );
   i2c::EI2CResult WriteRegisterByte(   uint8_t slaveAddressIn, uint8_t registerIn, uint8_t dataIn,                             bool issueRepeatedStart = false );
-  i2c::EI2CResult WriteRegisterWord(   uint8_t slaveAddressIn, uint8_t registerIn, uint16_t dataIn,                             bool issueRepeatedStart = false );
+  i2c::EI2CResult WriteRegisterWord(   uint8_t slaveAddressIn, uint8_t registerIn, uint16_t dataIn,                            bool issueRepeatedStart = false );
   i2c::EI2CResult WriteBytes(          uint8_t slaveAddressIn,                     uint8_t *dataIn,    uint8_t numberBytesIn,  bool issueRepeatedStart = false );
   i2c::EI2CResult WriteRegisterBytes(  uint8_t slaveAddressIn, uint8_t registerIn, uint8_t *dataIn,    uint8_t numberBytesIn,  bool issueRepeatedStart = false );
   
   // Read operations
-  i2c::EI2CResult ReadRegisterByte(   uint8_t slaveAddressIn, uint8_t registerIn, uint8_t *dataOut,                           bool issueRepeatedStart = false );
+  i2c::EI2CResult ReadByte(           uint8_t slaveAddressIn, uint8_t *dataOut,                                                bool issueRepeatedStart = false );
+  i2c::EI2CResult ReadBytes(          uint8_t slaveAddressIn, uint8_t *dataOut,   uint8_t numberBytesIn,                       bool issueRepeatedStart = false );
+  i2c::EI2CResult ReadRegisterByte(   uint8_t slaveAddressIn, uint8_t registerIn, uint8_t *dataOut,                            bool issueRepeatedStart = false );
   i2c::EI2CResult ReadRegisterWord(   uint8_t slaveAddressIn, uint8_t registerIn, uint16_t *dataOut,                           bool issueRepeatedStart = false );
-  i2c::EI2CResult ReadRegisterBytes(  uint8_t slaveAddressIn, uint8_t registerIn, uint8_t *dataOut,   uint8_t numberBytesIn,  bool issueRepeatedStart = false );
+  i2c::EI2CResult ReadRegisterBytes(  uint8_t slaveAddressIn, uint8_t registerIn, uint8_t *dataOut,    uint8_t numberBytesIn,  bool issueRepeatedStart = false );
 
 private:
   // Attributes  

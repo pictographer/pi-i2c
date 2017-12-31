@@ -39,14 +39,12 @@ void setup()
         NDataManager::Initialize();
 
         // Power System Arm
-#if 0
         // '9539 low -> high (1 second) -> low
         g_SystemMuxes.WriteExtendedGPIO(RLY_ARM, LOW);
         delay(1000);
         g_SystemMuxes.WriteExtendedGPIO(RLY_ARM, HIGH);
         delay(1000);
         g_SystemMuxes.WriteExtendedGPIO(RLY_ARM, LOW);
-#endif
 
         // Set timer 5 divisor to 8 for PWM frequency of 3921.16Hz (D44, D45, D46)
         // TCCR5B = ( TCCR5B & B11111000 ) | B00000010;

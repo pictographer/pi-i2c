@@ -11,6 +11,7 @@ CPP:=./OpenROV2x/CAutopilot_STD.cpp\
 ./OpenROV2x/NCommManager.cpp\
 ./OpenROV2x/NModuleManager.cpp\
 ./OpenROV2x/CSocket.cpp\
+./OpenROV2x/CMS5611_01BA.cpp\
 ./OpenROV2x/CMS5803_14BA.cpp\
 ./OpenROV2x/NArduinoManager.cpp\
 ./OpenROV2x/CCommand.cpp\
@@ -30,6 +31,7 @@ CPP:=./OpenROV2x/CAutopilot_STD.cpp\
 ./libraries/ORUtil/orutil.cpp\
 ./libraries/MS5837_30BA/MS5837_30BA.cpp\
 ./libraries/MS5803_14BA/MS5803_14BA.cpp\
+./libraries/MS5611_01BA/MS5611_01BA.cpp\
 ./libraries/MPU9150/MPU9150_Vector3.cpp\
 ./libraries/MPU9150/MPU9150.cpp\
 ./libraries/MPU9150/MPU9150_Calibration.cpp\
@@ -59,6 +61,7 @@ INC:=-Ilibraries\
 -Ilibraries/I2C/src\
 -Ilibraries/MPL3115A2\
 -Ilibraries/MPU9150\
+-Ilibraries/MS5611_01BA\
 -Ilibraries/MS5803_14BA\
 -Ilibraries/MS5837_30BA\
 -Ilibraries/ORUtil\
