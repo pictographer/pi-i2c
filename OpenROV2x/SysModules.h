@@ -91,3 +91,8 @@ CMS5837_30BA m_ms5837( &I2C0, ms5837_30ba::EAddress::ADDRESS_A );
 CBallast m_ballast;
 #endif
 
+#if(HAS_P86BSD030PA)
+#include "CP86BSD030PA.h"
+CP86BSD030PA m_p86bsd030pa( &I2C0 );
+#endif
+

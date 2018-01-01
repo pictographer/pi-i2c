@@ -11,6 +11,7 @@ CPP:=./OpenROV2x/CAutopilot_STD.cpp\
 ./OpenROV2x/NCommManager.cpp\
 ./OpenROV2x/NModuleManager.cpp\
 ./OpenROV2x/CSocket.cpp\
+./OpenROV2x/CP86BSD030PA.cpp\
 ./OpenROV2x/CMS5611_01BA.cpp\
 ./OpenROV2x/CMS5803_14BA.cpp\
 ./OpenROV2x/NArduinoManager.cpp\
