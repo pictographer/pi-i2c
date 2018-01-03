@@ -396,8 +396,8 @@ uint8_t P86BSD030PA::CalculateCRC4()
 
 void P86BSD030PA::ProcessData()
 {
-    m_TEMP2 = ((m_D2*200)/2047) - 50; // degrees C
-    m_P = (((m_D1 - (16383/10))*(0x399A-0x666))/((8*16383)/10)) + 3; // psi
+    m_TEMP2 = ((int32_t) ((m_D2*200)/2047)) - 50; // degrees C
+    m_P = (((m_D1 - (16383/10))*(27-3))/((8*16383)/10)) + 3; // psi
     m_P *= 68.9476; // psi to mbar
 	
     // Create data sample with calculated parameters

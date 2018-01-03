@@ -349,15 +349,24 @@ EI2CResult I2C::ReadByte( uint8_t slaveAddressIn, uint8_t *dataOut, bool issueRe
 
 EI2CResult I2C::ReadBytes( uint8_t slaveAddressIn, uint8_t *dataOut, uint8_t numberBytesIn, bool issueRepeatedStart )
 {
+        union i2c_smbus_data data ;
+
         // Start write transaction
         m_result = StartTransaction();
         if( m_result ){ return HANDLE_RESULT( m_result ); }
 
-        // Read in the requested amount of bytes
-        for( size_t i = 0; i < numberBytesIn; ++i )
-        {
-                m_result = ReadByte( slaveAddressIn, dataOut + i , issueRepeatedStart );
-                if ( m_result ){ return HANDLE_RESULT( m_result ); }
+        // Send address
+        int result = ioctl( m_customProperties.m_fileDescriptor, I2C_SLAVE, slaveAddressIn );
+        if( result ){ return HANDLE_RESULT( EI2CResult::RESULT_ERR_FAILED ); }
+
+        if (i2c_smbus_access (m_customProperties.m_fileDescriptor, I2C_SMBUS_READ, 0, I2C_SMBUS_BLOCK_DATA, &data))
+           return HANDLE_RESULT( EI2CResult::RESULT_ERR_FAILED );
+        else {
+           if (numberBytesIn <= data.block[0]) {
+               memcpy(dataOut, &data.block[1], numberBytesIn);
+           } else {
+              return HANDLE_RESULT( EI2CResult::RESULT_ERR_FAILED );
+           }
         }
 
         // Send stop, if requested
