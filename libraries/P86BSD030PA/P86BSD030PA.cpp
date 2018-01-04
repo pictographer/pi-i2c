@@ -401,8 +401,8 @@ void P86BSD030PA::ProcessData()
     m_P *= 68.9476; // psi to mbar
 	
     // Create data sample with calculated parameters
-    m_data.Update(  ( (float)m_TEMP2 / 100.0f ),    // Temperature
-                    ( (float)m_P / 10.0f ),         // Pressure
+    m_data.Update(  ( (float)m_TEMP2 / 1.0f ),    // Temperature
+                    ( (float)m_P / 1.0f ),         // Pressure
                     m_waterMod );
 }
 
