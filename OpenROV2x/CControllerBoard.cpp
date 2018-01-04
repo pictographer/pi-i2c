@@ -98,6 +98,20 @@ float CControllerBoard::read20Volts()
              return(f_volts);
 }
 
+float CControllerBoard::readPiCurrent( uint8_t thePI )
+{
+             float f_ma = 0.0f;
+             uint32_t ma =  5000;
+             if (thePI == RPA) {
+                g_SystemMuxes.SetPath(SCL_12V_RPA);
+             } else {
+                g_SystemMuxes.SetPath(SCL_12V_RPB);
+             }
+             m_powerSense->Cmd_ReadCurrent(&ma);
+             f_ma = (1.0f * ma)/1000.0f;
+             return(f_ma);
+}
+
 void CControllerBoard::Update( CCommand& commandIn )
 {
         if( time.HasElapsed( 100 ) )
@@ -142,10 +156,10 @@ void CControllerBoard::Update( CCommand& commandIn )
                 Serial.print( readBrdCurrent( A0 ) );
                 Serial.print( ';' );
                 Serial.print( F( "BT1I:" ) );
-                Serial.print( readCurrent( A6 ) );
+                Serial.print( readPiCurrent( RPA ) );
                 Serial.print( ';' );
                 Serial.print( F( "BT2I:" ) );
-                Serial.print( readCurrent( A5 ) );
+                Serial.print( readPiCurrent( RPB ) );
                 Serial.print( ';' );
                 Serial.print( F( "BRDV:" ) );
                 Serial.print( read20Volts() );
@@ -165,7 +179,7 @@ void CControllerBoard::Update( CCommand& commandIn )
                 NDataManager::m_capeData.IOUT = readBrdCurrent( A0 );
 
                 // Total current draw from batteries:
-                NDataManager::m_capeData.BTTI = readCurrent( A5 ) + readCurrent( A6 );
+                NDataManager::m_capeData.BTTI = readPiCurrent( RPA ) + readPiCurrent( RPB );
                 NDataManager::m_capeData.FMEM = orutil::FreeMemory();
                 NDataManager::m_capeData.UTIM = millis();
         }

@@ -52,7 +52,7 @@ ERetCode INA260::Cmd_ReadVoltage( uint32_t *volts ) {
 
 ERetCode INA260::Cmd_ReadCurrent( uint32_t *current ) {
        uint16_t raw_amps = 0;
-       ReadRegisterWord( BUS_VOLTAGE, &raw_amps );
+       ReadRegisterWord( CURRENT, &raw_amps );
        // each unit is 1.25mA
        // return a value in milliamps
        *current = (BSWAP16(raw_amps) * 125)/100;
