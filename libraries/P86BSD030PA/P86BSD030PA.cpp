@@ -223,7 +223,7 @@ EResult P86BSD030PA::SetWaterType( EWaterType typeIn )
 uint32_t P86BSD030PA::GetUpdatePeriod()
 {
     // Two conversion periods
-    return 2 * kOSRInfo[ static_cast<uint8_t>( m_osr ) ].conversionTime_ms;
+    return 2 * m_conversionTime_ms;
 }
 
 // --------------------------------------------------------------

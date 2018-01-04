@@ -359,7 +359,9 @@ EI2CResult I2C::ReadBytes( uint8_t slaveAddressIn, uint8_t *dataOut, uint8_t num
         int result = ioctl( m_customProperties.m_fileDescriptor, I2C_SLAVE, slaveAddressIn );
         if( result ){ return HANDLE_RESULT( EI2CResult::RESULT_ERR_FAILED ); }
 
-        if (i2c_smbus_access (m_customProperties.m_fileDescriptor, I2C_SMBUS_READ, 0, I2C_SMBUS_BLOCK_DATA, &data))
+        data.block[0] = 0x1F;
+
+        if (i2c_smbus_access (m_customProperties.m_fileDescriptor, I2C_SMBUS_READ, 0, I2C_SMBUS_I2C_BLOCK_DATA, &data))
            return HANDLE_RESULT( EI2CResult::RESULT_ERR_FAILED );
         else {
            if (numberBytesIn <= data.block[0]) {
