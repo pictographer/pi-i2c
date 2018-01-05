@@ -111,7 +111,6 @@ void CP86BSD030PA::Update( CCommand& commandIn )
 		// Change water type
 		else if( commandIn.Equals( "depth_water" ) )
 		{
-#ifdef DEPTH_WATER
 			if( commandIn.m_arguments[1] == (uint32_t)EWaterType::FRESH )
 			{
 				m_device.SetWaterType( EWaterType::FRESH );
@@ -130,7 +129,6 @@ void CP86BSD030PA::Update( CCommand& commandIn )
 				Serial.print( commandIn.m_arguments[1] ); 	
 				Serial.println( ';' );
 			}
-#endif
 		}
 	}
 
