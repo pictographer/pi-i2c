@@ -41,8 +41,10 @@ GPIO.output(6, True)
 # Initialise GPIO18 to high (true) to enable I2C
 # if RPiA otherwise disable I2C
 if (input4 == True) :
+    print "RPi A"
     GPIO.output(18, True) 
 else :
+    print "RPi B"
     GPIO.output(18, False) 
 # Pulse GPIO19 to reset I2C MUXes
 GPIO.output(19, False) 
