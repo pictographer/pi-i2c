@@ -12,6 +12,9 @@ import time
 import RPi.GPIO as GPIO 
 # Set the mode of numbering the pins. 
 GPIO.setmode(GPIO.BCM) 
+# GPIO pin 4 is an input. 
+GPIO.setup(4, GPIO.IN) 
+input4 = GPIO.input(4);
 # GPIO pin 6 is an output. 
 GPIO.setup(6, GPIO.OUT) 
 # GPIO pin 17 is an output. 
@@ -36,7 +39,11 @@ GPIO.output(34, False)
 # Initialise GPIO6 to high (true) to select the non-USB path
 GPIO.output(6, True) 
 # Initialise GPIO18 to high (true) to enable I2C
-GPIO.output(18, True) 
+# if RPiA otherwise disable I2C
+if (input4 == True) :
+    GPIO.output(18, True) 
+else :
+    GPIO.output(18, False) 
 # Pulse GPIO19 to reset I2C MUXes
 GPIO.output(19, False) 
 time.sleep(0.5)
