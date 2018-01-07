@@ -42,18 +42,22 @@ GPIO.output(6, True)
 # if RPiA otherwise disable I2C
 if (input4 == True) :
     print "RPi A"
+    # RPi A runs I2C
     GPIO.output(18, True) 
+    # Hold the Air Emergency Balast Valve 'blow' signal HIGH (GPIO35)
+    GPIO.output(35, True)
+    # Pulse GPIO19 to reset I2C MUXes
+    GPIO.output(19, False) 
+    time.sleep(0.5)
+    GPIO.output(19, True) 
+    time.sleep(0.5)
+    GPIO.output(19, False) 
 else :
     print "RPi B"
+    # RPi B does not run I2C
     GPIO.output(18, False) 
-# Pulse GPIO19 to reset I2C MUXes
-GPIO.output(19, False) 
-time.sleep(0.5)
-GPIO.output(19, True) 
-time.sleep(0.5)
-GPIO.output(19, False) 
-# Hold the Air Emergency Balast Valve 'blow' signal HIGH (GPIO35)
-GPIO.output(35, True)
+    # Hold the Air Emergency Balast Valve 'blow' signal WLOW on the 'other' PI
+    GPIO.output(35, False)
 print "Toggling watchdog"
 while 1: 
 #    print "Watch"
