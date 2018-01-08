@@ -36,12 +36,12 @@ GPIO.output(20, False)
 GPIO.output(21, False) 
 # Initialize the system shutdown pin (STIR_OFF_Rx) to zero (GPIO34)
 GPIO.output(34, False) 
-# Initialise GPIO6 to high (true) to select the non-USB path
-GPIO.output(6, True) 
 # Initialise GPIO18 to high (true) to enable I2C
 # if RPiA otherwise disable I2C
 if (input4 == True) :
     print "RPi A"
+    # Initialise GPIO6 to high (true) to select the non-USB path
+    GPIO.output(6, True) 
     # RPi A runs I2C
     GPIO.output(18, True) 
     # Hold the Air Emergency Balast Valve 'blow' signal HIGH (GPIO35)
@@ -58,6 +58,9 @@ else :
     GPIO.output(18, False) 
     # Hold the Air Emergency Balast Valve 'blow' signal WLOW on the 'other' PI
     GPIO.output(35, False)
+    # Initialise GPIO6 to high (true) to select the non-USB path
+    time.sleep(20)
+    GPIO.output(6, True) 
 print "Toggling watchdog"
 while 1: 
 #    print "Watch"
