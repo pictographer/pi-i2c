@@ -6,5 +6,5 @@
 #
 while : 
 do
-   sleep 10000000
+   sleep 60
 done
