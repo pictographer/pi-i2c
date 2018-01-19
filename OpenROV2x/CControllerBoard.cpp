@@ -13,6 +13,7 @@ extern I2C I2C0;
 extern CMuxes g_SystemMuxes;
 
 using namespace ina260;
+using namespace bq34z100;
 
 // File local variables and methods
 namespace
@@ -61,6 +62,7 @@ namespace
 CControllerBoard::CControllerBoard()
 {
     m_powerSense = NULL;
+    m_chargeSense = NULL;
 }
 
 void CControllerBoard::Initialize()
@@ -71,7 +73,14 @@ void CControllerBoard::Initialize()
         onesecondtimer.Reset();
 
         m_powerSense = new INA260( &I2C0 );
+        g_SystemMuxes.SetPath(SCL_5V_SYS);
         m_powerSense->Cmd_SetConfig( 0x6727 );
+        g_SystemMuxes.SetPath(SCL_12V_RPA);
+        m_powerSense->Cmd_SetConfig( 0x6727 );
+        g_SystemMuxes.SetPath(SCL_12V_RPB);
+        m_powerSense->Cmd_SetConfig( 0x6727 );
+
+        m_chargeSense = new BQ34Z100( &I2C0 );
 
         // Initialize all the readings to 0:
         for( int thisReading = 0; thisReading < numReadings; ++thisReading )

@@ -63,6 +63,7 @@ BROKEN:=\
 
 INC:=-Ilibraries\
 -Ilibraries/BNO055\
+-Ilibraries/BQ34Z100\
 -Ilibraries/I2C/src\
 -Ilibraries/MPL3115A2\
 -Ilibraries/P86BSD030PA\
