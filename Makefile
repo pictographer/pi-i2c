@@ -42,6 +42,7 @@ CPP:=./OpenROV2x/CAutopilot_STD.cpp\
 ./libraries/MPU9150/MPU9150_DMPDriver.cpp\
 ./libraries/MPU9150/MPU9150_Quaternion.cpp\
 ./libraries/MPU9150/MPU9150_DriverLayer.cpp\
+./libraries/BQ34Z100/BQ34Z100.cpp\
 ./libraries/BNO055/BNO055.cpp\
 ./libraries/PCA9547/PCA9547.cpp\
 ./libraries/PCA9685/PCA9685.cpp\
