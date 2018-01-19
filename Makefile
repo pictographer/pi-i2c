@@ -12,6 +12,7 @@ CPP:=./OpenROV2x/CAutopilot_STD.cpp\
 ./OpenROV2x/NModuleManager.cpp\
 ./OpenROV2x/CSocket.cpp\
 ./OpenROV2x/CP86BSD030PA.cpp\
+./OpenROV2x/CP89BSD012BS.cpp\
 ./OpenROV2x/CMS5611_01BA.cpp\
 ./OpenROV2x/CMS5803_14BA.cpp\
 ./OpenROV2x/NArduinoManager.cpp\
@@ -31,6 +32,7 @@ CPP:=./OpenROV2x/CAutopilot_STD.cpp\
 ./OpenROV2x/CThrusters_Simplified.cpp\
 ./libraries/ORUtil/orutil.cpp\
 ./libraries/P86BSD030PA/P86BSD030PA.cpp \
+./libraries/P89BSD012BS/P89BSD012BS.cpp \
 ./libraries/MS5837_30BA/MS5837_30BA.cpp\
 ./libraries/MS5803_14BA/MS5803_14BA.cpp\
 ./libraries/MS5611_01BA/MS5611_01BA.cpp\
@@ -63,6 +65,7 @@ INC:=-Ilibraries\
 -Ilibraries/I2C/src\
 -Ilibraries/MPL3115A2\
 -Ilibraries/P86BSD030PA\
+-Ilibraries/P89BSD012BS\
 -Ilibraries/MPU9150\
 -Ilibraries/MS5611_01BA\
 -Ilibraries/MS5803_14BA\

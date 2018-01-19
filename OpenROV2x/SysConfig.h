@@ -59,6 +59,9 @@
 // MS5837_30BA Depth Sensor
 #define HAS_MS5837_30BA (0)
 
+// 89BSD012BS Depth Sensor
+#define HAS_P89BSD012BS (1)
+
 // 86BSD030PA Depth Sensor
 #define HAS_P86BSD030PA (1)
 

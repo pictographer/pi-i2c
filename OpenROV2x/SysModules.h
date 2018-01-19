@@ -96,3 +96,8 @@ CBallast m_ballast;
 CP86BSD030PA m_p86bsd030pa( &I2C0 );
 #endif
 
+#if(HAS_P89BSD012BS)
+#include "CP89BSD012BS.h"
+CP89BSD012BS m_p89bsd012bs( &I2C0 );
+#endif
+
