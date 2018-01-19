@@ -12,7 +12,7 @@
 #include <errno.h>
 #include <cstdint>
 
-const size_t CSocket_print_max = 80;
+const size_t CSocket_print_max = 512;
 
 typedef enum { DEC=10, HEX=16 } CSocket_print_t;
 

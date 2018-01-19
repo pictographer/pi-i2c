@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <inttypes.h>
 #include <cfloat>
+#include <netinet/tcp.h>
 
 CSocket::CSocket() : buf_len(0), buf_start(0) {
    // begin(); // Might be a bad idea to call begin here, but where?
@@ -72,6 +73,8 @@ void CSocket::begin(int) {
       perror("Unable to accept socket connection. Error");
    }
    printf("Socket server connection accepted.\n");
+//   int one = 1;
+//   setsockopt(clientfd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
 }
 
 // If data is available in the buffer, update start, update length, and return
@@ -131,7 +134,9 @@ int CSocket::print(uint8_t u, CSocket_print_t format) {
 }
 
 int CSocket::print(char c) {
-   return write(clientfd, &c, 1);
+   ssize_t result = -1;
+   result = write(clientfd, &c, 1);
+   return( result );
 }
 
 int CSocket::print(const char* s) {

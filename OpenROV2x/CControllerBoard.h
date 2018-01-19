@@ -19,6 +19,7 @@ public:
 private:
     ina260::INA260 *m_powerSense;
     long readVcc();
+    long readLeakDetector();
     float read20Volts();
     float readPiCurrent( uint8_t thePI );
 };

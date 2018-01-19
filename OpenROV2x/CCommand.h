@@ -4,10 +4,10 @@
 #include <Arduino.h>
 
 // Commands
-#define COMMAND_MAX_ARGUMENTS			10
-#define COMMAND_MAX_STRING_LENGTH		40
+#define COMMAND_MAX_ARGUMENTS			32
+#define COMMAND_MAX_STRING_LENGTH		128
 #define COMMAND_MAX_COUNT			 8	// Use 3 for 328p
-#define COMMAND_DATA_BUFFER_SIZE		80
+#define COMMAND_DATA_BUFFER_SIZE		1024
 
 struct TInternalCommand
 {

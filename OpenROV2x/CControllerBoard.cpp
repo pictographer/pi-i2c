@@ -80,6 +80,13 @@ void CControllerBoard::Initialize()
         }
 }
 
+long CControllerBoard::readLeakDetector()
+{
+             uint32_t leak =  0;
+             leak = g_SystemMuxes.ReadExtendedGPIO(LEAK_SW);
+             return(leak);
+}
+
 long CControllerBoard::readVcc()
 {
              uint32_t volts =  5000;
@@ -140,21 +147,6 @@ void CControllerBoard::Update( CCommand& commandIn )
         if( onesecondtimer.HasElapsed( 1000 ) )
         {
                 readTemp();
-                Serial.print( F( "BRDT:" ) );
-                Serial.print( celsiusTempRead );
-                Serial.print( ';' );
-                Serial.print( F( "SC1I:" ) );
-                Serial.print( readCurrent( A3 ) );
-                Serial.print( ';' );
-                Serial.print( F( "SC2I:" ) );
-                Serial.print( readCurrent( A2 ) );
-                Serial.print( ';' );
-                Serial.print( F( "SC3I:" ) );
-                Serial.print( readCurrent( A1 ) );
-                Serial.print( ';' );
-                Serial.print( F( "BRDI:" ) );
-                Serial.print( readBrdCurrent( A0 ) );
-                Serial.print( ';' );
                 Serial.print( F( "BT1I:" ) );
                 Serial.print( readPiCurrent( RPA ) );
                 Serial.print( ';' );
@@ -166,6 +158,24 @@ void CControllerBoard::Update( CCommand& commandIn )
                 Serial.print( ';' );
                 Serial.print( F( "AVCC:" ) );
                 Serial.print( readVcc() );
+                Serial.print( ';' );
+                Serial.print( F( "LEAK:" ) );
+                Serial.print( readLeakDetector() );
+                Serial.print( ';' );
+                Serial.print( F( "BRDI:" ) );
+                Serial.print( readBrdCurrent( A0 ) );
+                Serial.print( ';' );
+                Serial.print( F( "SC1I:" ) );
+                Serial.print( readCurrent( A3 ) );
+                Serial.print( ';' );
+                Serial.print( F( "SC2I:" ) );
+                Serial.print( readCurrent( A2 ) );
+                Serial.print( ';' );
+                Serial.print( F( "SC3I:" ) );
+                Serial.print( readCurrent( A1 ) );
+                Serial.print( ';' );
+                Serial.print( F( "BRDT:" ) );
+                Serial.print( celsiusTempRead );
                 Serial.println( ';' );
 
         }
