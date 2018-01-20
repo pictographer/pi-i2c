@@ -30,7 +30,8 @@ void CCalibrationLaser::Update( CCommand& command )
 
         // Set the laser pin value
         m_pin.Write( command.m_arguments[1] );
-        Serial.print( "claser:" ); Serial.print( command.m_arguments[1] ); Serial.println( ';' );
+        Serial.print( "claser:" ); Serial.print( command.m_arguments[1] ); Serial.print( ';' );
+	Serial.println( F( "ENDUPDATE:1;" ) );
     }
 }
 

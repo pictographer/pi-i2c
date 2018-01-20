@@ -129,7 +129,8 @@ void CThrusters::Update( CCommand& command )
         Serial.print( starboard_forward_motor.m_negativeModifier );
         Serial.print( "," );
         Serial.print( starboard_aft_motor.m_negativeModifier );
-        Serial.println( ";" );
+        Serial.print( ";" );
+	Serial.println( F( "ENDUPDATE:1;" ) );
     }
 
     //Legacy Control just the port motors, only used for manual callibration
@@ -266,7 +267,8 @@ void CThrusters::Update( CCommand& command )
         //from the thust and yaw.
         //maxHtransDelta = max range - remaining authority from throttle and yaw
         maxHtransDelta = abs((500.0/abs(port_forward_motor.m_negativeModifier))*(1.0-abs(trg_throttle)-abs(trg_yaw)));
-        Serial.print("THRV2X1XV2.mhd:");Serial.print(maxHtransDelta);Serial.println(";");
+        Serial.print("THRV2X1XV2.mhd:");Serial.print(maxHtransDelta);Serial.print(";");
+	Serial.println( F( "ENDUPDATE:1;" ) );
         st = constrain( (500.0/abs(port_forward_motor.m_negativeModifier))*trg_strafe,-maxHtransDelta,maxHtransDelta);
         //st is the actual strafe translation we will employ
         Serial.print("THRV2X1XV2.st:");Serial.print(st);Serial.println(";");
@@ -283,6 +285,7 @@ void CThrusters::Update( CCommand& command )
 
         Serial.print("THRV2X1XV2.pf2:");Serial.print(pf);Serial.println(";");
         Serial.print("THRV2X1XV2.sf2:");Serial.print(sf);Serial.println(";");
+	Serial.println( F( "ENDUPDATE:1;" ) );
 
     }
 
@@ -301,7 +304,8 @@ void CThrusters::Update( CCommand& command )
         escpower.Write( command.m_arguments[1] ); //Turn on the ESCs
         Serial.print( F( "log:escpower=" ) );
         Serial.print( command.m_arguments[1] );
-        Serial.println( ';' );
+        Serial.print( ';' );
+	Serial.println( F( "ENDUPDATE:1;" ) );
     }
     #endif
 
@@ -375,7 +379,8 @@ void CThrusters::Update( CCommand& command )
             Serial.print( starboard_forward_motor.SetMotorTarget( new_sf ) );
             Serial.print( ',' );
             Serial.print( starboard_aft_motor.SetMotorTarget( new_sa ) );
-            Serial.println( ';' );
+            Serial.print( ';' );
+	    Serial.println( F( "ENDUPDATE:1;" ) );
         }
 
     }
@@ -417,7 +422,8 @@ void CThrusters::Update( CCommand& command )
         Serial.print( starboard_forward_motor.m_negativeModifier );
         Serial.print( "," );
         Serial.print( starboard_aft_motor.m_negativeModifier );
-        Serial.println( ";" );
+        Serial.print( ";" );
+	Serial.println( F( "ENDUPDATE:1;" ) );
     }
 }
 

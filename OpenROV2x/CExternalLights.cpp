@@ -73,7 +73,8 @@ void CExternalLights::Update( CCommand& commandIn )
                         delay(50);
 			Serial.print( F( "elights_tpow:" ) );
 			Serial.print( commandIn.m_arguments[1] );
-			Serial.println( ';' );
+			Serial.print( ';' );
+	                Serial.println( F( "ENDUPDATE:1;" ) );
 
 			// Pass through linearization function
 			m_targetPower_an = PercentToAnalog( m_targetPower );
@@ -115,6 +116,7 @@ void CExternalLights::Update( CCommand& commandIn )
 			Serial.print( F( "elights_pow:" ) );
 			Serial.print( orutil::Encode1K( m_targetPower ) );
 			Serial.print( ';' );
+	                Serial.println( F( "ENDUPDATE:1;" ) );
 		}
 	}
 }

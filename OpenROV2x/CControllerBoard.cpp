@@ -195,7 +195,9 @@ void CControllerBoard::Update( CCommand& commandIn )
                 Serial.print( ';' );
                 Serial.print( F( "BRDT:" ) );
                 Serial.print( celsiusTempRead );
-                Serial.println( ';' );
+                Serial.print( ';' );
+                // this must be last
+                Serial.println( F( "ENDUPDATE:1;" ) );
 
         }
 

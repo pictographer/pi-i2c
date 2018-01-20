@@ -42,6 +42,7 @@ namespace NArduinoManager
                         Serial.print( F( "log:" ) );
                         Serial.println( m_wdtResetInfo );
                         Serial.print( ';' );
+	                Serial.println( F( "ENDUPDATE:1;" ) );
                 }
 
                 // Set pin 13 as an output

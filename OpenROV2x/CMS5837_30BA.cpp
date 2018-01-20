@@ -21,7 +21,8 @@ CMS5837_30BA::CMS5837_30BA( I2C *i2cInterfaceIn, ms5837_30ba::EAddress addressIn
 
 void CMS5837_30BA::Initialize()
 {
-	Serial.println( F( "ms5837_init:1;" ) );
+	Serial.print( F( "ms5837_init:1;" ) );
+	Serial.println( F( "ENDUPDATE:1;" ) );
 
 	m_statusCheckTimer.Reset();
 	m_telemetryTimer.Reset();
@@ -56,8 +57,9 @@ void CMS5837_30BA::Update( CCommand& commandIn )
 		// Check to see if the error threshold is above acceptable levels
 		if( m_device.GetResultCount( EResult::RESULT_ERR_FAILED_SEQUENCE ) > m_maxFailuresPerPeriod )
 		{
-			Serial.println( "ms5837_HardReset:1" );
+			Serial.print( "ms5837_HardReset:1" );
 			m_device.HardReset();
+	                Serial.println( F( "ENDUPDATE:1;" ) );
 		}
 		else
 		{
@@ -77,7 +79,8 @@ void CMS5837_30BA::Update( CCommand& commandIn )
 
 			// Permanently disable the device
 			m_device.Disable();
-			Serial.println( F( "ms5837_disabled:1;" ) );
+			Serial.print( F( "ms5837_disabled:1;" ) );
+	                Serial.println( F( "ENDUPDATE:1;" ) );
 			return;
 		}
 	}
@@ -92,7 +95,8 @@ void CMS5837_30BA::Update( CCommand& commandIn )
 			m_depthOffset_m = m_device.m_data.depth_m;
 
 			// Send ack
-			Serial.println( F( "depth_zero:ack;" ) );
+			Serial.print( F( "depth_zero:ack;" ) );
+	                Serial.println( F( "ENDUPDATE:1;" ) );
 		}
 		// Clear the depth offset
 		else if( commandIn.Equals( "depth_clroff" ) )
@@ -101,7 +105,8 @@ void CMS5837_30BA::Update( CCommand& commandIn )
 			m_depthOffset_m = 0.0f;
 
 			// Send ack
-			Serial.println( F( "depth_clroff:ack;" ) );
+			Serial.print( F( "depth_clroff:ack;" ) );
+	                Serial.println( F( "ENDUPDATE:1;" ) );
 		}
 		// Change water type
 		else if( commandIn.Equals( "depth_water" ) )
@@ -113,7 +118,8 @@ void CMS5837_30BA::Update( CCommand& commandIn )
 				// Ack
 				Serial.print( F( "depth_water:" ) );	
 				Serial.print( commandIn.m_arguments[1] ); 	
-				Serial.println( ';' );
+				Serial.print( ';' );
+	                        Serial.println( F( "ENDUPDATE:1;" ) );
 			}
 			else if( commandIn.m_arguments[1] == (uint32_t)EWaterType::SALT )
 			{
@@ -122,7 +128,8 @@ void CMS5837_30BA::Update( CCommand& commandIn )
 				// Ack
 				Serial.print( F( "depth_water:" ) );	
 				Serial.print( commandIn.m_arguments[1] );
-				Serial.println( ';' );
+				Serial.print( ';' );
+	                        Serial.println( F( "ENDUPDATE:1;" ) );
 			}
 		}
 	}
@@ -138,7 +145,8 @@ void CMS5837_30BA::Update( CCommand& commandIn )
 			// Report results
 			Serial.print( F( "depth_t:" ) );	Serial.print( orutil::Encode1K( m_device.m_data.temperature_c ) ); 	Serial.print( ';' );
 			Serial.print( F( "depth_p:" ) );	Serial.print( orutil::Encode1K( m_device.m_data.pressure_mbar ) ); 	Serial.print( ';' );
-			Serial.print( F( "depth_d:" ) );	Serial.print( orutil::Encode1K( m_device.m_data.depth_m ) ); 		Serial.println( ';' );
+			Serial.print( F( "depth_d:" ) );	Serial.print( orutil::Encode1K( m_device.m_data.depth_m ) ); 		Serial.print( ';' );
+	                Serial.println( F( "ENDUPDATE:1;" ) );
 		}
 	}
 }

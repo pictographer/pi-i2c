@@ -23,8 +23,9 @@ CBNO055::CBNO055( I2C *i2cInterfaceIn, bno055::EAddress addressIn )
 
 void CBNO055::Initialize()
 {
-	Serial.println( F( "bno055_init:1;" ) );
-	
+	Serial.print( F( "bno055_init:1;" ) );
+	Serial.println( F( "ENDUPDATE:1;" ) );
+ 	
 	m_statusCheckTimer.Reset();
 	m_telemetryTimer.Reset();
 	m_calibTimer.Reset();
@@ -50,11 +51,13 @@ void CBNO055::Update( CCommand &commandIn )
 			m_yawOffset = m_device.m_data.yaw;
 
 			// Send ack
-			Serial.println( F( "imu_zyaw:ack;" ) );
+			Serial.print( F( "imu_zyaw:ack;" ) );
+	                Serial.println( F( "ENDUPDATE:1;" ) );
 		}
 		// Zero the roll and pich values
 		else if( commandIn.Equals( "imu_level" ) )
 		{
+#ifdef IMU_LEVEL
 			// Set offsets based on request from cockpit
 			m_rollOffset 	= orutil::Decode1K( commandIn.m_arguments[1] );
 			m_pitchOffset 	= orutil::Decode1K( commandIn.m_arguments[2] );
@@ -62,6 +65,8 @@ void CBNO055::Update( CCommand &commandIn )
 			// Report new settings
 			Serial.print( F( "imu_roff:" ) ); Serial.print( commandIn.m_arguments[1] ); Serial.println( ';' );
 			Serial.print( F( "imu_poff:" ) ); Serial.print( commandIn.m_arguments[2] ); Serial.println( ';' );
+#endif
+	                Serial.println( F( "ENDUPDATE:1;" ) );
 		}
 		// Set the operating mode
 		else if( commandIn.Equals( "imu_mode" ) )
@@ -73,7 +78,8 @@ void CBNO055::Update( CCommand &commandIn )
 
 				Serial.print( F( "imu_mode:" ) );
 				Serial.print( commandIn.m_arguments[1] );
-				Serial.println( ';' );
+				Serial.print( ';' );
+	                        Serial.println( F( "ENDUPDATE:1;" ) );
 			}
 			else if( commandIn.m_arguments[1] == 1 )
 			{
@@ -81,7 +87,8 @@ void CBNO055::Update( CCommand &commandIn )
 
 				Serial.print( F( "imu_mode:" ) );
 				Serial.print( commandIn.m_arguments[1] );
-				Serial.println( ';' );
+				Serial.print( ';' );
+	                        Serial.println( F( "ENDUPDATE:1;" ) );
 			}
 		}
 	}
@@ -92,8 +99,9 @@ void CBNO055::Update( CCommand &commandIn )
 		// Check to see if the error threshold is above acceptable levels
 		if( m_device.GetResultCount( EResult::RESULT_ERR_READING_EULER ) > m_maxFailuresPerPeriod )
 		{
-			Serial.println( "bno055_HardReset:1" );
+			Serial.print( "bno055_HardReset:1" );
 			m_device.HardReset();
+	                Serial.println( F( "ENDUPDATE:1;" ) );
 		}
 		else
 		{
@@ -106,7 +114,8 @@ void CBNO055::Update( CCommand &commandIn )
 		{
 			// Permanently disable the device
 			m_device.Disable();
-			Serial.println( F( "bno055_disabled:1;" ) );
+			Serial.print( F( "bno055_disabled:1;" ) );
+	                Serial.println( F( "ENDUPDATE:1;" ) );
 			return;
 		}
 	}
@@ -134,7 +143,8 @@ void CBNO055::Update( CCommand &commandIn )
 		{
 			Serial.print( F( "imu_r:" ) );	Serial.print( orutil::Encode1K( NDataManager::m_navData.ROLL ) ); 	Serial.print( ';' );
 			Serial.print( F( "imu_p:" ) );	Serial.print( orutil::Encode1K( NDataManager::m_navData.PITC ) ); 	Serial.print( ';' );
-			Serial.print( F( "imu_y:" ) );	Serial.print( orutil::Encode1K( NDataManager::m_navData.YAW ) ); 	Serial.println( ';' );
+			Serial.print( F( "imu_y:" ) );	Serial.print( orutil::Encode1K( NDataManager::m_navData.YAW ) ); 	Serial.print( ';' );
+	                Serial.println( F( "ENDUPDATE:1;" ) );
 		}
 	}
 
@@ -146,7 +156,8 @@ void CBNO055::Update( CCommand &commandIn )
 			Serial.print( F( "bno055_cAcc:" ) );	Serial.print( m_device.m_calibration.accel ); 	Serial.print( ';' );
 			Serial.print( F( "bno055_cGyr:" ) );	Serial.print( m_device.m_calibration.gyro ); 	Serial.print( ';' );
 			Serial.print( F( "bno055_cMag:" ) );	Serial.print( m_device.m_calibration.mag ); 	Serial.print( ';' );
-			Serial.print( F( "bno055_cSys:" ) );	Serial.print( m_device.m_calibration.system ); 	Serial.println( ';' );
+			Serial.print( F( "bno055_cSys:" ) );	Serial.print( m_device.m_calibration.system ); 	Serial.print( ';' );
+	                Serial.println( F( "ENDUPDATE:1;" ) );
 		}
 	}
 }

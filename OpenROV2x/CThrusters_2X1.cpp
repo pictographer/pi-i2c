@@ -99,7 +99,8 @@ void CThrusters::Update( CCommand& command )
         Serial.print( vertical_motor.m_negativeModifier );
         Serial.print( "," );
         Serial.print( starboard_motor.m_negativeModifier );
-        Serial.println( ";" );
+        Serial.print( ";" );
+	Serial.println( F( "ENDUPDATE:1;" ) );
     }
     else if( command.Equals( "go" ) )
     {
@@ -193,7 +194,8 @@ void CThrusters::Update( CCommand& command )
         escpower.Write( command.m_arguments[1] ); //Turn on the ESCs
         Serial.print( F( "log:escpower=" ) );
         Serial.print( command.m_arguments[1] );
-        Serial.println( ';' );
+        Serial.print( ';' );
+	Serial.println( F( "ENDUPDATE:1;" ) );
     }
     #endif
 
@@ -261,7 +263,8 @@ void CThrusters::Update( CCommand& command )
             Serial.print( vertical_motor.SetMotorTarget( new_v ) );
             Serial.print( ',' );
             Serial.print( starboard_motor.SetMotorTarget( new_s ) );
-            Serial.println( ';' );
+            Serial.print( ';' );
+	    Serial.println( F( "ENDUPDATE:1;" ) );
         }
 
     }
@@ -291,7 +294,8 @@ void CThrusters::Update( CCommand& command )
         Serial.print( vertical_motor.m_negativeModifier );
         Serial.print( "," );
         Serial.print( starboard_motor.m_negativeModifier );
-        Serial.println( ";" );
+        Serial.print( ";" );
+	Serial.println( F( "ENDUPDATE:1;" ) );
     }
 }
 

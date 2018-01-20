@@ -33,7 +33,8 @@ namespace NModuleManager
                 // Check to see if we have room left to register a module
                 if( m_moduleCount >= MAX_MODULES )
                 {
-                        Serial.println( F( "ERROR: TOO MANY MODULES;" ) );
+                        Serial.print( F( "ERROR: TOO MANY MODULES;" ) );
+			Serial.println( F( "ENDUPDATE:1;" ) );
                         return;
                 }
 

@@ -50,7 +50,8 @@ void setup()
         // TCCR5B = ( TCCR5B & B11111000 ) | B00000010;
 
         // Boot complete
-        Serial.println( F( "boot:1;" ) );
+        Serial.print( F( "boot:1;" ) );
+        Serial.println( F( "ENDUPDATE:1;" ) );
 }
 
 void loop()

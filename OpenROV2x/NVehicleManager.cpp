@@ -40,12 +40,14 @@ namespace NVehicleManager
                         {
                                 // SHA1 hash of all of the source used to build the firmware
                                 // This gets automatically generated at compile time by the ArduinoBuilder library and appended to CompileOptions.h
-                                Serial.println( VERSION_HASH );
+                                Serial.print( VERSION_HASH );
+	                        Serial.println( F( "ENDUPDATE:1;" ) );
                         }
                         else if( commandIn.Equals( "wake" ) )
                         {
                                 // Acknowledge greeting
-                                Serial.println( "awake:;" );
+                                Serial.print( "awake:;" );
+	                        Serial.println( F( "ENDUPDATE:1;" ) );
                         }
                         // TODO: These should be handled by the control module
                         else if( commandIn.Equals( "reportSetting" ) )
@@ -53,7 +55,8 @@ namespace NVehicleManager
                                 Serial.print( F( "*settings:" ) );
                                 Serial.print( F( "smoothingIncrement|" ) );             Serial.print( m_throttleSmoothingIncrement );   Serial.print( ',' );
                                 Serial.print( F( "deadZone_min|" ) );                   Serial.print( m_deadZoneMin );                                  Serial.print( ',' );
-                                Serial.print( F( "deadZone_max|" ) );                   Serial.print( m_deadZoneMax );                                  Serial.println( ';' );
+                                Serial.print( F( "deadZone_max|" ) );                   Serial.print( m_deadZoneMax );                                  Serial.print( ';' );
+	                        Serial.println( F( "ENDUPDATE:1;" ) );
                         }
                         else if( commandIn.Equals( "updateSetting" ) )
                         {

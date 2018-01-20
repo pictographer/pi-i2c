@@ -131,7 +131,8 @@ void CThrusters::Update( CCommand& command )
         Serial.print( starboard_vertical_motor.m_negativeModifier );
         Serial.print( "," );
         Serial.print( starboard_motor.m_negativeModifier );
-        Serial.println( ";" );
+        Serial.print( ";" );
+	Serial.println( F( "ENDUPDATE:1;" ) );
     }
 
     else if( command.Equals( "port" ) )
@@ -270,8 +271,9 @@ void CThrusters::Update( CCommand& command )
           vs = 1500 + 500 * trg_lift;
           vp2 = vp;
           vs2 = vs;
-          Serial.print("THR2XV2.vp1:");Serial.print(vp);Serial.println(";");
-          Serial.print("THR2XV2.vs1:");Serial.print(vs);Serial.println(";");
+          Serial.print("THR2XV2.vp1:");Serial.print(vp);Serial.print(";");
+          Serial.print("THR2XV2.vs1:");Serial.print(vs);Serial.print(";");
+	  Serial.println( F( "ENDUPDATE:1;" ) );
         }
       }
 
@@ -293,6 +295,7 @@ void CThrusters::Update( CCommand& command )
           vs2=vs-st;
           Serial.print("THR2XV2.vp2:");Serial.print(vp2);Serial.println(";");
           Serial.print("THR2XV2.vs2:");Serial.print(vs2);Serial.println(";");
+	  Serial.println( F( "ENDUPDATE:1;" ) );
         }
       }
 
@@ -304,7 +307,8 @@ void CThrusters::Update( CCommand& command )
         escpower.Write( command.m_arguments[1] ); //Turn on the ESCs
         Serial.print( F( "log:escpower=" ) );
         Serial.print( command.m_arguments[1] );
-        Serial.println( ';' );
+        Serial.print( ';' );
+	Serial.println( F( "ENDUPDATE:1;" ) );
     }
     #endif
 
@@ -375,7 +379,8 @@ void CThrusters::Update( CCommand& command )
             Serial.print( starboard_vertical_motor.SetMotorTarget( new_vs ) );
             Serial.print( ',' );
             Serial.print( starboard_motor.SetMotorTarget( new_s ) );
-            Serial.println( ';' );
+            Serial.print( ';' );
+	    Serial.println( F( "ENDUPDATE:1;" ) );
         }
 
     }
@@ -411,7 +416,8 @@ void CThrusters::Update( CCommand& command )
         Serial.print( starboard_vertical_motor.m_negativeModifier );
         Serial.print( "," );
         Serial.print( starboard_motor.m_negativeModifier );
-        Serial.println( ";" );
+        Serial.print( ";" );
+	Serial.println( F( "ENDUPDATE:1;" ) );
     }
 }
 

@@ -42,7 +42,8 @@ void CAutopilot::Initialize()
 {
         pilotTimer.Reset();
 
-        Serial.println( F( "log:pilot setup complete;" ) );
+        Serial.print( F( "log:pilot setup complete;" ) );
+	Serial.println( F( "ENDUPDATE:1;" ) );
 }
 
 
@@ -67,7 +68,8 @@ void CAutopilot::Update( CCommand& command )
                         Serial.println( F( "log:heading_hold_disabled;" ) );
                         Serial.print( F( "targetHeading:" ) );
                         Serial.print( F("DISABLED") );
-                        Serial.println( ';' );
+                        Serial.print( ';' );
+	                Serial.println( F( "ENDUPDATE:1;" ) );
 
                 }
 
@@ -90,7 +92,8 @@ void CAutopilot::Update( CCommand& command )
                         Serial.println( ';' );
                         Serial.print( F( "targetHeading:" ) );
                         Serial.print( tgt_Hdg );
-                        Serial.println( ';' );
+                        Serial.print( ';' );
+	                Serial.println( F( "ENDUPDATE:1;" ) );
                 }
 
                 //Backwards compatibility for a release or two (2.5.1 release)
@@ -128,7 +131,8 @@ void CAutopilot::Update( CCommand& command )
                         Serial.println( F( "log:depth_hold_disabled;" ) );
                         Serial.print( F( "targetDepth:" ) );
                         Serial.print( F("DISABLED") );
-                        Serial.println( ';' );
+                        Serial.print( ';' );
+	                Serial.println( F( "ENDUPDATE:1;" ) );
 
                 }
 
@@ -151,7 +155,8 @@ void CAutopilot::Update( CCommand& command )
                         Serial.println( ';' );
                         Serial.print( F( "targetDepth:" ) );
                         Serial.print( target_depth );
-                        Serial.println( ';' );
+                        Serial.print( ';' );
+	                Serial.println( F( "ENDUPDATE:1;" ) );
                 }
 
 
@@ -200,7 +205,8 @@ void CAutopilot::Update( CCommand& command )
                         Serial.println( F( "log:dhold pushing command;" ) );
                         Serial.print( F( "dp_er:" ) );
                         Serial.print( depth_Error );
-                        Serial.println( ';' );
+                        Serial.print( ';' );
+	                Serial.println( F( "ENDUPDATE:1;" ) );
 
                         if( abs( depth_Error ) > depth_deadband )
                         {
@@ -250,7 +256,8 @@ void CAutopilot::Update( CCommand& command )
                         Serial.println( F( "log:hold pushing command;" ) );
                         Serial.print( F( "p_er:" ) );
                         Serial.print( hdg_Error );
-                        Serial.println( ';' );
+                        Serial.print( ';' );
+	                Serial.println( F( "ENDUPDATE:1;" ) );
 
                         if( abs( hdg_Error ) > heading_deadband )
                         {

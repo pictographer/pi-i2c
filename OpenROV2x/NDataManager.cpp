@@ -50,7 +50,8 @@ namespace NDataManager
                 // Serial.print( ';' );
                 Serial.print( F( "fthr:" ) );
                 Serial.print( m_navData.FTHR );
-                Serial.println( ';' );
+                Serial.print( ';' );
+	        Serial.println( F( "ENDUPDATE:1;" ) );
         }
 
         void OutputSharedData()
@@ -85,7 +86,8 @@ namespace NDataManager
                 Serial.print( ';' );
                 Serial.print( F( "temp:" ) );
                 Serial.print( m_environmentData.TEMP );
-                Serial.println( ';' );
+                Serial.print( ';' );
+	        Serial.println( F( "ENDUPDATE:1;" ) );
 
                 // I2C Debugging
                 // -----------------------------------------------------------------
@@ -123,7 +125,8 @@ namespace NDataManager
                 Serial.println( ';' );
                 Serial.print( F( "i2c.BAD_ADDR:" ) );
                 Serial.print( I2C0.GetResultCount( i2c::EI2CResult::RESULT_ERR_BAD_ADDRESS ) );
-                Serial.println( ';' );
+                Serial.print( ';' );
+	        Serial.println( F( "ENDUPDATE:1;" ) );
         }
 
         void HandleOutputLoops()
@@ -139,7 +142,8 @@ namespace NDataManager
                         // Loops per sec
                         Serial.print( F( "alps:" ) );
                         Serial.print( m_loopsPerSec );
-                        Serial.println( ';' );
+                        Serial.print( ';' );
+	                Serial.println( F( "ENDUPDATE:1;" ) );
 
                         // Reset loop counter
                         m_loopsPerSec = 0;

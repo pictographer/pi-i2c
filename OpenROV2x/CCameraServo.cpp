@@ -130,7 +130,8 @@ void CCameraServo::Update( CCommand& command )
             // Acknowledge target position
             Serial.print( F( "camServ_tpos:" ) );
             Serial.print( static_cast<int32_t>( command.m_arguments[1] ) );
-            Serial.println( ';' );
+            Serial.print( ';' );
+	    Serial.println( F( "ENDUPDATE:1;" ) );
 
             // Update the target position
             m_targetPos_deg = Decode( static_cast<int32_t>( command.m_arguments[1] ) );
@@ -143,7 +144,8 @@ void CCameraServo::Update( CCommand& command )
             // Acknowledge receipt of command
             Serial.print( F( "camServ_spd:" ) );
             Serial.print( static_cast<int32_t>( command.m_arguments[1] ) );
-            Serial.println( ';' );
+            Serial.print( ';' );
+	    Serial.println( F( "ENDUPDATE:1;" ) );
 
             // Decode the requested speed and update the setting
             m_speed_deg_per_s   = Decode( static_cast<int32_t>( command.m_arguments[1] ) );
@@ -158,6 +160,7 @@ void CCameraServo::Update( CCommand& command )
 
                 // Report back
                 Serial.print( F( "camServ_inv:1;" ) );
+	        Serial.println( F( "ENDUPDATE:1;" ) );
             }
             else if( command.m_arguments[1] == 0 )
             {
@@ -166,6 +169,7 @@ void CCameraServo::Update( CCommand& command )
 
                 // Report back
                 Serial.print( F( "camServ_inv:0;" ) );
+	        Serial.println( F( "ENDUPDATE:1;" ) );
             }
 
             // Adjust target_us based on inversion
@@ -221,7 +225,8 @@ void CCameraServo::Update( CCommand& command )
     {
         Serial.print( F( "camServ_pos:" ) );
         Serial.print( Encode( m_currentPos_deg ) );
-        Serial.println( ';' );
+        Serial.print( ';' );
+	Serial.println( F( "ENDUPDATE:1;" ) );
     }
 }
 
