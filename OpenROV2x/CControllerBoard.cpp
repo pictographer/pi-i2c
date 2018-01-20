@@ -96,6 +96,13 @@ long CControllerBoard::readLeakDetector()
              return(leak);
 }
 
+long CControllerBoard::readCharge() 
+{
+             // percent remaining charge
+             g_SystemMuxes.SetPath(SCL_BATT);
+             return m_chargeSense->getRemaining();
+}
+
 long CControllerBoard::readVcc()
 {
              uint32_t volts =  5000;
@@ -170,6 +177,9 @@ void CControllerBoard::Update( CCommand& commandIn )
                 Serial.print( ';' );
                 Serial.print( F( "LEAK:" ) );
                 Serial.print( readLeakDetector() );
+                Serial.print( ';' );
+                Serial.print( F( "CHARGE:" ) );
+                Serial.print( readCharge() );
                 Serial.print( ';' );
                 Serial.print( F( "BRDI:" ) );
                 Serial.print( readBrdCurrent( A0 ) );

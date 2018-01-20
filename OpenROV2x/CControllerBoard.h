@@ -20,6 +20,7 @@ public:
 private:
     ina260::INA260 *m_powerSense;
     bq34z100::BQ34Z100 *m_chargeSense;
+    long readCharge();
     long readVcc();
     long readLeakDetector();
     float read20Volts();

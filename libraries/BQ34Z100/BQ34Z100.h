@@ -24,7 +24,8 @@ namespace bq34z100
 
             //Private member attributes
             uint8_t m_i2cAddress;
-            I2C* m_pI2C;
+            I2C    *m_pI2C;
+            uint8_t m_calibrationMode;
 
 	public:
 	    BQ34Z100( I2C* i2cInterfaceIn );
@@ -39,12 +40,12 @@ namespace bq34z100
 	    int getRemaining();
 	    int getFlags();
 	    int readControl(uint8_t,uint8_t);
-	    int readInstantCurrent();
 	    bool readFlash(uint16_t , uint8_t );
 	    int enableIT();
 	    int enableCal();
 	    int exitCal();
 	    int enterCal();
+            void seal();
 	    void reset();
 	    void checkSum(uint16_t , uint8_t);
 	    uint16_t CalibrateVoltageDivider(uint16_t);//used to calibrate the voltage divider

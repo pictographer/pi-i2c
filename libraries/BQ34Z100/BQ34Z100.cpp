@@ -20,6 +20,7 @@ BQ34Z100::BQ34Z100( I2C* i2cInterfaceIn )
 {
 	m_pI2C = i2cInterfaceIn; 
 	m_i2cAddress = bq34z100::BQ34Z100_ADDRESS;
+        m_calibrationMode = 0;
 }
 
 
@@ -49,12 +50,13 @@ int32_t BQ34Z100::ReadNBytes( uint8_t addressIn, uint8_t* dataOut, uint8_t byteC
 }
 
 //read a standard normal access value (the common ones you need)
+// assumes no more than a 4 byte access
 uint32_t BQ34Z100::Read(uint8_t add, uint8_t length)
 {
     uint8_t  dataOut[4];
     uint32_t returnVal = 0;
 
-    ReadNBytes( (uint8_t) add, (uint8_t *) &dataOut, length );
+    ReadNBytes( (uint8_t) add, (uint8_t *) dataOut, length );
     for (int i = 0; i < length; i++)
     {
         returnVal = returnVal + (dataOut[i] << (8 * i));
@@ -64,18 +66,27 @@ uint32_t BQ34Z100::Read(uint8_t add, uint8_t length)
 
 int BQ34Z100::enableCal()
 {
-    return readControl(0x2D,0x00);//reading this will enable the IT algorithm
+    (m_calibrationMode == 0 ? m_calibrationMode++ : m_calibrationMode--);
+    return readControl(0x2D,0x00);//reading this will toggle calibraion mode
 }
 
 int BQ34Z100::enterCal()
 {
-    return readControl(0x2D,0x00);//reading this will enable the IT algorithm
+    m_calibrationMode++;
+    return readControl(0x81,0x00);//reading this will enter calibration mode
 }
 
 
 int BQ34Z100::exitCal()
 {
-    return readControl(0x2D,0x00);//reading this will enable the IT algorithm
+    m_calibrationMode--;
+    return readControl(0x80,0x00);//reading this will exit calibration mode
+}
+
+void BQ34Z100::seal()
+{
+    uint16_t data = 0x2000;
+    WriteWord( 0x00, data );
 }
 
 int BQ34Z100::enableIT()
@@ -86,24 +97,15 @@ int BQ34Z100::enableIT()
 //  or enable IT)
 int BQ34Z100::readControl(uint8_t add,uint8_t add2)
 {
-    uint16_t additional_data = 0x0000;
-    additional_data = (add<<8);
+    uint16_t additional_data = (add<<8);
 
     WriteWord( add2, additional_data );
 
     uint8_t reg_add = 0x00;
-    uint8_t resp_data[2]; 
-    ReadNBytes( reg_add, resp_data, sizeof(resp_data));
-    int16_t temp = resp_data[0];
-    temp = temp | (resp_data[1] << 8);
+    uint32_t temp = Read( reg_add, 2);
     return temp;
+}
 
-}
-//lets you read the instantainious current
-int BQ34Z100::readInstantCurrent()
-{
-    return readControl(0x18,0x00);
-}
 //returns the current temp
 int BQ34Z100::getTemp()
 {
@@ -138,13 +140,11 @@ int BQ34Z100::getStatus()
 }
 int BQ34Z100::getFlags()
 {
-    return readControl(0x0E,0x0F);
+    return Read(0x0E, 2) ; //
 }
 void BQ34Z100::reset()
 {
-    WriteByte( 0x00, 0x41 );
-    // Wire.requestFrom(BQ34Z100, 1); 
-    // Wire.read();
+    WriteWord( 0x00, 0x41 );
 }
 
 /**    FLASH CONFIGURATION SETTINGS  **/
@@ -159,7 +159,7 @@ int BQ34Z100::setup(uint8_t BatteryChemistry,uint8_t SeriesCells,uint16_t CellCa
     *   Calibrate voltage Divider
     *   Calibrate Current Shunt
     */
-//Set chemistry
+    //Set chemistry
 
     //Set Series Cells
     //Set cell capacity
@@ -173,8 +173,8 @@ int BQ34Z100::setup(uint8_t BatteryChemistry,uint8_t SeriesCells,uint16_t CellCa
         CalibrateVoltageDivider(PackCurrentVoltage);//calling 3 times due to rounding issues
         CalibrateVoltageDivider(PackCurrentVoltage);//it gets closer each time
     }
-   //we now need to calibrate thecurrent
-CalibrateCurrentShunt(AppliedCurrent);
+    // we now need to calibrate thecurrent
+    CalibrateCurrentShunt(AppliedCurrent);
 
 }
 void BQ34Z100::CalibrateCurrentShunt(int16_t current)
@@ -201,6 +201,7 @@ void BQ34Z100::CalibrateCurrentShunt(int16_t current)
 
     delay(30);
 }
+
 uint16_t BQ34Z100::CalibrateVoltageDivider(uint16_t currentVoltage)
 {
     if(currentVoltage<5000)
@@ -220,7 +221,16 @@ return (uint16_t)newSetting;
 // a different page
 bool BQ34Z100::readFlash(uint16_t subclass, uint8_t offset)
 {
+    uint16_t data = 0x0000;
+    // unseal device
+    // byte 1
+    data = 0x0414;
+    WriteWord( 0x00, data );
+    // byte 2
+    data = 0x3672;
+    WriteWord( 0x00, data );
     delay(10);
+    // enable block data flash control
     WriteByte( 0x61, 0x00 ); // block data control
     delay(30);//mimic bq2300
     WriteByte( 0x3e, subclass ); // data flash class
@@ -232,12 +242,24 @@ bool BQ34Z100::readFlash(uint16_t subclass, uint8_t offset)
     delay(10);
     return false;
 }
+
 void BQ34Z100::writeTable(uint16_t subclass, uint8_t offset)
 {
+    uint16_t data = 0x0000;
+    // unseal device
+    // byte 1
+    data = 0x0414;
+    WriteWord( 0x00, data );
+    // byte 2
+    data = 0x3672;
+    WriteWord( 0x00, data );
+    // enable block data flash control
     WriteByte( 0x61, 0x00 ); // block data control
     delay(30);//mimic bq2300
+    // access subclass
     WriteByte( 0x3e, subclass ); // data flash class
     delay(30);//mimic bq2300
+    // write block offset
     WriteByte( 0x3f, (uint8_t)(offset / 32)); // data flash block - change this to 0x01 if offset is >31
     delay(30);//mimic bq2300
     bool changed = false;
