@@ -38,11 +38,11 @@ namespace NArduinoManager
                         EEPROM.write( 0, 0 );
 
                         // Print debug information about the watchdog triggering
-                        Serial.println( F( "log:Watchdog was triggered and the following was read from EEPROM;" ) );
+                        Serial.print( F( "log:Watchdog was triggered and the following was read from EEPROM;" ) );
                         Serial.print( F( "log:" ) );
-                        Serial.println( m_wdtResetInfo );
+                        Serial.print( m_wdtResetInfo );
                         Serial.print( ';' );
-	                Serial.println( F( "ENDUPDATE:1;" ) );
+	                Serial.print( F( "ENDUPDATE:1;" ) );
                 }
 
                 // Set pin 13 as an output

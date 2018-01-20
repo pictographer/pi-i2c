@@ -165,7 +165,7 @@ bool CCommand::GetCommandString()
                 if( strcmp( m_text, "" ) == 0 )
                 {
                         Serial.print( F( "icmd: CMD MUNGED!;" ) );
-	                Serial.println( F( "ENDUPDATE:1;" ) );
+	                Serial.print( F( "ENDUPDATE:1;" ) );
                         return false;
                 }
 
@@ -192,7 +192,7 @@ bool CCommand::GetCommandString()
                 commandReady = true;
 
                 Serial.print( ");" );
-	        Serial.println( F( "ENDUPDATE:1;" ) );
+	        Serial.print( F( "ENDUPDATE:1;" ) );
                 return true;
         }
 
@@ -228,7 +228,7 @@ void CCommand::PushCommand( const char* cmdtext, int32_t cmdargs[COMMAND_MAX_ARG
         if( internalCommandBuffer_head == internalCommandBuffer_tail )
         {
                 Serial.print( F( "log: CommandBufferOverrun;" ) );
-	        Serial.println( F( "ENDUPDATE:1;" ) );
+	        Serial.print( F( "ENDUPDATE:1;" ) );
                 internalCommandBuffer_tail++;
         }
 
@@ -270,7 +270,7 @@ void CCommand::Parse()
                 tt++;
         }
 
-        Serial.println( ';' );
+        Serial.print( ';' );
 
         Serial.print( F( "crc:" ) );
         uint8_t testcrc = dataBuffer[0];
@@ -321,6 +321,6 @@ void CCommand::Parse()
         }
 
         Serial.print( ");" );
-	Serial.println( F( "ENDUPDATE:1;" ) );
+	Serial.print( F( "ENDUPDATE:1;" ) );
         m_arguments[0] = i - 1;
 }

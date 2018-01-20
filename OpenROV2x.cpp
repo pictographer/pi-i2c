@@ -51,7 +51,7 @@ void setup()
 
         // Boot complete
         Serial.print( F( "boot:1;" ) );
-        Serial.println( F( "ENDUPDATE:1;" ) );
+        Serial.print( F( "ENDUPDATE:1;" ) );
 }
 
 void loop()

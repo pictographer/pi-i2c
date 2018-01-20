@@ -163,6 +163,9 @@ void CControllerBoard::Update( CCommand& commandIn )
         if( onesecondtimer.HasElapsed( 1000 ) )
         {
                 readTemp();
+                Serial.print( F( "BRDT:" ) );
+                Serial.print( celsiusTempRead );
+                Serial.print( ';' );
                 Serial.print( F( "BT1I:" ) );
                 Serial.print( readPiCurrent( RPA ) );
                 Serial.print( ';' );
@@ -193,11 +196,8 @@ void CControllerBoard::Update( CCommand& commandIn )
                 Serial.print( F( "SC3I:" ) );
                 Serial.print( readCurrent( A1 ) );
                 Serial.print( ';' );
-                Serial.print( F( "BRDT:" ) );
-                Serial.print( celsiusTempRead );
-                Serial.print( ';' );
                 // this must be last
-                Serial.println( F( "ENDUPDATE:1;" ) );
+                Serial.print( F( "ENDUPDATE:1;" ) );
 
         }
 

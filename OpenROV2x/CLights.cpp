@@ -76,7 +76,7 @@ void CLights::Update( CCommand& commandIn )
 		Serial.print( F( "lights_tpow:" ) );
 		Serial.print( commandIn.m_arguments[1] );
 		Serial.print( ';' );
-	        Serial.println( F( "ENDUPDATE:1;" ) );
+	        Serial.print( F( "ENDUPDATE:1;" ) );
 
 		// Pass through linearization function
 		m_targetPower_an = PercentToAnalog( m_targetPower );
@@ -111,7 +111,7 @@ void CLights::Update( CCommand& commandIn )
 		Serial.print( F( "lights_pow:" ) );
 		Serial.print( orutil::Encode1K( m_currentPower ) );
 		Serial.print( ';' );
-	        Serial.println( F( "ENDUPDATE:1;" ) );
+	        Serial.print( F( "ENDUPDATE:1;" ) );
 	}
 #if 0
 	else if( commandIn.Equals( "wake" ) )

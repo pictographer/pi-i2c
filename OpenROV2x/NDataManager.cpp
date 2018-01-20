@@ -51,7 +51,7 @@ namespace NDataManager
                 Serial.print( F( "fthr:" ) );
                 Serial.print( m_navData.FTHR );
                 Serial.print( ';' );
-	        Serial.println( F( "ENDUPDATE:1;" ) );
+	        Serial.print( F( "ENDUPDATE:1;" ) );
         }
 
         void OutputSharedData()
@@ -61,7 +61,7 @@ namespace NDataManager
                 // Thruster Data
                 Serial.print( F( "motorAttached:" ) );
                 Serial.print( m_thrusterData.MATC );
-                Serial.println( ';' );
+                Serial.print( ';' );
 
                 // Cape Data
                 Serial.print( F( "fmem:" ) );
@@ -78,7 +78,7 @@ namespace NDataManager
                 Serial.print( ';' );
                 Serial.print( F( "time:" ) );
                 Serial.print( m_capeData.UTIM );
-                Serial.println( ';' );
+                Serial.print( ';' );
 
                 // Environment Data
                 Serial.print( F( "pres:" ) );
@@ -87,7 +87,7 @@ namespace NDataManager
                 Serial.print( F( "temp:" ) );
                 Serial.print( m_environmentData.TEMP );
                 Serial.print( ';' );
-	        Serial.println( F( "ENDUPDATE:1;" ) );
+	        Serial.print( F( "ENDUPDATE:1;" ) );
 
                 // I2C Debugging
                 // -----------------------------------------------------------------
@@ -104,29 +104,29 @@ namespace NDataManager
 
                 Serial.print( F( "i2c.OK:" ) );
                 Serial.print( I2C0.GetResultCount( i2c::EI2CResult::RESULT_SUCCESS ) );
-                Serial.println( ';' );
+                Serial.print( ';' );
                 Serial.print( F( "i2c.NACK:" ) );
                 Serial.print( I2C0.GetResultCount( i2c::EI2CResult::RESULT_NACK ) );
-                Serial.println( ';' );
+                Serial.print( ';' );
                 Serial.print( F( "i2c.TIMEOUT:" ) );
                 Serial.print( I2C0.GetResultCount( i2c::EI2CResult::RESULT_ERR_TIMEOUT ) );
-                Serial.println( ';' );
+                Serial.print( ';' );
                 Serial.print( F( "i2c.FAILED:" ) );
                 Serial.print( I2C0.GetResultCount( i2c::EI2CResult::RESULT_ERR_FAILED ) );
-                Serial.println( ';' );
+                Serial.print( ';' );
                 Serial.print( F( "i2c.AL_INIT:" ) );
                 Serial.print( I2C0.GetResultCount( i2c::EI2CResult::RESULT_ERR_ALREADY_INITIALIZED ) );
-                Serial.println( ';' );
+                Serial.print( ';' );
                 Serial.print( F( "i2c.BAD_BAUD:" ) );
                 Serial.print( I2C0.GetResultCount( i2c::EI2CResult::RESULT_ERR_INVALID_BAUD ) );
-                Serial.println( ';' );
+                Serial.print( ';' );
                 Serial.print( F( "i2c.LOST_ARB:" ) );
                 Serial.print( I2C0.GetResultCount( i2c::EI2CResult::RESULT_ERR_LOST_ARBITRATION ) );
-                Serial.println( ';' );
+                Serial.print( ';' );
                 Serial.print( F( "i2c.BAD_ADDR:" ) );
                 Serial.print( I2C0.GetResultCount( i2c::EI2CResult::RESULT_ERR_BAD_ADDRESS ) );
                 Serial.print( ';' );
-	        Serial.println( F( "ENDUPDATE:1;" ) );
+	        Serial.print( F( "ENDUPDATE:1;" ) );
         }
 
         void HandleOutputLoops()
@@ -143,7 +143,7 @@ namespace NDataManager
                         Serial.print( F( "alps:" ) );
                         Serial.print( m_loopsPerSec );
                         Serial.print( ';' );
-	                Serial.println( F( "ENDUPDATE:1;" ) );
+	                Serial.print( F( "ENDUPDATE:1;" ) );
 
                         // Reset loop counter
                         m_loopsPerSec = 0;

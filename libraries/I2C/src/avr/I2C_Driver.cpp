@@ -67,7 +67,7 @@ namespace i2c
             // Enable TWI module and acks
             TWCR = _BV( TWEN ) | _BV( TWEA );
 
-            //Serial.println( "i2c:enabled;" );
+            //Serial.print( "i2c:enabled;" );
 
             return EI2CResult::RESULT_SUCCESS;
         }
@@ -77,7 +77,7 @@ namespace i2c
             // Disables the TWI interface and TWI interrupts
             TWCR = 0;
 
-            //Serial.println( "i2c:disabled;" );
+            //Serial.print( "i2c:disabled;" );
 
             return EI2CResult::RESULT_SUCCESS; 
         }
@@ -98,7 +98,7 @@ namespace i2c
                 return EI2CResult::RESULT_ERR_INVALID_BAUD;
             }
 
-            //Serial.println( "i2c:setbaud;" );
+            //Serial.print( "i2c:setbaud;" );
 
 	        return EI2CResult::RESULT_SUCCESS;
         }
@@ -108,7 +108,7 @@ namespace i2c
             EI2CResult ret;
             uint8_t status = 0;
 
-            //Serial.println( "i2c:start;" );
+            //Serial.print( "i2c:start;" );
 
             // Send start
             TWCR = ( 1 << TWINT ) | ( 1 << TWSTA ) | ( 1 << TWEN );
@@ -119,7 +119,7 @@ namespace i2c
             if( ret )
 		    {
                 // Timeout
-                //Serial.println( "i2c:timeout;" );
+                //Serial.print( "i2c:timeout;" );
                 Reset();
                 return ret;
             }
@@ -128,7 +128,7 @@ namespace i2c
                 // Successful transaction start
                 if( ( status == ETWIStatus::TWI_START ) || ( status == ETWIStatus::TWI_REPEATED_START ) )
                 {
-                    //Serial.println( "i2c:ok;" );
+                    //Serial.print( "i2c:ok;" );
                     return EI2CResult::RESULT_SUCCESS;
                 }
                 
@@ -136,14 +136,14 @@ namespace i2c
                 if( status == ETWIStatus::TWI_LOST_ARBITRATION )
                 {
                     // Lost Arbitration
-                    //Serial.println( "i2c:arb;" );
+                    //Serial.print( "i2c:arb;" );
                     Reset();
                     return EI2CResult::RESULT_ERR_LOST_ARBITRATION;
                 }
                 else
                 {
                     // Unknown error
-                    //Serial.println( "i2c:fail;" );
+                    //Serial.print( "i2c:fail;" );
                     Reset();
                     return EI2CResult::RESULT_ERR_FAILED;
                 }
@@ -155,7 +155,7 @@ namespace i2c
             EI2CResult ret;
             uint8_t status = 0;
 
-            //Serial.println( "i2c:sendaddr;" );
+            //Serial.print( "i2c:sendaddr;" );
 
             // Set slave address
             TWDR = ((slaveAddressIn << 1) + actionIn );
@@ -167,7 +167,7 @@ namespace i2c
             if( ret )
 		    {
                 // Timeout
-                //Serial.println( "i2c:timeout;" );
+                //Serial.print( "i2c:timeout;" );
                 Reset();
                 return ret;
             }
@@ -176,7 +176,7 @@ namespace i2c
                 // Success
                 if( ( status == ETWIStatus::TWI_MT_SLA_ACK ) || ( status == ETWIStatus::TWI_MR_SLA_ACK ) )
                 {
-                    //Serial.println( "i2c:ok;" );
+                    //Serial.print( "i2c:ok;" );
                     return EI2CResult::RESULT_SUCCESS;
                 }
 
@@ -184,14 +184,14 @@ namespace i2c
                 if( ( status == ETWIStatus::TWI_MT_SLA_NACK ) || ( status == ETWIStatus::TWI_MR_SLA_NACK ) )
                 {
                     // Nack received. End transaction
-                    //Serial.println( "i2c:nack;" );
+                    //Serial.print( "i2c:nack;" );
                     StopTransaction();
                     return EI2CResult::RESULT_NACK;
                 }
                 else
                 {
                     // Unknown error
-                    //Serial.println( "i2c:fail;" );
+                    //Serial.print( "i2c:fail;" );
                     Reset();
                     return EI2CResult::RESULT_ERR_FAILED;
                 }
@@ -203,7 +203,7 @@ namespace i2c
             EI2CResult ret;
             uint8_t status = 0;
 
-            //Serial.println( "i2c:write;" );
+            //Serial.print( "i2c:write;" );
 
             // Write byte to data register
             TWDR = byteIn;
@@ -215,7 +215,7 @@ namespace i2c
             if( ret )
 		    {
                 // Timeout
-                //Serial.println( "i2c:timeout;" );
+                //Serial.print( "i2c:timeout;" );
                 Reset();
                 return ret;
             }
@@ -224,14 +224,14 @@ namespace i2c
                 // Success
                 if( status == ETWIStatus::TWI_MT_DATA_ACK )
                 {
-                    //Serial.println( "i2c:ok;" );
+                    //Serial.print( "i2c:ok;" );
                     return EI2CResult::RESULT_SUCCESS;
                 }
 
                 // Handle errors
                 if( status == ETWIStatus::TWI_MT_DATA_NACK )
                 {
-                    //Serial.println( "i2c:nack;" );
+                    //Serial.print( "i2c:nack;" );
 
                     // Nack received. End transaction
                     StopTransaction();
@@ -240,7 +240,7 @@ namespace i2c
                 else
                 {
                     // Unknown error
-                    //Serial.println( "i2c:fail;" );
+                    //Serial.print( "i2c:fail;" );
                     Reset();
                     return EI2CResult::RESULT_ERR_FAILED;
                 }
@@ -252,7 +252,7 @@ namespace i2c
             EI2CResult ret;
             uint8_t status = 0;
 
-            //Serial.println( "i2c:read;" );
+            //Serial.print( "i2c:read;" );
 
             // Handle ACK/NACK
             if( sendNack )
@@ -272,7 +272,7 @@ namespace i2c
             if( ret )
 		    {
                 // Timeout
-                //Serial.println( "i2c:timeout;" );
+                //Serial.print( "i2c:timeout;" );
                 Reset();
                 return ret;
             }
@@ -283,7 +283,7 @@ namespace i2c
                     // Success
                     if( status == ETWIStatus::TWI_MR_DATA_NACK )
                     {
-                        //Serial.println( "i2c:ok;" );
+                        //Serial.print( "i2c:ok;" );
 
                         // Read data byte into buffer
                         *dataOut = TWDR;
@@ -295,7 +295,7 @@ namespace i2c
                     // Success
                     if( status == ETWIStatus::TWI_MR_DATA_ACK )
                     {
-                        //Serial.println( "i2c:ok;" );
+                        //Serial.print( "i2c:ok;" );
 
                         // Read data byte into buffer
                         *dataOut = TWDR;
@@ -306,14 +306,14 @@ namespace i2c
                 if( status == ETWIStatus::TWI_LOST_ARBITRATION )
                 {
                     // Lost arbitration
-                    //Serial.println( "i2c:arb;" );
+                    //Serial.print( "i2c:arb;" );
                     Reset();
                     return EI2CResult::RESULT_ERR_LOST_ARBITRATION;
                 }
                 else
                 {
                     // Unknown error
-                    //Serial.println( "i2c:fail;" );
+                    //Serial.print( "i2c:fail;" );
                     Reset();
                     return EI2CResult::RESULT_ERR_FAILED;
                 }
@@ -324,7 +324,7 @@ namespace i2c
         {
             EI2CResult ret;
 
-            //Serial.println( "i2c:stop;" );
+            //Serial.print( "i2c:stop;" );
 
             // Send Stop
             TWCR = ( 1 << TWINT ) | ( 1 << TWEN ) | ( 1 << TWSTO );
@@ -335,12 +335,12 @@ namespace i2c
             if( ret )
 		    {
                 // Timeout
-                //Serial.println( "i2c:timeout;" );
+                //Serial.print( "i2c:timeout;" );
                 Reset();
                 return ret;
             }
 
-            //Serial.println( "i2c:ok;" );
+            //Serial.print( "i2c:ok;" );
             return EI2CResult::RESULT_SUCCESS;
         }
 
@@ -348,7 +348,7 @@ namespace i2c
         {
             uint32_t startTime = millis();
 
-            //Serial.println( "i2c:wfs;" );
+            //Serial.print( "i2c:wfs;" );
 
             // Wait for TWSTO to be cleared
             while( ( TWCR & ( 1 << TWSTO ) ) )
@@ -356,12 +356,12 @@ namespace i2c
                 // Check for timeout
                 if( ( millis() - startTime ) > kTimeout_ms )
                 {
-                    //Serial.println( "i2c:wfs_to;" );
+                    //Serial.print( "i2c:wfs_to;" );
                     return EI2CResult::RESULT_ERR_TIMEOUT;
                 }
             }
 
-            //Serial.println( "i2c:wfs_ok;" );
+            //Serial.print( "i2c:wfs_ok;" );
 
             return EI2CResult::RESULT_SUCCESS;
         }
@@ -370,7 +370,7 @@ namespace i2c
         {
             uint32_t startTime = millis();
 
-            //Serial.println( "i2c:wfi;" );
+            //Serial.print( "i2c:wfi;" );
 
             // Wait for TWINT to be set
             while( !( TWCR & ( 1 << TWINT ) ) )
@@ -378,7 +378,7 @@ namespace i2c
                 // Check for timeout
                 if( ( millis() - startTime ) > kTimeout_ms )
                 {
-                    //Serial.println( "i2c:wfi_to;" );
+                    //Serial.print( "i2c:wfi_to;" );
                     return EI2CResult::RESULT_ERR_TIMEOUT;
                 }
             }
@@ -386,14 +386,14 @@ namespace i2c
             // Return the status
             twiStatusOut = TWI_STATUS;
 
-            //Serial.println( "i2c:wfi_ok;" );
+            //Serial.print( "i2c:wfi_ok;" );
 
             return EI2CResult::RESULT_SUCCESS;
         }
 
         void Reset()
         {
-            //Serial.println( "i2c:reset;" );
+            //Serial.print( "i2c:reset;" );
             // Disables TWI and releases SDA and SCL lines to high impedance
             TWCR = 0;
 

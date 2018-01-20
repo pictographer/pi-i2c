@@ -43,7 +43,7 @@ void CAutopilot::Initialize()
         pilotTimer.Reset();
 
         Serial.print( F( "log:pilot setup complete;" ) );
-	Serial.println( F( "ENDUPDATE:1;" ) );
+	Serial.print( F( "ENDUPDATE:1;" ) );
 }
 
 
@@ -65,11 +65,11 @@ void CAutopilot::Update( CCommand& command )
 
                         int32_t m_argumentsToSend[] = {1, 00}; //include number of parms as fist parm
                         command.PushCommand( "yaw", m_argumentsToSend );
-                        Serial.println( F( "log:heading_hold_disabled;" ) );
+                        Serial.print( F( "log:heading_hold_disabled;" ) );
                         Serial.print( F( "targetHeading:" ) );
                         Serial.print( F("DISABLED") );
                         Serial.print( ';' );
-	                Serial.println( F( "ENDUPDATE:1;" ) );
+	                Serial.print( F( "ENDUPDATE:1;" ) );
 
                 }
 
@@ -89,11 +89,11 @@ void CAutopilot::Update( CCommand& command )
                         tgt_Hdg = _headingHoldTarget;
                         Serial.print( F( "log:heading_hold_enabled on=" ) );
                         Serial.print( tgt_Hdg );
-                        Serial.println( ';' );
+                        Serial.print( ';' );
                         Serial.print( F( "targetHeading:" ) );
                         Serial.print( tgt_Hdg );
                         Serial.print( ';' );
-	                Serial.println( F( "ENDUPDATE:1;" ) );
+	                Serial.print( F( "ENDUPDATE:1;" ) );
                 }
 
                 //Backwards compatibility for a release or two (2.5.1 release)
@@ -128,11 +128,11 @@ void CAutopilot::Update( CCommand& command )
 
                         int32_t m_argumentsToSend[] = {1, 0}; //include number of parms as fist parm
                         command.PushCommand( "lift", m_argumentsToSend );
-                        Serial.println( F( "log:depth_hold_disabled;" ) );
+                        Serial.print( F( "log:depth_hold_disabled;" ) );
                         Serial.print( F( "targetDepth:" ) );
                         Serial.print( F("DISABLED") );
                         Serial.print( ';' );
-	                Serial.println( F( "ENDUPDATE:1;" ) );
+	                Serial.print( F( "ENDUPDATE:1;" ) );
 
                 }
 
@@ -152,11 +152,11 @@ void CAutopilot::Update( CCommand& command )
                         target_depth = _depthHoldTarget;
                         Serial.print( F( "log:depth_hold_enabled on=" ) );
                         Serial.print( target_depth );
-                        Serial.println( ';' );
+                        Serial.print( ';' );
                         Serial.print( F( "targetDepth:" ) );
                         Serial.print( target_depth );
                         Serial.print( ';' );
-	                Serial.println( F( "ENDUPDATE:1;" ) );
+	                Serial.print( F( "ENDUPDATE:1;" ) );
                 }
 
 
@@ -202,11 +202,11 @@ void CAutopilot::Update( CCommand& command )
                         raw_lift = ( float )depth_Error * depth_hold_loop_gain;
                         lift = constrain( raw_lift, -100, 100 );
 
-                        Serial.println( F( "log:dhold pushing command;" ) );
+                        Serial.print( F( "log:dhold pushing command;" ) );
                         Serial.print( F( "dp_er:" ) );
                         Serial.print( depth_Error );
                         Serial.print( ';' );
-	                Serial.println( F( "ENDUPDATE:1;" ) );
+	                Serial.print( F( "ENDUPDATE:1;" ) );
 
                         if( abs( depth_Error ) > depth_deadband )
                         {
@@ -253,11 +253,11 @@ void CAutopilot::Update( CCommand& command )
                         // Constrain and output to motors
 
                         yaw = constrain( raw_yaw, -50, 50 );
-                        Serial.println( F( "log:hold pushing command;" ) );
+                        Serial.print( F( "log:hold pushing command;" ) );
                         Serial.print( F( "p_er:" ) );
                         Serial.print( hdg_Error );
                         Serial.print( ';' );
-	                Serial.println( F( "ENDUPDATE:1;" ) );
+	                Serial.print( F( "ENDUPDATE:1;" ) );
 
                         if( abs( hdg_Error ) > heading_deadband )
                         {

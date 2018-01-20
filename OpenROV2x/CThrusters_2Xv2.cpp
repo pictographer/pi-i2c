@@ -132,7 +132,7 @@ void CThrusters::Update( CCommand& command )
         Serial.print( "," );
         Serial.print( starboard_motor.m_negativeModifier );
         Serial.print( ";" );
-	Serial.println( F( "ENDUPDATE:1;" ) );
+	Serial.print( F( "ENDUPDATE:1;" ) );
     }
 
     else if( command.Equals( "port" ) )
@@ -273,7 +273,7 @@ void CThrusters::Update( CCommand& command )
           vs2 = vs;
           Serial.print("THR2XV2.vp1:");Serial.print(vp);Serial.print(";");
           Serial.print("THR2XV2.vs1:");Serial.print(vs);Serial.print(";");
-	  Serial.println( F( "ENDUPDATE:1;" ) );
+	  Serial.print( F( "ENDUPDATE:1;" ) );
         }
       }
 
@@ -284,18 +284,18 @@ void CThrusters::Update( CCommand& command )
           //from the vertical thruster range.  If vertical is full power,
           //the strafe will be zero.
           maxVtransDelta = std::abs((500.0/std::abs(port_vertical_motor.m_negativeModifier))*(1.0-std::abs(trg_lift)));
-          Serial.print("THR2XV2.mvd:");Serial.print(maxVtransDelta);Serial.println(";");
+          Serial.print("THR2XV2.mvd:");Serial.print(maxVtransDelta);Serial.print(";");
           st = constrain( (int) ((500.0/std::abs(port_vertical_motor.m_negativeModifier))*trg_strafe),-maxVtransDelta,maxVtransDelta);
-          Serial.print("THR2XV2.st:");Serial.print(st);Serial.println(";");
+          Serial.print("THR2XV2.st:");Serial.print(st);Serial.print(";");
           //Adjust the vertrans thrusters with the ideal translate value
           //if we go the wrong way... switch these.
-          Serial.print("THR2XV2.vp0:");Serial.print(vp);Serial.println(";");
+          Serial.print("THR2XV2.vp0:");Serial.print(vp);Serial.print(";");
 
           vp2=vp+st;
           vs2=vs-st;
-          Serial.print("THR2XV2.vp2:");Serial.print(vp2);Serial.println(";");
-          Serial.print("THR2XV2.vs2:");Serial.print(vs2);Serial.println(";");
-	  Serial.println( F( "ENDUPDATE:1;" ) );
+          Serial.print("THR2XV2.vp2:");Serial.print(vp2);Serial.print(";");
+          Serial.print("THR2XV2.vs2:");Serial.print(vs2);Serial.print(";");
+	  Serial.print( F( "ENDUPDATE:1;" ) );
         }
       }
 
@@ -308,7 +308,7 @@ void CThrusters::Update( CCommand& command )
         Serial.print( F( "log:escpower=" ) );
         Serial.print( command.m_arguments[1] );
         Serial.print( ';' );
-	Serial.println( F( "ENDUPDATE:1;" ) );
+	Serial.print( F( "ENDUPDATE:1;" ) );
     }
     #endif
 
@@ -380,7 +380,7 @@ void CThrusters::Update( CCommand& command )
             Serial.print( ',' );
             Serial.print( starboard_motor.SetMotorTarget( new_s ) );
             Serial.print( ';' );
-	    Serial.println( F( "ENDUPDATE:1;" ) );
+	    Serial.print( F( "ENDUPDATE:1;" ) );
         }
 
     }
@@ -398,7 +398,7 @@ void CThrusters::Update( CCommand& command )
         Serial.print( vs );
         Serial.print( ',' );
         Serial.print( s );
-        Serial.println( ';' );
+        Serial.print( ';' );
         NDataManager::m_thrusterData.MATC = port_motor.IsActive() || port_motor.IsActive() || port_motor.IsActive();
         Serial.print( F( "mtrmod:" ) );
         Serial.print( port_motor.m_positiveModifier );
@@ -417,7 +417,7 @@ void CThrusters::Update( CCommand& command )
         Serial.print( "," );
         Serial.print( starboard_motor.m_negativeModifier );
         Serial.print( ";" );
-	Serial.println( F( "ENDUPDATE:1;" ) );
+	Serial.print( F( "ENDUPDATE:1;" ) );
     }
 }
 

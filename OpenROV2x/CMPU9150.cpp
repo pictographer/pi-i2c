@@ -53,7 +53,7 @@ CMPU9150::CMPU9150( mpu9150::EAddress addressIn )
 void CMPU9150::Initialize()
 {
 	Serial.print( F( "mpu9150_init:0;" ) );
-	Serial.println( F( "ENDUPDATE:1;" ) );
+	Serial.print( F( "ENDUPDATE:1;" ) );
 	
 	m_statusCheckTimer.Reset();
 	m_telemetryTimer.Reset();
@@ -79,7 +79,7 @@ void CMPU9150::Update( CCommand& commandIn )
 		{
 			m_isDisabled = true;
 			Serial.print( F( "mpu9150_disabled:1;" ) );
-	                Serial.println( F( "ENDUPDATE:1;" ) );
+	                Serial.print( F( "ENDUPDATE:1;" ) );
 			return;
 		}
 		else
@@ -92,12 +92,12 @@ void CMPU9150::Update( CCommand& commandIn )
 					// Success
 					m_isInitialized = true;
 					Serial.print( F( "mpu9150_init:1;" ) );
-	                                Serial.println( F( "ENDUPDATE:1;" ) );
+	                                Serial.print( F( "ENDUPDATE:1;" ) );
 				}
 				else
 				{
 					Serial.print( F( "mpu9150_init:0;" ) );
-	                                Serial.println( F( "ENDUPDATE:1;" ) );
+	                                Serial.print( F( "ENDUPDATE:1;" ) );
 				}
 
 				// Increment hard reset counter, whether init succeeded or not
@@ -123,7 +123,7 @@ void CMPU9150::Update( CCommand& commandIn )
 
 			// Send ack
 			Serial.print( F( "imu_zyaw:ack;" ) );
-	                Serial.println( F( "ENDUPDATE:1;" ) );
+	                Serial.print( F( "ENDUPDATE:1;" ) );
 		}
 		// Zero the roll and pich values
 		else if( commandIn.Equals( "imu_level" ) )
@@ -136,7 +136,7 @@ void CMPU9150::Update( CCommand& commandIn )
 			// Report new settings
 			Serial.print( F( "imu_roff:" ) ); Serial.print( commandIn.m_arguments[1] ); Serial.print( ';' );
 			Serial.print( F( "imu_poff:" ) ); Serial.print( commandIn.m_arguments[2] ); Serial.print( ';' );
-	                Serial.println( F( "ENDUPDATE:1;" ) );
+	                Serial.print( F( "ENDUPDATE:1;" ) );
 #endif
 		}
 		// Set the operating mode
@@ -144,7 +144,7 @@ void CMPU9150::Update( CCommand& commandIn )
 		{
 			// Does not support mode changes right now, send nack
 			Serial.print( F( "imu_level:nack;" ) );
-	                Serial.println( F( "ENDUPDATE:1;" ) );
+	                Serial.print( F( "ENDUPDATE:1;" ) );
 		}
 	}
 
@@ -183,7 +183,7 @@ void CMPU9150::Update( CCommand& commandIn )
 				Serial.print( F( "imu_r:" ) );	Serial.print( orutil::Encode1K( NDataManager::m_navData.ROLL ) ); 	Serial.print( ';' );
 				Serial.print( F( "imu_p:" ) );	Serial.print( orutil::Encode1K( NDataManager::m_navData.PITC ) ); 	Serial.print( ';' );
 				Serial.print( F( "imu_y:" ) );	Serial.print( orutil::Encode1K( NDataManager::m_navData.YAW ) ); 	Serial.print( ';' );
-	                        Serial.println( F( "ENDUPDATE:1;" ) );
+	                        Serial.print( F( "ENDUPDATE:1;" ) );
 			}
 		}
 	}

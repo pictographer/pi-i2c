@@ -243,12 +243,12 @@ bool MPU9150::init( int mpuRate, int magMix, int magRate, int lpf )
 
 	if( m_useMagCalibration )
 	{
-		Serial.println( "Using mag cal" );
+		Serial.print( "Using mag cal" );
 	}
 
 	if( m_useAccelCalibration )
 	{
-		Serial.println( "Using accel cal" );
+		Serial.print( "Using accel cal" );
 	}
 
 #endif
@@ -272,14 +272,14 @@ bool MPU9150::init( int mpuRate, int magMix, int magRate, int lpf )
 	mpu_configure_fifo( INV_XYZ_GYRO | INV_XYZ_ACCEL );                // get accel and gyro data in the FIFO also
 
 #ifdef MPULIB_DEBUG
-	Serial.println( "Loading firmware" );
+	Serial.print( "Loading firmware" );
 #endif
 
 	if( ( result = dmp_load_motion_driver_firmware() ) != 0 )          // try to load the DMP firmware
 	{
 #ifdef MPULIB_DEBUG
 		Serial.print( "Failed to load dmp firmware: " );
-		Serial.println( result );
+		Serial.print( result );
 #endif
 		return false;
 	}
@@ -293,7 +293,7 @@ bool MPU9150::init( int mpuRate, int magMix, int magRate, int lpf )
 	if( mpu_set_dmp_state( 1 ) != 0 )
 	{
 #ifdef MPULIB_DEBUG
-		Serial.println( "mpu_set_dmp_state failed" );
+		Serial.print( "mpu_set_dmp_state failed" );
 #endif
 		return false;
 	}

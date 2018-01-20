@@ -39,3 +39,6 @@ TAGS
 # Vi
 *.swp
 *.swo
+*.swm
+*.swn
+*.sv
