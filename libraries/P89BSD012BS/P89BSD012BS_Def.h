@@ -27,11 +27,14 @@ namespace p89bsd012bs
     // Computation constants
     constexpr int32_t POW_2_7  = 128;           // 2^7
     constexpr int32_t POW_2_8  = 256;           // 2^8
+    constexpr int32_t POW_2_9  = 512;           // 2^9
+    constexpr int32_t POW_2_11 = 2048;          // 2^11
     constexpr int32_t POW_2_13 = 8192;          // 2^13
     constexpr int32_t POW_2_15 = 32768;         // 2^15
     constexpr int32_t POW_2_16 = 65536;         // 2^16
     constexpr int32_t POW_2_21 = 2097152;       // 2^21
     constexpr int32_t POW_2_23 = 8388608;       // 2^23
+    constexpr int32_t POW_2_24 = 16777216;      // 2^24
     constexpr int32_t POW_2_31 = 2147483648;    // 2^31
     constexpr int64_t POW_2_33 = 8589934592;    // 2^33
     constexpr int64_t POW_2_37 = 137438953472;  // 2^37
@@ -116,6 +119,21 @@ namespace p89bsd012bs
         orutil::CTimer  timer;
         EState          nextState;
         uint32_t        delayTime_ms;
+    };
+
+    enum class Coefficient : uint8_t
+    {
+       C_C0 = 0,
+       C_C1,
+       C_C2,
+       C_C3,
+       C_C4,
+       C_C5,
+       C_C6,
+       C_A0,
+       C_A1,
+       C_A2,
+       _COEFF_COUNT
     };
 
     // ----------

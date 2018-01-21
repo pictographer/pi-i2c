@@ -56,13 +56,13 @@ namespace p89bsd012bs
         orutil::TResultCount<EResult::_RESULT_COUNT, EResult::RESULT_SUCCESS> m_results;
     
         // Computation parameters
-        uint16_t    m_coeffs[8] = {0};  // unsigned 16-bit integer (0-65535)
+        uint16_t    m_coeffs[10] = {0};  // unsigned 16-bit integer (0-65535)
 
         uint32_t    m_D1        = 0;    // Digital pressure value
         uint32_t    m_D2        = 0;    // Digital temperature value
         
         int32_t     m_dT        = 0;    // Difference between actual and reference temperature
-        int32_t     m_TEMP      = 0;    // Actual temperature
+        double      m_TEMP      = 0;    // Actual temperature
         
         int64_t     m_OFF       = 0;    // Offset at actual temperature
         int64_t     m_SENS      = 0;    // Sensitivity at actual temperature
@@ -74,9 +74,15 @@ namespace p89bsd012bs
         int64_t     m_OFF2      = 0;    // Second order final off 
         int64_t     m_SENS2     = 0;    // Second order final sens
         int64_t     m_TEMP2     = 0;    // Second order final temp
+
+        double      m_Yn        = 0;
+        double      m_Yd        = 0;
+        double      m_Y         = 0;
+        double      m_Pc        = 0;
+        double      m_Pi        = 0;
         
-        int32_t     m_P         = 0;    // Temperature compensated pressure
-        int32_t     m_MaxP      = 0;    // Max pressure
+        double      m_P         = 0;    // Temperature compensated pressure
+        double      m_MaxP      = 0;    // Max pressure
         
         // Bytes to hold the results from I2C communications with the sensor
         uint8_t     m_highByte  = 0;

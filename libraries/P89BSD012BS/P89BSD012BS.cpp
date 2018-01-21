@@ -260,7 +260,7 @@ EResult P89BSD012BS::Cmd_ReadCalibrationData()
     uint8_t coeffs[ 2 ];
  
     // Read sensor coefficients
-    for( uint8_t i = 0; i < 7; ++i )
+    for( uint8_t i = 0; i < 10; ++i )
     {
         i2c::EI2CResult ret = ReadRegisterBytes( CMD_PROM_READ_BASE + ( i * 2 ), coeffs, 2 );
  
@@ -401,44 +401,38 @@ uint8_t P89BSD012BS::CalculateCRC4()
 void P89BSD012BS::ProcessData()
 {
     // Calculate base terms
-    m_dT      = (int32_t)m_D2 - ( (int32_t)m_coeffs[5] * POW_2_8 );
-    m_TEMP    = 2000 + ( ( (int64_t)m_dT * (int32_t)m_coeffs[6] ) / POW_2_23 );
+    // TEMP = A0/3 + A1*2*D2/2^24 + A2*2*(D2/2^24)^2
+    m_dT      = (m_D2/POW_2_24);
+    m_TEMP    = (m_coeffs[static_cast<uint8_t>(Coefficient::C_A0)]/3) +
+                (m_coeffs[static_cast<uint8_t>(Coefficient::C_A1)]*2*m_dT) +
+                (m_coeffs[static_cast<uint8_t>(Coefficient::C_A2)]*2*m_dT*m_dT);
+    // Q0 = 9
+    // Q1 = 11
+    // Q2 = 9
+    // Q3 = 15
+    // Q4 = 15
+    // Q5 = 16
+    // Q6 = 16
  	
-    m_OFF     = ( (int64_t)m_coeffs[2] * POW_2_16 ) + ( ( (int64_t)m_coeffs[4] * m_dT ) / POW_2_7 );
-    m_SENS    = ( (int64_t)m_coeffs[1] * POW_2_15 ) + ( ( (int64_t)m_coeffs[3] * m_dT ) / POW_2_8 );
+    // Y = (D1 + C0*2^Q0 + C3*2^Q3*D2/2^24 + C4*2^Q4*(D2/2^24)^2) /
+    //     (C1*2^Q1 + C5*2^Q5*D2/2^24 + C6*2^Q6*(D2/2^24)^2)
+    m_Yn      = m_D1 +       
+                (m_coeffs[static_cast<uint8_t>(Coefficient::C_C0)]*POW_2_9) +
+                (m_coeffs[static_cast<uint8_t>(Coefficient::C_C3)]*POW_2_15*m_dT) +
+                (m_coeffs[static_cast<uint8_t>(Coefficient::C_C4)]*POW_2_15*m_dT*m_dT);
+    m_Yd      = (m_coeffs[static_cast<uint8_t>(Coefficient::C_C1)]*POW_2_11) +
+                (m_coeffs[static_cast<uint8_t>(Coefficient::C_C5)]*POW_2_16*m_dT) +
+                (m_coeffs[static_cast<uint8_t>(Coefficient::C_C6)]*POW_2_16*m_dT*m_dT);
+    m_Y       = (m_Yn/m_Yd);
+    // P = Y*(1- (C2*2^Q2/2^24)) + C2*2^Q2/2^24*Y^2
+    m_Pc      = ((m_coeffs[static_cast<uint8_t>(Coefficient::C_C2)]*POW_2_9)/POW_2_24);
+    m_Pi      = (m_Y*(1-m_Pc)) + (m_Y*m_Y*m_Pc);
 
-    // Calculate intermediate values depending on temperature
-    if( m_TEMP < 2000 )
-    {
-        // Temps < 20C
-	m_Ti      = 3 * ( ( int64_t )m_dT * m_dT ) / POW_2_33;
-	m_OFFi    = 3 * ( ( m_TEMP - 2000 ) * ( m_TEMP - 2000 ) ) / 2 ;
-	m_SENSi   = 5 * ( ( m_TEMP - 2000 ) * ( m_TEMP - 2000 ) ) / 8 ;
- 		
-	// Additional compensation for very low temperatures (< -15C)
-     	if( m_TEMP < -1500 )
-     	{
-  		// For 14 bar model
-    		m_OFFi    = m_OFFi + 7 * ( ( m_TEMP + 1500 ) * ( m_TEMP + 1500 ) );
-     		m_SENSi   = m_SENSi + 4 * ( ( m_TEMP + 1500 ) * ( m_TEMP + 1500 ) );
-     	}
-     }
-     else
-     {
-    	m_Ti      = 2 * ( ( int64_t )m_dT * m_dT ) / POW_2_37;
- 	m_OFFi    = 1 * ( ( m_TEMP - 2000 ) * ( m_TEMP - 2000 ) ) / 16;
- 	m_SENSi   = 0;
-     }
- 	
-     m_OFF2    = m_OFF - m_OFFi;
-     m_SENS2   = m_SENS - m_SENSi;
- 	
-     m_TEMP2 = (m_TEMP - m_Ti);
-     m_P = ( ( ( ( (int64_t)m_D1 * m_SENS2 ) / POW_2_21 ) - m_OFF2 ) / POW_2_13 );
-     m_MaxP = ((m_TEMP2 - 145.41)/(-5.917)); // max pressure in psi
+    m_P       = ((m_Pi-0.1)/0.8)*12;
+    m_MaxP    = ((m_TEMP - 145.41)/(-5.917)); // max pressure in psi
 	
      // Create data sample with calculated parameters
-     m_data.Update(  ( (float)m_TEMP2 / 1.0f ),    // Temperature
+     m_data.Update(  ( (float)m_TEMP / 1.0f ),     // Temperature
                     ( (float)m_P / 1.0f ),         // Max pressure
                     m_waterMod );
 }
