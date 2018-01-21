@@ -40,13 +40,13 @@ void P89BSD012BS::Tick()
             if( Cmd_StartPresConversion() )
             {
                 // Failure, start new conversion sequence
-                DelayedTransition( EState::CONVERTING_PRESSURE, m_conversionTime_ms );
+                DelayedTransition( EState::CONVERTING_PRESSURE, kOSRInfo[ static_cast<uint8_t>( m_osr ) ].conversionTime_ms  );
                 m_results.AddResult( EResult::RESULT_ERR_FAILED_SEQUENCE );
             }
             else
             {
                 // Success, next read the value and start converting pressure
-                DelayedTransition( EState::CONVERTING_TEMPERATURE, m_conversionTime_ms );
+                DelayedTransition( EState::CONVERTING_TEMPERATURE, kOSRInfo[ static_cast<uint8_t>( m_osr ) ].conversionTime_ms  );
             }
 
             break;
@@ -58,7 +58,7 @@ void P89BSD012BS::Tick()
             if( Cmd_ReadPressure() )
             {
                 // Failure, start new conversion sequence
-                DelayedTransition( EState::CONVERTING_PRESSURE, m_conversionTime_ms );
+                DelayedTransition( EState::CONVERTING_PRESSURE, kOSRInfo[ static_cast<uint8_t>( m_osr ) ].conversionTime_ms  );
                 m_results.AddResult( EResult::RESULT_ERR_FAILED_SEQUENCE );
             }
             else
@@ -67,13 +67,13 @@ void P89BSD012BS::Tick()
                 if( Cmd_StartTempConversion() )
                 {
                     // Failure, start new conversion sequence
-                    DelayedTransition( EState::CONVERTING_PRESSURE, m_conversionTime_ms );
+                    DelayedTransition( EState::CONVERTING_PRESSURE, kOSRInfo[ static_cast<uint8_t>( m_osr ) ].conversionTime_ms  );
                     m_results.AddResult( EResult::RESULT_ERR_FAILED_SEQUENCE );
                 }
                 else
                 {
                     // Success
-                    DelayedTransition( EState::PROCESSING_DATA, m_conversionTime_ms );
+                    DelayedTransition( EState::PROCESSING_DATA, kOSRInfo[ static_cast<uint8_t>( m_osr ) ].conversionTime_ms  );
                 }
             }
 
@@ -207,7 +207,11 @@ void P89BSD012BS::FreeLock()
 
 EResult P89BSD012BS::SetOversampleRate( EOversampleRate rateIn )
 {
-    // this device does not have a settable oversampling rate
+    // Change the oversampling rate
+    m_osr = rateIn;
+ 
+    // Reset sensor, since we might be in the middle of a conversion.
+    Transition( EState::UNINITIALIZED );
 
     return EResult::RESULT_SUCCESS;
 }
@@ -253,16 +257,42 @@ EResult P89BSD012BS::Cmd_Reset()
 
 EResult P89BSD012BS::Cmd_ReadCalibrationData()
 {
-   // this device has no stored calibration data that needs to be loaded
+    uint8_t coeffs[ 2 ];
+ 
+    // Read sensor coefficients
+    for( uint8_t i = 0; i < 7; ++i )
+    {
+        i2c::EI2CResult ret = ReadRegisterBytes( CMD_PROM_READ_BASE + ( i * 2 ), coeffs, 2 );
+ 
+ 	if( ret )
+ 	{
+            // I2C Failure
+            return (EResult)m_results.AddResult( EResult::RESULT_ERR_I2C_TRANSACTION );
+ 	}
+ 
+        // Combine high and low bytes
+        m_coeffs[i] = ( ( ( uint16_t )coeffs[ 0 ] << 8 ) | coeffs[ 1 ] );
+    }
+ 
+    uint8_t readCRC = ( m_coeffs[ 0 ] >> 12 );
+ 
+   // Compare read CRC4 to calculated CRC4
+   if( readCRC == CalculateCRC4() )
+   {
+ 	return EResult::RESULT_SUCCESS;
+   }
+   else
+   {
+ 	return (EResult)m_results.AddResult( EResult::RESULT_ERR_CRC_MISMATCH );
+   }
    return EResult::RESULT_SUCCESS;
 }
 
 EResult P89BSD012BS::Cmd_StartPresConversion()
 {
-    uint8_t dummy = 0;
 
     // reading the device initiates a measurement
-    if( ReadByte( &dummy ) )
+    if( WriteByte( CMD_PRES_CONV_BASE + kOSRInfo[ static_cast<uint8_t>( m_osr ) ].commandMod ) )
     {
         // I2C Failure
         return (EResult)m_results.AddResult( EResult::RESULT_ERR_I2C_TRANSACTION );
@@ -276,10 +306,9 @@ EResult P89BSD012BS::Cmd_StartPresConversion()
 
 EResult P89BSD012BS::Cmd_StartTempConversion()
 {
-    uint8_t dummy = 0;
 
     // reading the device initiates a measurement
-    if( ReadByte( &dummy ) )
+    if( WriteByte( CMD_TEMP_CONV_BASE + kOSRInfo[ static_cast<uint8_t>( m_osr ) ].commandMod ) )
     {
         // I2C Failure
         return (EResult)m_results.AddResult( EResult::RESULT_ERR_I2C_TRANSACTION );
@@ -293,59 +322,34 @@ EResult P89BSD012BS::Cmd_StartTempConversion()
 
 EResult P89BSD012BS::Cmd_ReadPressure()
 {
-    uint8_t bytes[ 2 ];
+    uint8_t bytes[ 3 ];
 
-    // two bytes of pressure
-    // the upper two bits in the first byte are a status
-    // the remaining 14 bits are the pressure
-    i2c::EI2CResult ret = ReadBytes( bytes, 2 );
+    i2c::EI2CResult ret = ReadRegisterBytes( CMD_ADC_READ, bytes, 3 );
     if( ret )
     {
         // I2C Failure
         return (EResult)m_results.AddResult( EResult::RESULT_ERR_I2C_TRANSACTION );
     }
 
-    // slice off the status bits
-    // 00 : good data
-    // 01 : reserved
-    // 10 : stale data
-    // 11 : fault
-    uint8_t status = bytes[0]&0xC0;
     // Combine the bytes into one integer for the final result
-    m_D1 = ( ( uint32_t )(bytes[ 0 ]&0x3F) << 8 ) + ( ( uint32_t )bytes[ 1 ] );
+    m_D1 = ( ( uint32_t )bytes[ 0 ] << 16 ) + ( ( uint32_t )bytes[ 1 ] << 8 ) + ( uint32_t )bytes[ 2 ];
 
     return EResult::RESULT_SUCCESS;
 }
 
 EResult P89BSD012BS::Cmd_ReadTemperature()
 {
-    uint8_t bytes[ 4 ];
+    uint8_t bytes[ 3 ];
 
-    // two bytes of pressure
-    // the upper two bits in the first byte are a status
-    // the remaining 14 bits are the pressure
-    // this is followed by two bytes of temperature
-    // the first byte is the upper 8 bits of temperature
-    // the upper 3 bits of the second byte are the lower 3 bits
-    // for a total of 11 bits of temperature
-    i2c::EI2CResult ret = ReadBytes( bytes, 4 );
-
+    i2c::EI2CResult ret = ReadRegisterBytes( CMD_ADC_READ, bytes, 3 );
     if( ret )
     {
         // I2C Failure
         return (EResult)m_results.AddResult( EResult::RESULT_ERR_I2C_TRANSACTION );
     }
 
-    // slice off the status bits
-    // 00 : good data
-    // 01 : reserved
-    // 10 : stale data
-    // 11 : fault
-    uint8_t status = bytes[0]&0xC0;
     // Combine the bytes into one integer for the final result
-    m_D2 = ( ( uint32_t )bytes[ 2 ] << 8 ) + ( ( uint32_t )(bytes[ 3 ]&0xE0) ) ;
-    // right align it
-    m_D2 >>= 5;
+    m_D2 = ( ( uint32_t )bytes[ 0 ] << 16 ) + ( ( uint32_t )bytes[ 1 ] << 8 ) + ( uint32_t )bytes[ 2 ];
 
     return EResult::RESULT_SUCCESS;
 }
@@ -396,13 +400,46 @@ uint8_t P89BSD012BS::CalculateCRC4()
 
 void P89BSD012BS::ProcessData()
 {
-    m_TEMP2 = ((int32_t) ((m_D2*200)/2047)) - 50; // degrees C
-    m_P = (((m_D1 - (16383/10))*(27-3))/((8*16383)/10)) + 3; // psi
-    m_P *= 68.9476; // psi to mbar
+    // Calculate base terms
+    m_dT      = (int32_t)m_D2 - ( (int32_t)m_coeffs[5] * POW_2_8 );
+    m_TEMP    = 2000 + ( ( (int64_t)m_dT * (int32_t)m_coeffs[6] ) / POW_2_23 );
+ 	
+    m_OFF     = ( (int64_t)m_coeffs[2] * POW_2_16 ) + ( ( (int64_t)m_coeffs[4] * m_dT ) / POW_2_7 );
+    m_SENS    = ( (int64_t)m_coeffs[1] * POW_2_15 ) + ( ( (int64_t)m_coeffs[3] * m_dT ) / POW_2_8 );
+
+    // Calculate intermediate values depending on temperature
+    if( m_TEMP < 2000 )
+    {
+        // Temps < 20C
+	m_Ti      = 3 * ( ( int64_t )m_dT * m_dT ) / POW_2_33;
+	m_OFFi    = 3 * ( ( m_TEMP - 2000 ) * ( m_TEMP - 2000 ) ) / 2 ;
+	m_SENSi   = 5 * ( ( m_TEMP - 2000 ) * ( m_TEMP - 2000 ) ) / 8 ;
+ 		
+	// Additional compensation for very low temperatures (< -15C)
+     	if( m_TEMP < -1500 )
+     	{
+  		// For 14 bar model
+    		m_OFFi    = m_OFFi + 7 * ( ( m_TEMP + 1500 ) * ( m_TEMP + 1500 ) );
+     		m_SENSi   = m_SENSi + 4 * ( ( m_TEMP + 1500 ) * ( m_TEMP + 1500 ) );
+     	}
+     }
+     else
+     {
+    	m_Ti      = 2 * ( ( int64_t )m_dT * m_dT ) / POW_2_37;
+ 	m_OFFi    = 1 * ( ( m_TEMP - 2000 ) * ( m_TEMP - 2000 ) ) / 16;
+ 	m_SENSi   = 0;
+     }
+ 	
+     m_OFF2    = m_OFF - m_OFFi;
+     m_SENS2   = m_SENS - m_SENSi;
+ 	
+     m_TEMP2 = (m_TEMP - m_Ti);
+     m_P = ( ( ( ( (int64_t)m_D1 * m_SENS2 ) / POW_2_21 ) - m_OFF2 ) / POW_2_13 );
+     m_MaxP = ((m_TEMP2 - 145.41)/(-5.917)); // max pressure in psi
 	
-    // Create data sample with calculated parameters
-    m_data.Update(  ( (float)m_TEMP2 / 1.0f ),    // Temperature
-                    ( (float)m_P / 1.0f ),         // Pressure
+     // Create data sample with calculated parameters
+     m_data.Update(  ( (float)m_TEMP2 / 1.0f ),    // Temperature
+                    ( (float)m_P / 1.0f ),         // Max pressure
                     m_waterMod );
 }
 
@@ -420,4 +457,9 @@ i2c::EI2CResult P89BSD012BS::ReadByte( uint8_t *dataOut )
 i2c::EI2CResult P89BSD012BS::ReadBytes( uint8_t *dataOut, uint8_t numBytesIn )
 {
     return m_pI2C->ReadBytes( m_address, dataOut, numBytesIn );
+}
+
+i2c::EI2CResult P89BSD012BS::ReadRegisterBytes( uint8_t registerIn, uint8_t *dataOut, uint8_t numBytesIn )
+{
+    return m_pI2C->ReadRegisterBytes( m_address, registerIn, dataOut, numBytesIn );
 }

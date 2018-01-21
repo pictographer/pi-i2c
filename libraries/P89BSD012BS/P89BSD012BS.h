@@ -76,6 +76,7 @@ namespace p89bsd012bs
         int64_t     m_TEMP2     = 0;    // Second order final temp
         
         int32_t     m_P         = 0;    // Temperature compensated pressure
+        int32_t     m_MaxP      = 0;    // Max pressure
         
         // Bytes to hold the results from I2C communications with the sensor
         uint8_t     m_highByte  = 0;
@@ -100,5 +101,6 @@ namespace p89bsd012bs
         i2c::EI2CResult WriteByte( uint8_t registerIn );
         i2c::EI2CResult ReadByte( uint8_t *dataOut );
         i2c::EI2CResult ReadBytes( uint8_t *dataOut, uint8_t numBytesIn );
+        i2c::EI2CResult ReadRegisterBytes( uint8_t registerIn, uint8_t *dataOut, uint8_t numBytesIn );
     };
 }

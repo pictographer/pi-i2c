@@ -97,7 +97,7 @@ void CP89BSD012BS::Update( CCommand& commandIn )
 		if( commandIn.Equals( "depth_zero" ) )
 		{
 			// Set offset based on current value
-			m_depthOffset_m = m_device.m_data.depth_m;
+			// m_depthOffset_m = m_device.m_data.depth_m;
 
 			// Send ack
 			Serial.print( F( "depth_zero:ack;" ) );

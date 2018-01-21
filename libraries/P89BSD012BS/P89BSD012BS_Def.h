@@ -27,11 +27,15 @@ namespace p89bsd012bs
     // Computation constants
     constexpr int32_t POW_2_7  = 128;           // 2^7
     constexpr int32_t POW_2_8  = 256;           // 2^8
+    constexpr int32_t POW_2_13 = 8192;          // 2^13
     constexpr int32_t POW_2_15 = 32768;         // 2^15
     constexpr int32_t POW_2_16 = 65536;         // 2^16
     constexpr int32_t POW_2_21 = 2097152;       // 2^21
     constexpr int32_t POW_2_23 = 8388608;       // 2^23
     constexpr int32_t POW_2_31 = 2147483648;    // 2^31
+    constexpr int64_t POW_2_33 = 8589934592;    // 2^33
+    constexpr int64_t POW_2_37 = 137438953472;  // 2^37
+
 
     //typedef void (*TStateCallback)();
 
@@ -75,9 +79,9 @@ namespace p89bsd012bs
     struct TData
     {
         public:
-            float temperature_c = 0.0f;
-            float pressure_mbar = 0.0f;
-            float depth_m       = 0.0f;
+            float temperature_c     = 0.0f;
+            float pressure_psi      = 0.0f;
+            float max_pressure_psi  = 0.0f;
 
             bool SampleAvailable()
             {
@@ -93,12 +97,12 @@ namespace p89bsd012bs
             }
 
         private:
-            void Update( float tempIn, float presIn, float waterModIn )
+            void Update( float tempIn, float presIn, float maxPresIn )
             {
-                temperature_c   = tempIn;
-                pressure_mbar   = presIn;
-                depth_m         = ( presIn - 1013.25f ) * waterModIn / 100.0f;
-                isAvailable     = true;
+                temperature_c    = tempIn;
+                pressure_psi     = presIn;
+                max_pressure_psi = maxPresIn;
+                isAvailable      = true;
             }
 
             bool isAvailable = false;
