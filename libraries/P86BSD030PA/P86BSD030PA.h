@@ -85,6 +85,7 @@ namespace p86bsd030pa
         // Methods
         void Transition( EState nextState );
         void DelayedTransition( EState nextState, uint32_t millisIn );
+        float CalculateDepth( float pressure, float temp );
 
         EResult Cmd_Reset();
         EResult Cmd_ReadCalibrationData();

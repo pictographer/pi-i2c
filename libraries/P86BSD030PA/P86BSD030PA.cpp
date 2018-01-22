@@ -394,6 +394,40 @@ uint8_t P86BSD030PA::CalculateCRC4()
     return ( n_rem ^ 0x00 );
 }
 
+// The oil density v temp (C) is defined by this equation
+// according to the data provided by SRC
+// -1.26668*10^-10*T^7
+// +2.40294*10^-6*T^6
+// -1.57784*10^-6*T^5
+// +0.000035917*T^4
+// +0.000221066*T^3
+// -0.0167518*T^2
+// -0.145954*T
+// +324.689
+// returning lbf/cuin*10000 
+// It is sufficient to use the first 3 terms for our purposes
+float P86BSD030PA::CalculateDepth( float pressure, float temp )
+{
+   float depth = 0.0f;
+   float density = 0.0f;
+
+   density = 324.689f - (0.145954f*temp) - (0.0167518f*temp*temp);
+   // density is lb/cuin*10000
+   // convert to kg/m3
+   // 1 lb/cuin is 27679.9 kg/m3
+   density = (2.76799f * density);
+   // density now in kg/m3
+   // pressure in mbar
+   // total pressure less atmospheric pressure
+   pressure = pressure - 1013.25f;
+   // 1 mbar = 10.2 kg/m2
+   pressure *= 10.2f;
+   // depth = pressure diff/(density * gravity)
+   depth = pressure/(density*9.8);
+   return (depth);
+}
+
+
 void P86BSD030PA::ProcessData()
 {
     m_TEMP2 = ((int32_t) ((m_D2*200)/2047)) - 50; // degrees C
@@ -403,7 +437,7 @@ void P86BSD030PA::ProcessData()
     // Create data sample with calculated parameters
     m_data.Update(  ( (float)m_TEMP2 / 1.0f ),    // Temperature
                     ( (float)m_P / 1.0f ),         // Pressure
-                    m_waterMod );
+                    CalculateDepth( (float) m_P, (float) m_TEMP2 ) );
 }
 
 // I2C call wrappers

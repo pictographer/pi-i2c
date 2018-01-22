@@ -93,11 +93,11 @@ namespace p86bsd030pa
             }
 
         private:
-            void Update( float tempIn, float presIn, float waterModIn )
+            void Update( float tempIn, float presIn, float depth )
             {
                 temperature_c   = tempIn;
                 pressure_mbar   = presIn;
-                depth_m         = ( presIn - 1013.25f ) * waterModIn / 100.0f;
+                depth_m         = depth;
                 isAvailable     = true;
             }
 
