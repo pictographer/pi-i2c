@@ -11,6 +11,7 @@ public:
 	CP89BSD012BS( I2C *i2cInterfaceIn );
 	void Initialize();
 	void Update( CCommand& commandIn );
+        uint8_t GetMaxPressureFlag( void );
 
 private:
 	// Device driver

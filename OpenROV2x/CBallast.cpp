@@ -7,9 +7,11 @@
 #include "CBallast.h"
 #include "NCommManager.h"
 #include "CMuxes.h"
+#include "CP89BSD012BS.h"
 
 extern CMuxes g_SystemMuxes;
 extern I2C I2C0;
+extern CP89BSD012BS m_p89bsd012bs;
 
 // delay to OFF time
 #define OFF_TIME( value ) ((4095/255)*value)
@@ -73,6 +75,10 @@ void CBallast::Update( CCommand& commandIn )
                      if( commandIn.m_arguments[1] >= -100 && commandIn.m_arguments[1] <= 100 )
                      {
 
+                        // check if the pressure reading is above the allowable maximum
+                        // if it is then only allow reduction of pressure in the reservoir
+                        if ((commandIn.m_arguments[1] > 0) && (m_p89bsd012bs.GetMaxPressureFlag())) return;
+                        // process the command normally
                         m_ballast = commandIn.m_arguments[1];
                         if ((m_ballast_pre < 0) && (m_ballast > 0)) {
                              g_SystemMuxes.SetPath(SCL_ME);

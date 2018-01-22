@@ -8,6 +8,7 @@ P89BSD012BS::P89BSD012BS( I2C *i2cInterfaceIn )
     : m_pI2C( i2cInterfaceIn )
     , m_address( I2C_ADDRESS )
 {
+    m_MaxPAlert = 0;
 }
 
 // --------------------------------------------------------------
@@ -230,6 +231,11 @@ uint32_t P89BSD012BS::GetUpdatePeriod()
     return 2 * m_conversionTime_ms;
 }
 
+uint8_t P89BSD012BS::GetMaxPressureFlag()
+{
+    return(m_MaxPAlert);
+}
+
 // --------------------------------------------------------------
 // Private Methods
 // --------------------------------------------------------------
@@ -436,7 +442,9 @@ void P89BSD012BS::ProcessData()
 
     // If the measure pressure exceeds the maximum allowable pressure
     if (m_P > m_MaxP) {
-
+        m_MaxPAlert = 1;
+    } else {
+        m_MaxPAlert = 0;
     }
 	
     // Create data sample with calculated parameters

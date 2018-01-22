@@ -29,6 +29,8 @@ namespace p89bsd012bs
         EResult SetOversampleRate( EOversampleRate rateIn );
         EResult SetWaterType( EWaterType typeIn );
 
+        uint8_t  GetMaxPressureFlag();
+
         uint32_t GetUpdatePeriod();
 
         // Statistics
@@ -83,7 +85,9 @@ namespace p89bsd012bs
         
         double      m_P         = 0;    // Temperature compensated pressure
         double      m_MaxP      = 0;    // Max pressure
-        
+
+        uint8_t     m_MaxPAlert = 0;
+
         // Bytes to hold the results from I2C communications with the sensor
         uint8_t     m_highByte  = 0;
         uint8_t     m_midByte   = 0;

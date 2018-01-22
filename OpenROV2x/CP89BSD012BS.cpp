@@ -24,6 +24,11 @@ CP89BSD012BS::CP89BSD012BS( I2C *i2cInterfaceIn )
 {
 }
 
+uint8_t CP89BSD012BS::GetMaxPressureFlag()
+{
+        return(m_device.GetMaxPressureFlag());
+}
+
 void CP89BSD012BS::Initialize()
 {
 	Serial.print( F( "p89bsd_init:1;" ) );
