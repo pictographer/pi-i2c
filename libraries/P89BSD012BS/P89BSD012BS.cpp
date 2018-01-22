@@ -429,10 +429,18 @@ void P89BSD012BS::ProcessData()
     m_Pi      = (m_Y*(1-m_Pc)) + (m_Y*m_Y*m_Pc);
 
     m_P       = ((m_Pi-0.1)/0.8)*12;
+    // convert bar to psi
+    m_P       = m_P * 14.5038;
+    // calculate max pressure allowed in psi based on data from SRC
     m_MaxP    = ((m_TEMP - 145.41)/(-5.917)); // max pressure in psi
+
+    // If the measure pressure exceeds the maximum allowable pressure
+    if (m_P > m_MaxP) {
+
+    }
 	
-     // Create data sample with calculated parameters
-     m_data.Update(  ( (float)m_TEMP / 1.0f ),     // Temperature
+    // Create data sample with calculated parameters
+    m_data.Update(  ( (float)m_TEMP / 1.0f ),     // Temperature
                     ( (float)m_P / 1.0f ),         // Max pressure
                     m_waterMod );
 }
