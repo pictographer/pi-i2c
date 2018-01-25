@@ -92,24 +92,31 @@ void CExternalLights::Update( CCommand& commandIn )
                         g_SystemMuxes.SetPath(SCL_PWM);
                         if (m_currentPower_an == 0) {
                             // top
-                            m_led_pwm->DigitalWriteLow(pca9685::LED_10);
+                            if ((m_targetLight == 0) || (m_targetLight == 4))
+                               m_led_pwm->DigitalWriteLow(pca9685::LED_10);
                             // front
-                            m_led_pwm->DigitalWriteLow(pca9685::LED_11);
+                            if ((m_targetLight == 0) || (m_targetLight == 1))
+                               m_led_pwm->DigitalWriteLow(pca9685::LED_11);
                             // bottom
-                            m_led_pwm->DigitalWriteLow(pca9685::LED_12);
+                            if ((m_targetLight == 0) || (m_targetLight == 2))
+                               m_led_pwm->DigitalWriteLow(pca9685::LED_12);
                             // side
-                            m_led_pwm->DigitalWriteLow(pca9685::LED_13);
+                            if ((m_targetLight == 0) || (m_targetLight == 3))
+                               m_led_pwm->DigitalWriteLow(pca9685::LED_13);
                         } else {
                             // range 0-255 m_targetPower
-                            // for now, all lights are driven together
                             // top
-                            m_led_pwm->DigitalWrite(pca9685::LED_10, ON_TIME(m_currentPower_an), OFF_TIME(m_currentPower_an));
+                            if ((m_targetLight == 0) || (m_targetLight == 4))
+                               m_led_pwm->DigitalWrite(pca9685::LED_10, ON_TIME(m_currentPower_an), OFF_TIME(m_currentPower_an));
                             // front
-                            m_led_pwm->DigitalWrite(pca9685::LED_11, ON_TIME(m_currentPower_an), OFF_TIME(m_currentPower_an));
+                            if ((m_targetLight == 0) || (m_targetLight == 1))
+                               m_led_pwm->DigitalWrite(pca9685::LED_11, ON_TIME(m_currentPower_an), OFF_TIME(m_currentPower_an));
                             // bottom
-                            m_led_pwm->DigitalWrite(pca9685::LED_12, ON_TIME(m_currentPower_an), OFF_TIME(m_currentPower_an));
+                            if ((m_targetLight == 0) || (m_targetLight == 2))
+                               m_led_pwm->DigitalWrite(pca9685::LED_12, ON_TIME(m_currentPower_an), OFF_TIME(m_currentPower_an));
                             // side
-                            m_led_pwm->DigitalWrite(pca9685::LED_13, ON_TIME(m_currentPower_an), OFF_TIME(m_currentPower_an));
+                            if ((m_targetLight == 0) || (m_targetLight == 3))
+                               m_led_pwm->DigitalWrite(pca9685::LED_13, ON_TIME(m_currentPower_an), OFF_TIME(m_currentPower_an));
                         }
                         delay(50);
 			// Emit current power
@@ -117,7 +124,23 @@ void CExternalLights::Update( CCommand& commandIn )
 			Serial.print( orutil::Encode1K( m_targetPower ) );
 			Serial.print( ';' );
 	                Serial.print( F( "ENDUPDATE:1;" ) );
-		}
+		} else {
+		        if( commandIn.Equals( "elights_select" ) )
+		        {
+                            // printf("lights: select %d\n", commandIn.m_arguments[1]);
+			    // Update the target position
+                            // 0: all lights
+                            // 1: camera 1 Front
+                            // 2: camera 2 Bottom
+                            // 3: camera 3 Top
+                            // 4: camera 4 Side
+			    m_targetLight = commandIn.m_arguments[1];
+			    Serial.print( F( "elights_select:" ) );
+			    Serial.print( m_targetLight );
+			    Serial.print( ';' );
+	                    Serial.print( F( "ENDUPDATE:1;" ) );
+		        }
+                }
 	}
 }
 

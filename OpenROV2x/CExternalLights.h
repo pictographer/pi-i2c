@@ -25,6 +25,7 @@ private:
     float       m_targetPower = 0.0f;
     float       m_currentPower = 0.0f;
 
+    uint32_t    m_targetLight = 0;
     uint32_t    m_lastPower_an = 0;
     uint32_t    m_targetPower_an = 0;
     uint32_t    m_currentPower_an = 0;
