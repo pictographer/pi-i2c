@@ -30,15 +30,24 @@ namespace
 CExternalLights::CExternalLights( uint32_t pinIn )
 	: m_pin( pinIn, CPin::kAnalog, CPin::kOutput )
 {
+#ifdef OLD_BOARD
         m_led_pwm = new pca9685::PCA9685( &I2C0, pca9685::PCA9685_ADDRESS_40 );
+#else
+        m_led_pwm = new pca9685::PCA9685( &I2C0, pca9685::PCA9685_ADDRESS_73 );
+#endif
 }
 
 void CExternalLights::Initialize()
 {
     // enable power to LEDs
+#ifdef OLD_BOARD
     g_SystemMuxes.WriteExtendedGPIO(BAL_LEDS_EN, LOW);
     // get the PWM ready
     g_SystemMuxes.SetPath(SCL_PWM);
+#else
+    g_SystemMuxes.WriteExtendedGPIO(BAL_EN, LOW);
+    g_SystemMuxes.SetPath(SCL_NONE);
+#endif
     // top
     m_led_pwm->DigitalWriteLow(pca9685::LED_10);
     // front
@@ -89,7 +98,11 @@ void CExternalLights::Update( CCommand& commandIn )
 			m_currentPower 		= m_targetPower;
 			m_currentPower_an 	= m_targetPower_an;
 
+#ifdef OLD_BOARD
                         g_SystemMuxes.SetPath(SCL_PWM);
+#else
+                        g_SystemMuxes.SetPath(SCL_NONE);
+#endif
                         if (m_currentPower_an == 0) {
                             // top
                             if ((m_targetLight == 0) || (m_targetLight == 4))

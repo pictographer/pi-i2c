@@ -14,7 +14,6 @@ namespace pca9685
     //Unshifted 7-bit I2C address for device
     const uint8_t PCA9685_ADDRESS_40 = 0x40; //b1000000
     const uint8_t PCA9685_ADDRESS_73 = 0x73; //b1110011
-    const uint8_t PCA9685_ADDRESS_74 = 0x74; //b1110100
 
     enum ERetCode : int32_t
     {

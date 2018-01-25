@@ -21,6 +21,9 @@ CMuxes::CMuxes()
     m_device2 = new pca9547::PCA9547( &I2C0, pca9547::PCA9547_2_ADDRESS );
     m_dio1 = new pca9539::PCA9539( &I2C0 );
     m_dio2 = new pca9539::PCA9539( &I2C0 );
+    // the new board expander
+    // this is not behind a selector
+    m_dio3 = new pca9539::PCA9539( &I2C0 );
 }
 
 void CMuxes::Initialize()
@@ -46,6 +49,14 @@ void CMuxes::Initialize()
         m_dio2->DigitalWrite(5,0x00);
         m_dio2->DigitalWrite(6,0x00);
         m_dio2->DigitalWrite(7,0x00);
+        // DIO3 is not behind a selector
+        SetPath(SCL_NONE);
+        m_dio3->PinMode(0xFEAA);
+        m_dio3->DigitalWrite(0,0x01);
+        m_dio3->DigitalWrite(2,0x01);
+        m_dio3->DigitalWrite(4,0x01);
+        m_dio3->DigitalWrite(6,0x01);
+        m_dio3->DigitalWrite(8,0x01);
         m_Initialized = 1;
     }
 }
@@ -68,7 +79,9 @@ void CMuxes::SetPath( uint16_t path )
         case SCL_UNUSED2:
            m_device0->DigitalWrite( (path%8)+pca9547::PCA9547_SELECT::CHANNEL_0 );
            m_device1->DigitalWrite( pca9547::PCA9547_SELECT::NO_CHANNEL );
+#ifdef OLD_BOARD
            m_device2->DigitalWrite( pca9547::PCA9547_SELECT::NO_CHANNEL );
+#endif
            break;
     // 0x71 CH0 through CH7
         case SCL_BATT:
@@ -81,7 +94,9 @@ void CMuxes::SetPath( uint16_t path )
         case SCL_EXP:
            m_device1->DigitalWrite( (path%8)+pca9547::PCA9547_SELECT::CHANNEL_0 );
            m_device0->DigitalWrite( pca9547::PCA9547_SELECT::NO_CHANNEL );
+#ifdef OLD_BOARD
            m_device2->DigitalWrite( pca9547::PCA9547_SELECT::NO_CHANNEL );
+#endif
            break;
     // 0x72 CH0 through CH7
         case SCL_MA:
@@ -92,9 +107,18 @@ void CMuxes::SetPath( uint16_t path )
         case SCL_VRT:
         case SCL_PWM:
         case SCL_DIO1:
+#ifdef OLD_BOARD
            m_device2->DigitalWrite( (path%8)+pca9547::PCA9547_SELECT::CHANNEL_0 );
+#endif
            m_device0->DigitalWrite( pca9547::PCA9547_SELECT::NO_CHANNEL );
            m_device1->DigitalWrite( pca9547::PCA9547_SELECT::NO_CHANNEL );
+           break;
+        case SCL_NONE:
+           m_device0->DigitalWrite( pca9547::PCA9547_SELECT::NO_CHANNEL );
+           m_device1->DigitalWrite( pca9547::PCA9547_SELECT::NO_CHANNEL );
+#ifdef OLD_BOARD
+           m_device2->DigitalWrite( pca9547::PCA9547_SELECT::NO_CHANNEL );
+#endif
            break;
         default:
            break;
@@ -112,7 +136,7 @@ void CMuxes::WriteExtendedGPIO( uint16_t pin, uint8_t state )
         case MCD_EN:
         case MCD_FLT:
         case MCD_ALT:
-        case BAL_FLT:
+        case BAL_FLT1:
         case BAL_ALT:
         case VALVE_1_EN:
         case VALVE_1_STAT:
@@ -120,8 +144,7 @@ void CMuxes::WriteExtendedGPIO( uint16_t pin, uint8_t state )
         case VALVE_2_STAT:
         case VALVE_3_EN:
         case VALVE_3_STAT:
-        case LEAK_SW:
-        case UNUSED:
+        case LEAK_SW1:
            SetPath(SCL_DIO1);
            m_dio1->DigitalWrite((pin%16), state);
            break;
@@ -145,6 +168,26 @@ void CMuxes::WriteExtendedGPIO( uint16_t pin, uint8_t state )
            SetPath(SCL_DIO2);
            m_dio2->DigitalWrite((pin%16), state);
            break;
+        // DIO3
+        case MCTRL_RESET:
+        case TM20_60:
+        case PORT_EN:
+        case PORT_FLT:
+        case STAR_EN:
+        case STAR_FLT:
+        case BAL_EN:
+        case BAL_FLT2:
+        case VALVE_SER_EN:
+        case VALVE_SER_FLT:
+        case LEAK_SW2:
+        case MA_LCK:
+        case MB_LCK:
+        case MC_LCK:
+        case MD_LCK:
+        case ME_LCK:
+           SetPath(SCL_NONE);
+           m_dio3->DigitalWrite((pin%16), state);
+           break;
         default:
            break;
     }
@@ -161,7 +204,7 @@ uint8_t CMuxes::ReadExtendedGPIO( uint16_t pin )
         case MCD_EN:
         case MCD_FLT:
         case MCD_ALT:
-        case BAL_FLT:
+        case BAL_FLT1:
         case BAL_ALT:
         case VALVE_1_EN:
         case VALVE_1_STAT:
@@ -169,8 +212,7 @@ uint8_t CMuxes::ReadExtendedGPIO( uint16_t pin )
         case VALVE_2_STAT:
         case VALVE_3_EN:
         case VALVE_3_STAT:
-        case LEAK_SW:
-        case UNUSED:
+        case LEAK_SW1:
            SetPath(SCL_DIO1);
            m_dio1->DigitalRead((pin%16), &state);
            break;
@@ -193,6 +235,26 @@ uint8_t CMuxes::ReadExtendedGPIO( uint16_t pin )
         case MAG_SW_MON:
            SetPath(SCL_DIO2);
            m_dio2->DigitalRead((pin%16), &state);
+           break;
+        // DIO3
+        case MCTRL_RESET:
+        case TM20_60:
+        case PORT_EN:
+        case PORT_FLT:
+        case STAR_EN:
+        case STAR_FLT:
+        case BAL_EN:
+        case BAL_FLT2:
+        case VALVE_SER_EN:
+        case VALVE_SER_FLT:
+        case LEAK_SW2:
+        case MA_LCK:
+        case MB_LCK:
+        case MC_LCK:
+        case MD_LCK:
+        case ME_LCK:
+           SetPath(SCL_NONE);
+           m_dio3->DigitalRead((pin%16), &state);
            break;
         default:
            break;

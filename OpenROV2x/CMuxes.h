@@ -34,7 +34,9 @@ enum EPathSelect : uint16_t
     SCL_HZT,
     SCL_VRT,
     SCL_PWM,
-    SCL_DIO1
+    SCL_DIO1,
+    // Turn off all
+    SCL_NONE
 };
 
 enum EPinSelect : uint16_t
@@ -46,7 +48,7 @@ enum EPinSelect : uint16_t
     MCD_EN,
     MCD_FLT,
     MCD_ALT,
-    BAL_FLT,
+    BAL_FLT1,
     BAL_ALT,
     VALVE_1_EN,
     VALVE_1_STAT,
@@ -54,7 +56,7 @@ enum EPinSelect : uint16_t
     VALVE_2_STAT,
     VALVE_3_EN,
     VALVE_3_STAT,
-    LEAK_SW,
+    LEAK_SW1,
     UNUSED,
     // DIO2
     BAL_LEDS_EN,
@@ -72,7 +74,24 @@ enum EPinSelect : uint16_t
     CHG_DETECT,
     RLY_STAT,
     BLOW_VALVE_STAT,
-    MAG_SW_MON
+    MAG_SW_MON,
+    // DIO3
+    MCTRL_RESET,
+    TM20_60,
+    PORT_EN,
+    PORT_FLT,
+    STAR_EN,
+    STAR_FLT,
+    BAL_EN,
+    BAL_FLT2,
+    VALVE_SER_EN,
+    VALVE_SER_FLT,
+    LEAK_SW2,
+    MA_LCK,
+    MB_LCK,
+    MC_LCK,
+    MD_LCK,
+    ME_LCK
 }; 
 
 
@@ -93,9 +112,7 @@ private:
 	pca9547::PCA9547 *m_device2;
         pca9539::PCA9539 *m_dio1;
         pca9539::PCA9539 *m_dio2;
+        pca9539::PCA9539 *m_dio3;
         uint8_t m_Initialized;
 
 };
-
-
-

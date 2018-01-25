@@ -92,7 +92,11 @@ void CControllerBoard::Initialize()
 long CControllerBoard::readLeakDetector()
 {
              uint32_t leak =  0;
-             leak = g_SystemMuxes.ReadExtendedGPIO(LEAK_SW);
+#ifdef OLD_BOARD
+             leak = g_SystemMuxes.ReadExtendedGPIO(LEAK_SW1);
+#else
+             leak = g_SystemMuxes.ReadExtendedGPIO(LEAK_SW2);
+#endif
              return(leak);
 }
 
