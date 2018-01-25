@@ -14,11 +14,10 @@ using namespace pca9685;
 #define GET_OFF_L(pin) static_cast<PCA9685_REGISTER>(static_cast<uint8_t>(PCA9685_REGISTER::LED0_OFF_L)+(pin*4))
 #define GET_OFF_H(pin) static_cast<PCA9685_REGISTER>(static_cast<uint8_t>(PCA9685_REGISTER::LED0_OFF_H)+(pin*4))
 
-PCA9685::PCA9685( I2C* i2cInterfaceIn )
-    : m_i2cAddress( pca9685::PCA9685_ADDRESS )
+PCA9685::PCA9685( I2C* i2cInterfaceIn, uint8_t addr )
+    : m_i2cAddress( addr )
     , m_pI2C( i2cInterfaceIn )
 {
-    
 }
 
 ERetCode PCA9685::Initialize()

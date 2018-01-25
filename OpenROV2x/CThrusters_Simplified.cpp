@@ -125,7 +125,7 @@ void CThrusters::Initialize()
     motor_b = new drv10983::DRV10983( &I2C0 );
     motor_c = new drv10983::DRV10983( &I2C0 );
     motor_d = new drv10983::DRV10983( &I2C0 );
-    motor_signals = new pca9685::PCA9685( &I2C0 );
+    motor_signals = new pca9685::PCA9685( &I2C0, pca9685::PCA9685_ADDRESS_40 );
     // setup the IO expander inputs and output directions
     // and power the motor controllers
     g_SystemMuxes.WriteExtendedGPIO(MAB_EN,LOW);

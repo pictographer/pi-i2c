@@ -30,7 +30,7 @@ namespace
 CExternalLights::CExternalLights( uint32_t pinIn )
 	: m_pin( pinIn, CPin::kAnalog, CPin::kOutput )
 {
-        m_led_pwm = new pca9685::PCA9685( &I2C0 );
+        m_led_pwm = new pca9685::PCA9685( &I2C0, pca9685::PCA9685_ADDRESS_40 );
 }
 
 void CExternalLights::Initialize()

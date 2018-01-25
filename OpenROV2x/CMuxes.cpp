@@ -63,7 +63,7 @@ void CMuxes::SetPath( uint16_t path )
         case SCL_3V3_SYS:
         case SCL_5V_SYS:
         case SCL_IMU0:
-        case SCL_UNUSED0:
+        case SCL_TEMP:
         case SCL_UNUSED1:
         case SCL_UNUSED2:
            m_device0->DigitalWrite( (path%8)+pca9547::PCA9547_SELECT::CHANNEL_0 );

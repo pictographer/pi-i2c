@@ -24,7 +24,7 @@ namespace
 
 CBallast::CBallast()
 {
-        m_ballast_pwm = new pca9685::PCA9685( &I2C0 );
+        m_ballast_pwm = new pca9685::PCA9685( &I2C0, pca9685::PCA9685_ADDRESS_40 );
         m_motor_e = new drv10983::DRV10983( &I2C0 );
         m_valveState = 0;
         m_ballast = 0;

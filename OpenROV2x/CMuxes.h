@@ -14,7 +14,7 @@ enum EPathSelect : uint16_t
     SCL_3V3_SYS,
     SCL_5V_SYS,
     SCL_IMU0,
-    SCL_UNUSED0,
+    SCL_TEMP,
     SCL_UNUSED1,
     SCL_UNUSED2,
     // 0x71 CH0 through CH7
