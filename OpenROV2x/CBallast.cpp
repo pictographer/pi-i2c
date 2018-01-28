@@ -158,7 +158,7 @@ void CBallast::Update( CCommand& commandIn )
                           m_motor_e->Cmd_SetSpeed(SCALE_SPEED(m_ballast));
 #else
                           g_SystemMuxes.SetPath(SCL_NONE);
-                          m_ballast_pwm->DigitalWrite(pca9685::LED_9, ON_TIME(m_ballast), OFF_TIME(m_ballast));
+                          m_ballast_pwm->DigitalWrite(pca9685::LED_4, ON_TIME(m_ballast), OFF_TIME(m_ballast));
 #endif
                           m_ballast_pre = m_ballast;
                      }
