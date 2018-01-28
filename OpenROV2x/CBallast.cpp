@@ -112,6 +112,7 @@ void CBallast::Update( CCommand& commandIn )
 #else
                              g_SystemMuxes.SetPath(SCL_NONE);
                              m_ballast_pwm->DigitalWriteLow(pca9685::LED_9);
+                             delay(50);
 #endif
                           } else {
                              if ((m_ballast < 0) && (m_ballast_pre > 0)) {
@@ -121,6 +122,7 @@ void CBallast::Update( CCommand& commandIn )
 #else
                                 g_SystemMuxes.SetPath(SCL_NONE);
                                 m_ballast_pwm->DigitalWriteLow(pca9685::LED_9);
+                                delay(50);
 #endif
                              }
                           }
