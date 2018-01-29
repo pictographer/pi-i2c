@@ -105,24 +105,24 @@ void CBallast::Update( CCommand& commandIn )
                         if ((commandIn.m_arguments[1] > 0) && (m_p89bsd012bs.GetMaxPressureFlag())) return;
                         // process the command normally
                         m_ballast = commandIn.m_arguments[1];
-                        if ((m_ballast_pre < 0) && (m_ballast > 0)) {
+                        if ((m_ballast_pre <= 0) && (m_ballast >= 0)) {
 #ifdef OLD_BOARD
                              g_SystemMuxes.SetPath(SCL_ME);
                              m_motor_e->Cmd_SetSpeed(0x0000);
 #else
                              g_SystemMuxes.SetPath(SCL_NONE);
                              m_ballast_pwm->DigitalWriteLow(pca9685::LED_9);
-                             delay(50);
+                             delay(10);
 #endif
                           } else {
-                             if ((m_ballast < 0) && (m_ballast_pre > 0)) {
+                             if ((m_ballast <= 0) && (m_ballast_pre >= 0)) {
 #ifdef OLD_BOARD
                                 g_SystemMuxes.SetPath(SCL_ME);
                                 m_motor_e->Cmd_SetSpeed(0x0000);
 #else
                                 g_SystemMuxes.SetPath(SCL_NONE);
                                 m_ballast_pwm->DigitalWriteLow(pca9685::LED_9);
-                                delay(50);
+                                delay(10);
 #endif
                              }
                           }
@@ -159,6 +159,7 @@ void CBallast::Update( CCommand& commandIn )
                           g_SystemMuxes.SetPath(SCL_ME);
                           m_motor_e->Cmd_SetSpeed(SCALE_SPEED(m_ballast));
 #else
+                          delay(10);
                           g_SystemMuxes.SetPath(SCL_NONE);
                           m_ballast_pwm->DigitalWrite(pca9685::LED_4, ON_TIME(m_ballast), OFF_TIME(m_ballast));
 #endif
