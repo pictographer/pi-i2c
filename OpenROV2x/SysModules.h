@@ -21,7 +21,7 @@ CControllerBoard m_controllerBoard;
 // this is repurposed for power
 #if(HAS_STD_LIGHTS)
 #include "CLights.h"
-CLights m_lights( PIN_STANDARD_LIGHTS );
+CLights m_lights( PIN_STANDARD_LIGHTS, PIN_I2C_ENABLE );
 #endif
 
 #if(HAS_EXT_LIGHTS )
@@ -84,6 +84,11 @@ CMS5611_01BA m_ms5611( &I2C0 );
 #if(HAS_MS5837_30BA)
 #include "CMS5837_30BA.h"
 CMS5837_30BA m_ms5837( &I2C0, ms5837_30ba::EAddress::ADDRESS_A );
+#endif
+
+#if(HAS_BOUYANCY)
+#include "CBouyancy.h"
+CBouyancy m_bouyancy;
 #endif
 
 #if(HAS_BALLAST)

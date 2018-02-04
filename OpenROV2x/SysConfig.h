@@ -41,6 +41,9 @@
 // After Market Modules
 // ---------------------------------------------------------
 
+// Buoyancy PID loops
+#define HAS_BOUYANCY (1)
+
 // Ballast Pump and Valve
 #define HAS_BALLAST (1)
 

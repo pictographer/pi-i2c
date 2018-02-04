@@ -8,7 +8,7 @@
 class CLights : public CModule
 {
 public:
-    CLights( uint32_t pinIn );
+    CLights( uint32_t pinIn, uint32_t pinI2C );
     void Initialize();
     void Update( CCommand& commandIn );
 
@@ -16,6 +16,7 @@ private:
     orutil::CTimer      m_controlTimer;
     orutil::CTimer      m_telemetryTimer;
     CPin        m_pin;
+    CPin        m_pinI2C;
 
     float       m_targetPower = 0.0f;
     float       m_currentPower = 0.0f;

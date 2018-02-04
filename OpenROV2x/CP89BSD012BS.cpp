@@ -2,12 +2,14 @@
 #if(HAS_P89BSD012BS)
 
 #include "I2C.h"
+#include "CBallast.h"
 #include "CP89BSD012BS.h"
 #include "NCommManager.h"
 #include "CMuxes.h"
 
 extern CMuxes g_SystemMuxes;
 extern I2C I2C0;
+extern CBallast m_ballast;
 
 using namespace p89bsd012bs;
 
@@ -43,6 +45,10 @@ void CP89BSD012BS::Initialize()
 
 void CP89BSD012BS::Update( CCommand& commandIn )
 {
+        if (m_device.GetMaxPressureFlag()) {
+           m_ballast.Stop();
+        }
+
 	if( m_device.IsEnabled() == false )
 	{
 		return;
@@ -61,6 +67,7 @@ void CP89BSD012BS::Update( CCommand& commandIn )
 		}
 	}
 
+#if 0
 	// Handle health checks
 	if( m_statusCheckTimer.HasElapsed( kStatusCheckDelay_ms ) )
 	{
@@ -94,6 +101,7 @@ void CP89BSD012BS::Update( CCommand& commandIn )
 			return;
 		}
 	}
+#endif
     
 	// Handle commands
 	if( NCommManager::m_isCommandAvailable )
@@ -155,12 +163,24 @@ void CP89BSD012BS::Update( CCommand& commandIn )
 		if( m_device.m_data.SampleAvailable() )
 		{
 			// Report results
-//			Serial.print( F( "depth_t:" ) );	Serial.print( orutil::Encode1K( m_device.m_data.temperature_c ) ); 	Serial.print( ';' );
-//			Serial.print( F( "depth_p:" ) );	Serial.print( orutil::Encode1K( m_device.m_data.pressure_mbar ) ); 	Serial.print( ';' );
-//			Serial.print( F( "depth_d:" ) );	Serial.print( orutil::Encode1K( m_device.m_data.depth_m ) ); 		Serial.print( ';' );
+			Serial.print( F( "ballast_t:" ) );	Serial.print( orutil::Encode1K( m_device.m_data.temperature_c ) ); 	Serial.print( ';' );
+			Serial.print( F( "ballast_p:" ) );	Serial.print( orutil::Encode1K( m_device.m_data.pressure_psi ) ); 	Serial.print( ';' );
+			Serial.print( F( "ballast_mp:" ) );	Serial.print( orutil::Encode1K( m_device.m_data.max_pressure_psi ) ); 	Serial.print( ';' );
 	                Serial.print( F( "ENDUPDATE:1;" ) );
 		}
 	}
 }
 
+void CP89BSD012BS::ForcePressureMeasurement( void )
+{
+    uint8_t count = 0;
+
+    // it should not get stuck
+    // set path to enable access to sensor
+    g_SystemMuxes.SetPath(SCL_PXDCR);
+    while (!m_device.m_data.SampleAvailable() && (count++ < 16)) {
+         delay(10);
+         m_device.Tick();
+    } 
+}
 #endif

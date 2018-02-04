@@ -347,6 +347,32 @@ EI2CResult I2C::ReadByte( uint8_t slaveAddressIn, uint8_t *dataOut, bool issueRe
 
 }
 
+EI2CResult I2C::ReadRegisterNBytes( uint8_t slaveAddressIn, uint8_t registerIn, uint8_t *dataOut, uint8_t numberBytesIn, bool issueRepeatedStart )
+{
+        // Start transaction
+        m_result = StartTransaction();
+        if( m_result ){ return HANDLE_RESULT( m_result ); }
+
+        // Send address
+        int result = ioctl( m_customProperties.m_fileDescriptor, I2C_SLAVE, slaveAddressIn );
+        if( result ){ return HANDLE_RESULT( EI2CResult::RESULT_ERR_FAILED ); }
+
+        wiringPiI2CWrite( m_customProperties.m_fileDescriptor, registerIn );
+        // Read in the requested amount of bytes
+        for( size_t i = 0; i < numberBytesIn; ++i )
+        {
+              dataOut[i] = wiringPiI2CRead( m_customProperties.m_fileDescriptor );
+        }
+
+        // Send stop, if requested
+        if( !issueRepeatedStart )
+        {
+                m_result = StopTransaction();
+                if( m_result ){ return HANDLE_RESULT( m_result ); }
+        }
+
+}
+
 EI2CResult I2C::ReadBytes( uint8_t slaveAddressIn, uint8_t *dataOut, uint8_t numberBytesIn, bool issueRepeatedStart )
 {
         union i2c_smbus_data data ;
@@ -358,7 +384,7 @@ EI2CResult I2C::ReadBytes( uint8_t slaveAddressIn, uint8_t *dataOut, uint8_t num
         // Send address
         int result = ioctl( m_customProperties.m_fileDescriptor, I2C_SLAVE, slaveAddressIn );
         if( result ){ return HANDLE_RESULT( EI2CResult::RESULT_ERR_FAILED ); }
-
+#if 1
         data.block[0] = 0x1F;
 
         if (i2c_smbus_access (m_customProperties.m_fileDescriptor, I2C_SMBUS_READ, 0, I2C_SMBUS_I2C_BLOCK_DATA, &data))
@@ -370,6 +396,13 @@ EI2CResult I2C::ReadBytes( uint8_t slaveAddressIn, uint8_t *dataOut, uint8_t num
               return HANDLE_RESULT( EI2CResult::RESULT_ERR_FAILED );
            }
         }
+#else
+        // Read in the requested amount of bytes
+        for( size_t i = 0; i < numberBytesIn; ++i )
+        {
+              dataOut[i] = wiringPiI2CRead( m_customProperties.m_fileDescriptor );
+        }
+#endif
 
         // Send stop, if requested
         if( !issueRepeatedStart )

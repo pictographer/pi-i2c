@@ -12,6 +12,7 @@ public:
 	void Initialize();
 	void Update( CCommand& commandIn );
         uint8_t GetMaxPressureFlag( void );
+        void ForcePressureMeasurement( void );
 
 private:
 	// Device driver

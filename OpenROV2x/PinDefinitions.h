@@ -67,6 +67,7 @@
 
 // this is set repurposed as the main power
 #define PIN_STANDARD_LIGHTS		   34 
+#define PIN_I2C_ENABLE		           18 
 //
 #define PIN_LASERS                  PIN_PWM_2
 // Not yet used                     PIN_PWM_3

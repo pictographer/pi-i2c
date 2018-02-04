@@ -41,8 +41,9 @@ namespace
 	}
 }
 
-CLights::CLights( uint32_t pinIn )
-	: m_pin( pinIn, CPin::kDigital, CPin::kOutput )
+CLights::CLights( uint32_t pinIn, uint32_t pinI2C )
+	: m_pin( pinIn, CPin::kDigital, CPin::kOutput ),
+          m_pinI2C( pinI2C, CPin::kDigital, CPin::kOutput )
 {
 }
 
@@ -94,6 +95,8 @@ void CLights::Update( CCommand& commandIn )
 		// Write the power value to the pin
 		// m_pin.Write( m_currentPower_an );
                 if (m_targetPower > 0) {
+                    // force takeover of the I2C bus
+	            m_pinI2C.Write( 1 );
                     // Go through power disarm sequence
                     // SCL_DIO2
                     g_SystemMuxes.WriteExtendedGPIO(RLY_SAF,LOW);

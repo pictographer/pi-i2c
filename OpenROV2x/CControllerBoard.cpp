@@ -97,7 +97,7 @@ long CControllerBoard::readLeakDetector()
 #else
              leak = g_SystemMuxes.ReadExtendedGPIO(LEAK_SW2);
 #endif
-             return(leak);
+             return(((leak == 0) ? 1 : 0));
 }
 
 long CControllerBoard::readCharge() 

@@ -33,6 +33,7 @@ CBallast::CBallast()
         m_valveState = 0;
         m_ballast = 0;
         m_ballast_pre = 0;
+        m_down = 0;
 }
 
 void CBallast::Initialize()
@@ -102,7 +103,10 @@ void CBallast::Update( CCommand& commandIn )
 
                         // check if the pressure reading is above the allowable maximum
                         // if it is then only allow reduction of pressure in the reservoir
-                        if ((commandIn.m_arguments[1] > 0) && (m_p89bsd012bs.GetMaxPressureFlag())) return;
+                        if ((commandIn.m_arguments[1] > 0) && (m_p89bsd012bs.GetMaxPressureFlag())) {
+                           Stop();
+                           return;
+                        }
                         // process the command normally
                         m_ballast = commandIn.m_arguments[1];
                         if ((m_ballast_pre <= 0) && (m_ballast >= 0)) {
@@ -131,6 +135,7 @@ void CBallast::Update( CCommand& commandIn )
                             g_SystemMuxes.WriteExtendedGPIO( VALVE_1_EN, HIGH );
 #else
                             g_SystemMuxes.WriteExtendedGPIO( VALVE_SER_EN, HIGH );
+                            m_down = 0;
 #endif
                           } else {
 #ifdef OLD_BOARD
@@ -144,6 +149,7 @@ void CBallast::Update( CCommand& commandIn )
 #else
                                 g_SystemMuxes.SetPath(SCL_NONE);
 #endif
+                                if (m_ballast > 0) m_down = 1;
                                 m_ballast_pwm->DigitalWriteLow(pca9685::LED_9);
                              } else {
 #ifdef OLD_BOARD
@@ -151,6 +157,7 @@ void CBallast::Update( CCommand& commandIn )
 #else
                                 g_SystemMuxes.SetPath(SCL_NONE);
 #endif
+                                m_down = 0;
                                 m_ballast_pwm->DigitalWriteHigh(pca9685::LED_9);
                              }
                           }
@@ -168,6 +175,61 @@ void CBallast::Update( CCommand& commandIn )
 
                 }
 	}
+}
+
+void CBallast::Stop() {
+       if (m_down == 1) {
+           g_SystemMuxes.WriteExtendedGPIO( VALVE_SER_EN, HIGH );
+           g_SystemMuxes.SetPath(SCL_NONE);
+           m_ballast_pwm->DigitalWriteLow(pca9685::LED_4);
+           m_ballast_pre = 0;
+       }
+}
+
+void CBallast::CheckAndStop() {
+       // advance the state machine enough to force a pressure measurement
+       m_p89bsd012bs.ForcePressureMeasurement();
+       if ((m_p89bsd012bs.GetMaxPressureFlag()) && (m_down == 1)) {
+           g_SystemMuxes.WriteExtendedGPIO( VALVE_SER_EN, HIGH );
+           g_SystemMuxes.SetPath(SCL_NONE);
+           m_ballast_pwm->DigitalWriteLow(pca9685::LED_4);
+           m_ballast_pre = 0;
+       }
+}
+
+void CBallast::Drive( int32_t value ) {
+       m_ballast = value;
+       if ((m_ballast_pre <= 0) && (m_ballast >= 0)) {
+            g_SystemMuxes.SetPath(SCL_NONE);
+            m_ballast_pwm->DigitalWriteLow(pca9685::LED_9);
+            delay(10);
+         } else {
+            if ((m_ballast <= 0) && (m_ballast_pre >= 0)) {
+               g_SystemMuxes.SetPath(SCL_NONE);
+               m_ballast_pwm->DigitalWriteLow(pca9685::LED_9);
+               delay(10);
+            }
+         }
+         if (m_ballast == 0) {
+           g_SystemMuxes.WriteExtendedGPIO( VALVE_SER_EN, HIGH );
+           m_down = 0;
+         } else {
+            g_SystemMuxes.WriteExtendedGPIO( VALVE_SER_EN, LOW );
+            if (m_ballast >= 0) {
+               g_SystemMuxes.SetPath(SCL_NONE);
+               if (m_ballast > 0) m_down = 1;
+               m_ballast_pwm->DigitalWriteLow(pca9685::LED_9);
+            } else {
+               g_SystemMuxes.SetPath(SCL_NONE);
+               m_down = 0;
+               m_ballast_pwm->DigitalWriteHigh(pca9685::LED_9);
+            }
+         }
+         // -backwards +forwards
+         delay(10);
+         g_SystemMuxes.SetPath(SCL_NONE);
+         m_ballast_pwm->DigitalWrite(pca9685::LED_4, ON_TIME(m_ballast), OFF_TIME(m_ballast));
+         m_ballast_pre = m_ballast;
 }
 
 #endif

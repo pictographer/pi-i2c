@@ -75,7 +75,7 @@ namespace p86bsd030pa
         int64_t     m_SENS2     = 0;    // Second order final sens
         int64_t     m_TEMP2     = 0;    // Second order final temp
         
-        int32_t     m_P         = 0;    // Temperature compensated pressure
+        float       m_P         = 0;    // Temperature compensated pressure
         
         // Bytes to hold the results from I2C communications with the sensor
         uint8_t     m_highByte  = 0;

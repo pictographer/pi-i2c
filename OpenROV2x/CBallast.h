@@ -11,6 +11,9 @@ public:
     CBallast();
     void Initialize();
     void Update( CCommand& commandIn );
+    void Stop();
+    void CheckAndStop();
+    void Drive( int32_t value ); 
 
 private:
     pca9685::PCA9685   *m_ballast_pwm;
@@ -30,6 +33,8 @@ private:
         0x0E,
         0x0C
    };
+
+    uint8_t     m_down;
 
     int32_t     m_valveState;
     int32_t     m_ballast;

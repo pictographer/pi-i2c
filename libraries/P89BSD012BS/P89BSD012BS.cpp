@@ -1,6 +1,7 @@
 // Includes
 #include "P89BSD012BS.h"
 #include <assert.h>
+#include <math.h>
 
 using namespace p89bsd012bs;
 
@@ -240,6 +241,16 @@ uint8_t P89BSD012BS::GetMaxPressureFlag()
 // Private Methods
 // --------------------------------------------------------------
 
+int16_t P89BSD012BS::Convert( uint16_t number, uint8_t size )
+{
+   int16_t result = 0;
+
+   uint16_t mask = pow( 2, (size-1));
+   result = (-(number&mask)) + (number&(~mask));
+
+   return( result );
+}
+
 void P89BSD012BS::Transition( EState stateIn )
 {
     // Set new state
@@ -263,25 +274,43 @@ EResult P89BSD012BS::Cmd_Reset()
 
 EResult P89BSD012BS::Cmd_ReadCalibrationData()
 {
-    uint8_t coeffs[ 2 ];
+    uint16_t coeffs[8];
+    uint16_t spare = 0x00;
  
     // Read sensor coefficients
-    for( uint8_t i = 0; i < 10; ++i )
+    for( uint8_t i = 0; i < 8; ++i )
     {
-        i2c::EI2CResult ret = ReadRegisterBytes( CMD_PROM_READ_BASE + ( i * 2 ), coeffs, 2 );
- 
+        i2c::EI2CResult ret = ReadRegisterWord( CMD_PROM_READ_BASE + ( i * 2 ), &(coeffs[i]) );
+        spare = ((coeffs[i]<<8)&0xFF00) | ((coeffs[i]>>8)&0x00FF);
+        coeffs[i] = spare;
  	if( ret )
  	{
             // I2C Failure
             return (EResult)m_results.AddResult( EResult::RESULT_ERR_I2C_TRANSACTION );
  	}
+     }
  
-        // Combine high and low bytes
-        m_coeffs[i] = ( ( ( uint16_t )coeffs[ 0 ] << 8 ) | coeffs[ 1 ] );
+     // address 1
+     m_ucoeffs[0] = (coeffs[1]&0xFFFC)>>2;
+     m_ucoeffs[1] = ((coeffs[1]&0x03)<<12) + ((coeffs[2]&0xFFF0)>>4);
+     m_ucoeffs[2] = (((coeffs[2]&0xF)<<6) + (coeffs[3]>>10))&0x3FF;
+     m_ucoeffs[3] = (coeffs[3]&0x3FF);
+     m_ucoeffs[4] = (coeffs[4]>>6)&0x3FF;
+     m_ucoeffs[5] = (((coeffs[4]&0x3F)<<4) + (coeffs[5]>>12)) &0x3FF;
+     m_ucoeffs[6] = (coeffs[5]>>2)&0x3FF;
+     m_ucoeffs[7] = (((coeffs[5]&0x3)<<8) + (coeffs[6]>>8))&0x3FF;
+     m_ucoeffs[8] = (((coeffs[6]&0xFF)<<2) + (coeffs[7]>>14))&0x3FF;
+     m_ucoeffs[9] = (coeffs[7]>>4)&0x3FF;
+
+    // convert to signed integers
+    // from 2s complement
+    for( uint8_t i = 0; i < 10; ++i ) {
+       m_coeffs[i] = Convert( m_ucoeffs[i], (i < 2 ? 14 : 10) );
     }
  
+#if 0
     uint8_t readCRC = ( m_coeffs[ 0 ] >> 12 );
- 
+
    // Compare read CRC4 to calculated CRC4
    if( readCRC == CalculateCRC4() )
    {
@@ -291,6 +320,7 @@ EResult P89BSD012BS::Cmd_ReadCalibrationData()
    {
  	return (EResult)m_results.AddResult( EResult::RESULT_ERR_CRC_MISMATCH );
    }
+#endif
    return EResult::RESULT_SUCCESS;
 }
 
@@ -330,7 +360,8 @@ EResult P89BSD012BS::Cmd_ReadPressure()
 {
     uint8_t bytes[ 3 ];
 
-    i2c::EI2CResult ret = ReadRegisterBytes( CMD_ADC_READ, bytes, 3 );
+    i2c::EI2CResult ret = ReadRegisterNBytes( CMD_ADC_READ, bytes, 3 );
+    // i2c::EI2CResult ret = ReadBytes( bytes, 3 );
     if( ret )
     {
         // I2C Failure
@@ -347,7 +378,8 @@ EResult P89BSD012BS::Cmd_ReadTemperature()
 {
     uint8_t bytes[ 3 ];
 
-    i2c::EI2CResult ret = ReadRegisterBytes( CMD_ADC_READ, bytes, 3 );
+    i2c::EI2CResult ret = ReadRegisterNBytes( CMD_ADC_READ, bytes, 3 );
+    // i2c::EI2CResult ret = ReadBytes( bytes, 3 );
     if( ret )
     {
         // I2C Failure
@@ -408,10 +440,10 @@ void P89BSD012BS::ProcessData()
 {
     // Calculate base terms
     // TEMP = A0/3 + A1*2*D2/2^24 + A2*2*(D2/2^24)^2
-    m_dT      = (m_D2/POW_2_24);
-    m_TEMP    = (m_coeffs[static_cast<uint8_t>(Coefficient::C_A0)]/3) +
-                (m_coeffs[static_cast<uint8_t>(Coefficient::C_A1)]*2*m_dT) +
-                (m_coeffs[static_cast<uint8_t>(Coefficient::C_A2)]*2*m_dT*m_dT);
+    m_dT      = (((double)m_D2)/POW_2_24);
+    m_TEMP    = (((double)m_coeffs[static_cast<uint8_t>(Coefficient::C_A0)])/3.0) +
+                (((double)m_coeffs[static_cast<uint8_t>(Coefficient::C_A1)])*2.0*m_dT) +
+                (((double)m_coeffs[static_cast<uint8_t>(Coefficient::C_A2)])*2.0*m_dT*m_dT);
     // Q0 = 9
     // Q1 = 11
     // Q2 = 9
@@ -423,12 +455,12 @@ void P89BSD012BS::ProcessData()
     // Y = (D1 + C0*2^Q0 + C3*2^Q3*D2/2^24 + C4*2^Q4*(D2/2^24)^2) /
     //     (C1*2^Q1 + C5*2^Q5*D2/2^24 + C6*2^Q6*(D2/2^24)^2)
     m_Yn      = m_D1 +       
-                (m_coeffs[static_cast<uint8_t>(Coefficient::C_C0)]*POW_2_9) +
-                (m_coeffs[static_cast<uint8_t>(Coefficient::C_C3)]*POW_2_15*m_dT) +
-                (m_coeffs[static_cast<uint8_t>(Coefficient::C_C4)]*POW_2_15*m_dT*m_dT);
-    m_Yd      = (m_coeffs[static_cast<uint8_t>(Coefficient::C_C1)]*POW_2_11) +
-                (m_coeffs[static_cast<uint8_t>(Coefficient::C_C5)]*POW_2_16*m_dT) +
-                (m_coeffs[static_cast<uint8_t>(Coefficient::C_C6)]*POW_2_16*m_dT*m_dT);
+                (((double)m_coeffs[static_cast<uint8_t>(Coefficient::C_C0)])*POW_2_9) +
+                (((double)m_coeffs[static_cast<uint8_t>(Coefficient::C_C3)])*POW_2_15*m_dT) +
+                (((double)m_coeffs[static_cast<uint8_t>(Coefficient::C_C4)])*POW_2_15*m_dT*m_dT);
+    m_Yd      = (((double)m_coeffs[static_cast<uint8_t>(Coefficient::C_C1)])*POW_2_11) +
+                (((double)m_coeffs[static_cast<uint8_t>(Coefficient::C_C5)])*POW_2_16*m_dT) +
+                (((double)m_coeffs[static_cast<uint8_t>(Coefficient::C_C6)])*POW_2_16*m_dT*m_dT);
     m_Y       = (m_Yn/m_Yd);
     // P = Y*(1- (C2*2^Q2/2^24)) + C2*2^Q2/2^24*Y^2
     m_Pc      = ((m_coeffs[static_cast<uint8_t>(Coefficient::C_C2)]*POW_2_9)/POW_2_24);
@@ -439,6 +471,10 @@ void P89BSD012BS::ProcessData()
     m_P       = m_P * 14.5038;
     // calculate max pressure allowed in psi based on data from SRC
     m_MaxP    = ((m_TEMP - 145.41)/(-5.917)); // max pressure in psi
+    // derate maximum pressure to add safety margin
+    m_MaxP    = 0.9*m_MaxP;
+
+    // printf("Measured Pressure: %f Max Pressure: %f\n", m_P, m_MaxP );
 
     // If the measure pressure exceeds the maximum allowable pressure
     if (m_P > m_MaxP) {
@@ -448,9 +484,10 @@ void P89BSD012BS::ProcessData()
     }
 	
     // Create data sample with calculated parameters
-    m_data.Update(  ( (float)m_TEMP / 1.0f ),     // Temperature
-                    ( (float)m_P / 1.0f ),         // Max pressure
-                    m_waterMod );
+    m_data.Update(  ( (float)m_TEMP ),     // Temperature
+                    ( (float)m_P ),         // Measured pressure
+                    ( (float)m_MaxP )         // Max pressure
+                    );
 }
 
 // I2C call wrappers
@@ -472,4 +509,14 @@ i2c::EI2CResult P89BSD012BS::ReadBytes( uint8_t *dataOut, uint8_t numBytesIn )
 i2c::EI2CResult P89BSD012BS::ReadRegisterBytes( uint8_t registerIn, uint8_t *dataOut, uint8_t numBytesIn )
 {
     return m_pI2C->ReadRegisterBytes( m_address, registerIn, dataOut, numBytesIn );
+}
+
+i2c::EI2CResult P89BSD012BS::ReadRegisterWord( uint8_t registerIn, uint16_t *dataOut )
+{
+    return m_pI2C->ReadRegisterWord( m_address, registerIn, dataOut );
+}
+
+i2c::EI2CResult P89BSD012BS::ReadRegisterNBytes( uint8_t registerIn, uint8_t *dataOut, uint8_t numberBytesIn )
+{
+    return m_pI2C->ReadRegisterNBytes( m_address, registerIn, dataOut, numberBytesIn );
 }

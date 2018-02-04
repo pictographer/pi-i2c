@@ -76,6 +76,8 @@ public:
   i2c::EI2CResult ReadRegisterByte(   uint8_t slaveAddressIn, uint8_t registerIn, uint8_t *dataOut,                            bool issueRepeatedStart = false );
   i2c::EI2CResult ReadRegisterWord(   uint8_t slaveAddressIn, uint8_t registerIn, uint16_t *dataOut,                           bool issueRepeatedStart = false );
   i2c::EI2CResult ReadRegisterBytes(  uint8_t slaveAddressIn, uint8_t registerIn, uint8_t *dataOut,    uint8_t numberBytesIn,  bool issueRepeatedStart = false );
+  i2c::EI2CResult ReadRegisterNBytes( uint8_t slaveAddressIn, uint8_t registerIn, uint8_t *dataOut,    uint8_t numberBytesIn,  bool issueRepeatedStart = false );
+
 
 private:
   // Attributes  

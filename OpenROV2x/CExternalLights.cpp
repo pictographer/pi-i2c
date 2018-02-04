@@ -105,30 +105,30 @@ void CExternalLights::Update( CCommand& commandIn )
 #endif
                         if (m_currentPower_an == 0) {
                             // top
-                            if ((m_targetLight == 0) || (m_targetLight == 4))
+                            if ((m_targetLight == 0) || (m_targetLight == 3))
                                m_led_pwm->DigitalWriteLow(pca9685::LED_10);
                             // front
                             if ((m_targetLight == 0) || (m_targetLight == 1))
                                m_led_pwm->DigitalWriteLow(pca9685::LED_11);
                             // bottom
-                            if ((m_targetLight == 0) || (m_targetLight == 2))
+                            if ((m_targetLight == 0) || (m_targetLight == 4))
                                m_led_pwm->DigitalWriteLow(pca9685::LED_12);
                             // side
-                            if ((m_targetLight == 0) || (m_targetLight == 3))
+                            if ((m_targetLight == 0) || (m_targetLight == 2))
                                m_led_pwm->DigitalWriteLow(pca9685::LED_13);
                         } else {
                             // range 0-255 m_targetPower
                             // top
-                            if ((m_targetLight == 0) || (m_targetLight == 4))
+                            if ((m_targetLight == 0) || (m_targetLight == 3))
                                m_led_pwm->DigitalWrite(pca9685::LED_10, ON_TIME(m_currentPower_an), OFF_TIME(m_currentPower_an));
                             // front
                             if ((m_targetLight == 0) || (m_targetLight == 1))
                                m_led_pwm->DigitalWrite(pca9685::LED_11, ON_TIME(m_currentPower_an), OFF_TIME(m_currentPower_an));
                             // bottom
-                            if ((m_targetLight == 0) || (m_targetLight == 2))
+                            if ((m_targetLight == 0) || (m_targetLight == 4))
                                m_led_pwm->DigitalWrite(pca9685::LED_12, ON_TIME(m_currentPower_an), OFF_TIME(m_currentPower_an));
                             // side
-                            if ((m_targetLight == 0) || (m_targetLight == 3))
+                            if ((m_targetLight == 0) || (m_targetLight == 2))
                                m_led_pwm->DigitalWrite(pca9685::LED_13, ON_TIME(m_currentPower_an), OFF_TIME(m_currentPower_an));
                         }
                         delay(50);
@@ -144,9 +144,9 @@ void CExternalLights::Update( CCommand& commandIn )
 			    // Update the target position
                             // 0: all lights
                             // 1: camera 1 Front
-                            // 2: camera 2 Bottom
+                            // 2: camera 2 Side
                             // 3: camera 3 Top
-                            // 4: camera 4 Side
+                            // 4: camera 4 Bottom
 			    m_targetLight = commandIn.m_arguments[1];
 			    Serial.print( F( "elights_select:" ) );
 			    Serial.print( m_targetLight );

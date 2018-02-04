@@ -11,6 +11,7 @@ public:
 	CP86BSD030PA( I2C *i2cInterfaceIn );
 	void Initialize();
 	void Update( CCommand& commandIn );
+        float GetDepth( void );
 
 private:
 	// Device driver

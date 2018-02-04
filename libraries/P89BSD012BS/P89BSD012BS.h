@@ -58,12 +58,13 @@ namespace p89bsd012bs
         orutil::TResultCount<EResult::_RESULT_COUNT, EResult::RESULT_SUCCESS> m_results;
     
         // Computation parameters
-        uint16_t    m_coeffs[10] = {0};  // unsigned 16-bit integer (0-65535)
+        uint16_t   m_ucoeffs[10] = {0};   // unsigned 16-bit integer (0-65535)
+        int16_t    m_coeffs[10] = {0};  // signed 16-bit integer 
 
         uint32_t    m_D1        = 0;    // Digital pressure value
         uint32_t    m_D2        = 0;    // Digital temperature value
         
-        int32_t     m_dT        = 0;    // Difference between actual and reference temperature
+        double      m_dT        = 0;    // Difference between actual and reference temperature
         double      m_TEMP      = 0;    // Actual temperature
         
         int64_t     m_OFF       = 0;    // Offset at actual temperature
@@ -104,6 +105,7 @@ namespace p89bsd012bs
         EResult Cmd_ReadTemperature();
         EResult Cmd_ReadPressure();
 
+        int16_t Convert( uint16_t number, uint8_t size );
         uint8_t CalculateCRC4();
         void ProcessData();
 
@@ -112,5 +114,8 @@ namespace p89bsd012bs
         i2c::EI2CResult ReadByte( uint8_t *dataOut );
         i2c::EI2CResult ReadBytes( uint8_t *dataOut, uint8_t numBytesIn );
         i2c::EI2CResult ReadRegisterBytes( uint8_t registerIn, uint8_t *dataOut, uint8_t numBytesIn );
+        i2c::EI2CResult ReadRegisterWord( uint8_t registerIn, uint16_t *dataOut );
+        i2c::EI2CResult ReadRegisterNBytes( uint8_t registerIn, uint8_t *dataOut, uint8_t numberBytesIn );
+
     };
 }

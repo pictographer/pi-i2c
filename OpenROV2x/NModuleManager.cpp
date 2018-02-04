@@ -47,17 +47,21 @@ namespace NModuleManager
 
         void HandleModuleUpdates( CCommand& commandIn )
         {
-                //unsigned long start = 0;
+                // unsigned long start = 0;
                 //unsigned long stop    = 0;
 
                 // Loop through each module and call its update functon
                 for( int i = 0; i < m_moduleCount; ++i )
                 {
+                        // check the ballast as often as possible
+                        // and stop it if the pressure exceeds the maximum
+                        // safe value
+                        m_ballast.CheckAndStop();
                         // Time and execute the update functions for this module
-                        //start = millis();
+                        // start = millis();
                         m_pModules[ i ]->Update( commandIn );
                         //stop = millis();
-
+                        //
                         // Set the delta for the module's execution time so we can send this out as debug info
                         //m_pModules[i]->m_executionTime = stop - start;
                 }
