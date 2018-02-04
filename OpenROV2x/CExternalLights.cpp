@@ -119,17 +119,41 @@ void CExternalLights::Update( CCommand& commandIn )
                         } else {
                             // range 0-255 m_targetPower
                             // top
-                            if ((m_targetLight == 0) || (m_targetLight == 3))
+                            if ((m_targetLight == 0) || (m_targetLight == 3)) {
                                m_led_pwm->DigitalWrite(pca9685::LED_10, ON_TIME(m_currentPower_an), OFF_TIME(m_currentPower_an));
+                               if (m_targetLight != 0) {
+                                   m_led_pwm->DigitalWriteLow(pca9685::LED_11);
+                                   m_led_pwm->DigitalWriteLow(pca9685::LED_12);
+                                   m_led_pwm->DigitalWriteLow(pca9685::LED_13);
+                               }
+                            }
                             // front
-                            if ((m_targetLight == 0) || (m_targetLight == 1))
+                            if ((m_targetLight == 0) || (m_targetLight == 1)) {
                                m_led_pwm->DigitalWrite(pca9685::LED_11, ON_TIME(m_currentPower_an), OFF_TIME(m_currentPower_an));
+                               if (m_targetLight != 0) {
+                                   m_led_pwm->DigitalWriteLow(pca9685::LED_10);
+                                   m_led_pwm->DigitalWriteLow(pca9685::LED_12);
+                                   m_led_pwm->DigitalWriteLow(pca9685::LED_13);
+                               }
+                            }
                             // bottom
-                            if ((m_targetLight == 0) || (m_targetLight == 4))
+                            if ((m_targetLight == 0) || (m_targetLight == 4)) {
                                m_led_pwm->DigitalWrite(pca9685::LED_12, ON_TIME(m_currentPower_an), OFF_TIME(m_currentPower_an));
+                               if (m_targetLight != 0) {
+                                   m_led_pwm->DigitalWriteLow(pca9685::LED_10);
+                                   m_led_pwm->DigitalWriteLow(pca9685::LED_11);
+                                   m_led_pwm->DigitalWriteLow(pca9685::LED_13);
+                               }
+                            }
                             // side
-                            if ((m_targetLight == 0) || (m_targetLight == 2))
+                            if ((m_targetLight == 0) || (m_targetLight == 2)) {
                                m_led_pwm->DigitalWrite(pca9685::LED_13, ON_TIME(m_currentPower_an), OFF_TIME(m_currentPower_an));
+                               if (m_targetLight != 0) {
+                                   m_led_pwm->DigitalWriteLow(pca9685::LED_10);
+                                   m_led_pwm->DigitalWriteLow(pca9685::LED_11);
+                                   m_led_pwm->DigitalWriteLow(pca9685::LED_12);
+                               }
+                            }
                         }
                         delay(50);
 			// Emit current power
