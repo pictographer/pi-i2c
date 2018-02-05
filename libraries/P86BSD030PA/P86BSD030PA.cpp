@@ -414,7 +414,7 @@ float P86BSD030PA::CalculateDepth( float pressure, float temp )
    density = 324.689f - (0.145954f*temp) - (0.0167518f*temp*temp);
    // density is lb/cuin*10000
    // convert to kg/m3
-   // 1 lb/cuin is 27679.9 kg/m3
+   // 1 lb/cu in is 27679.9 kg/m3
    density = (2.76799f * density);
    // density now in kg/m3
    // pressure in mbar
@@ -423,7 +423,7 @@ float P86BSD030PA::CalculateDepth( float pressure, float temp )
    // 1 mbar = 10.2 kg/m2
    pressure *= 10.2f;
    // depth = pressure diff/(density * gravity)
-   depth = pressure/(density*9.8);
+   depth = pressure/density;
    return (depth);
 }
 
@@ -431,7 +431,7 @@ float P86BSD030PA::CalculateDepth( float pressure, float temp )
 void P86BSD030PA::ProcessData()
 {
     m_TEMP2 = ((int32_t) ((m_D2*200)/2047)) - 50; // degrees C
-    m_P = (((((float)m_D1) - (16383.0/10.0))*(27.0-3.0))/((8.0*16383.0)/10.0)) + 3.0; // psi
+    m_P = (((((float)m_D1) - (0.1*16383.0))*(27.0-3.0))/(0.8*16383.0)) + 3.0; // psi
     m_P *= 68.9476; // psi to mbar
 	
     // Create data sample with calculated parameters
