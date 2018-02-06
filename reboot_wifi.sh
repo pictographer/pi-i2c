@@ -2,7 +2,9 @@
 #
 # test if WiFi is still alive
 #
-ping -c4 192.168.1.254 > /dev/null
+export GATEWAY=`route -n | grep 'UG[ \t]' | awk '{print $2}'`
+echo "ping -c4 ${GATEWAY} > /dev/null"
+ping -c4 ${GATEWAY} > /dev/null
 
 if [ $? != 0 ]
 then
