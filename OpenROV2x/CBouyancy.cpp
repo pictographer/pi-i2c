@@ -29,9 +29,9 @@ CBouyancy::CBouyancy()
 
 void CBouyancy::Initialize()
 {
-   // disable all user generated motor and bouyancy control operations
+   // leave all user generated motor and bouyancy control operations enabled
 
-   m_thrusters.Enable(0);
+   m_thrusters.Enable(1);
    // use motors to drop to about 1 foot of depth
 
    // execute PI loop to hold at about 1 foot
@@ -55,19 +55,39 @@ void CBouyancy::Update( CCommand& commandIn )
    int32_t newBallast = 0;
 
    if( NCommManager::m_isCommandAvailable ) {
-       if (commandIn.Equals( "balance" )) { 
+      if (commandIn.Equals( "start_balance" )) { 
            m_startUp = commandIn.m_arguments[1]; 
+      } else {
+          if (commandIn.Equals( "enable_thrusters" )) { 
+              uint32_t value =  commandIn.m_arguments[1];
+              m_thrusters.Enable(value);
+          } else {
+              if (commandIn.Equals( "enable_pids" )) { 
+                  uint32_t value = commandIn.m_arguments[1];
+                  m_motorPID = value&0x01;
+                  m_ballastPID = value&0x02;
+              } else {
+                  if (commandIn.Equals( "init_balance" )) { 
+                      uint32_t value = commandIn.m_arguments[1];
+                      m_initialization = value;
+                  }
+              }
+          }
       }
    }
 
    if (m_startUp == 0) return;
 
    if (m_initialization) {
+       // turn off thruster control
+       m_thrusters.Enable(0);
        // The initialization code
        m_thrusters.Vertical( newMotor );
        m_ballast.Drive( newBallast );
        // while the depth is not yet at about a foot or so
-       while (m_p86bsd030pa.GetDepth() < 0.3) {
+       // 0.3 meters is about 1 foot
+       m_TargetDepth = 0.3;
+       while (m_p86bsd030pa.GetDepth() < m_TargetDepth) {
           // run the motor to dive
           delay(10);
        }
@@ -76,36 +96,45 @@ void CBouyancy::Update( CCommand& commandIn )
 
    // now we are around a foot
    // run the PID to manage the ballast and slow the motor speed
-   float targetDepth = m_TargetDepth;
    float actualDepth = m_p86bsd030pa.GetDepth();
 
-   // as fast as possible (but motors won't respond if every 20 msec or so)
-   if (m_motorPID) {
-       nowM = millis();
-       newMotor = MotorControlPID( targetDepth, actualDepth, nowM-startM );
+   // about every 50 msec (but motors won't respond if every 20 msec or so)
+   nowM = millis();
+   if ((m_motorPID)  && ((nowM - startM) > 50)) {
+       newMotor = MotorControlPID( m_TargetDepth, actualDepth, nowM-startM );
        m_thrusters.Vertical( newMotor );
        startM = nowM;
    }
 
-   // about every 30 seconds
+   // about every 10 seconds
    nowB = millis();
-   if ((m_ballastPID) && ((nowB - startB) > 30000)) {
+   if ((m_ballastPID) && ((nowB - startB) > 10000)) {
        newBallast = BallastControlPID( 0, oldBallast, nowB-startB );
        // Number of 1/4 second intervals to run the ballast pump
        // sign indicates direction
-       if (newBallast > 1.0) {
-           m_ballast.Drive( 50 );
-           delay(250*newBallast);
+       if (std::abs(newBallast) > 1.0) {
+           int32_t drive = ((newBallast > 0) ? 25 : -25);
+           newBallast = std::abs(std::round(newBallast)); 
+           uint32_t turns = 0;
+           // break it into 1/4 second intervals to force check pressure
+           while (turns < (uint32_t)newBallast) {
+                m_ballast.Drive( drive );
+                delay(250);
+                turns++;
+           }
            m_ballast.Drive( 0 );
        }
        oldBallast = newBallast;
        startB = nowB;
    }
 
-   // if vertical thruster not being used
-   // keep at current depth using slow motors
+   // if we are close to the target depth
+   // (about 6 inches or so)
+   // and the motor is slow then allow the user
+   // to control things again
    //
-   if (std::abs(targetDepth - actualDepth) < 0.05) {
+   if ((std::abs(m_TargetDepth - actualDepth) < 0.15) &&
+       (std::abs(newMotor) < 10)) {
        m_thrusters.Enable(1);
    }
 }

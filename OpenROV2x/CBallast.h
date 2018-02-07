@@ -12,7 +12,7 @@ public:
     void Initialize();
     void Update( CCommand& commandIn );
     void Stop();
-    void CheckAndStop();
+    uint8_t CheckAndStop();
     void Drive( int32_t value ); 
 
 private:

@@ -14,6 +14,8 @@
 #include "CPin.h"
 #include "DRV10983.h"
 #include "PCA9685.h"
+#include "CBouyancy.h"
+#include "CP86BSD030PA.h"
 
 // delay to OFF time
 #define OFF_TIME( value ) ((4095/100)*(std::abs(value)))
@@ -22,6 +24,8 @@
 
 extern CMuxes g_SystemMuxes;
 extern I2C I2C0;
+extern CBouyancy m_bouyancy;
+extern CP86BSD030PA m_p86bsd030pa;
 
 template<class T>
 const T& constrain(const T& x, const T& a, const T& b) {
@@ -130,6 +134,12 @@ namespace
 
 void CThrusters::Initialize()
 {
+    // leave them on for now at time zero
+    m_enable = 1;
+    m_lastTargetDepth = 0.3;
+    m_first_zero = 0;
+    m_lift_zero_time = (uint32_t) -1;
+
 #ifdef OLD_BOARD
     motor_a = new drv10983::DRV10983( &I2C0 );
     motor_b = new drv10983::DRV10983( &I2C0 );
@@ -216,6 +226,28 @@ void CThrusters::Initialize()
 
 void CThrusters::Update( CCommand& command )
 {
+    //
+    // check if thruster commands are enabled
+    // skip this whole thing if thrusters are off
+    //
+    if (m_enable == 0) return;
+    // check if the lift is zero and how long it has been zero
+    // how long the lift has been zero
+    uint32_t now = millis();
+    if ((p_trg_lift == 0) && (m_lift_zero_time != (uint32_t) -1) && ((now - m_lift_zero_time) > 3000)) {
+       float newTargetDepth = m_p86bsd030pa.GetDepth();
+       // we've been at zero for a while, let's see if we have dropped
+       if (std::abs(newTargetDepth - m_lastTargetDepth) > 0.15) {
+           // disable thrusters and get the system stable at this
+           // depth
+           m_enable = 0;
+           m_bouyancy.SetTargetDepth( newTargetDepth );
+           // make sure the PIDs are running
+           m_bouyancy.RunPID( 1, 1 );
+	   m_lastTargetDepth = newTargetDepth;
+       }
+    }
+
     if( command.Equals( "mtrmod1" ) )
     {
 #if 0
@@ -527,6 +559,14 @@ void CThrusters::Update( CCommand& command )
       if (command.Equals("lift")){
         if (command.m_arguments[1]>=-100 && command.m_arguments[1]<=100) {
           trg_lift = command.m_arguments[1]/1.0;
+          if (trg_lift == 0) {
+             if (m_first_zero == 0) {
+                 m_first_zero++;
+             }
+          } else {
+             m_first_zero = 0;
+             m_lift_zero_time = (uint32_t) -1;
+          }
           // drive horizontal motors here
           if ((p_trg_lift <= 0.0) && (trg_lift >= 0.0)) {
               // direction change
@@ -596,7 +636,10 @@ void CThrusters::Update( CCommand& command )
               motor_signals->DigitalWrite(pca9685::LED_1, ON_TIME(trg_lift), OFF_TIME(trg_lift));
 #endif
           }
-          // drive both motors together in the same direction
+          // if we are zero, mark the zero time
+          if ((trg_lift == 0) && m_first_zero) {
+             m_lift_zero_time = millis();
+          }
           p_trg_lift = trg_lift;
 
           //the vertical component of the thrust factor is

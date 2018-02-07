@@ -186,7 +186,7 @@ void CBallast::Stop() {
        }
 }
 
-void CBallast::CheckAndStop() {
+uint8_t CBallast::CheckAndStop() {
        // advance the state machine enough to force a pressure measurement
        m_p89bsd012bs.ForcePressureMeasurement();
        if ((m_p89bsd012bs.GetMaxPressureFlag()) && (m_down == 1)) {
@@ -194,11 +194,17 @@ void CBallast::CheckAndStop() {
            g_SystemMuxes.SetPath(SCL_NONE);
            m_ballast_pwm->DigitalWriteLow(pca9685::LED_4);
            m_ballast_pre = 0;
+           return( 1 );
        }
+       return( 0 );
 }
 
 void CBallast::Drive( int32_t value ) {
        m_ballast = value;
+       if (CheckAndStop() > 0) {
+           return;
+       }
+
        if ((m_ballast_pre <= 0) && (m_ballast >= 0)) {
             g_SystemMuxes.SetPath(SCL_NONE);
             m_ballast_pwm->DigitalWriteLow(pca9685::LED_9);
