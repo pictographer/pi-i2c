@@ -57,6 +57,10 @@ void CBouyancy::Update( CCommand& commandIn )
    if( NCommManager::m_isCommandAvailable ) {
       if (commandIn.Equals( "start_balance" )) { 
            m_startUp = commandIn.m_arguments[1]; 
+           Serial.print( F( "cbalance:" ) );
+           Serial.print( m_startUp );
+           Serial.print( ';' );
+           Serial.print( F( "ENDUPDATE:1;" ) );
       } else {
           if (commandIn.Equals( "enable_thrusters" )) { 
               uint32_t value =  commandIn.m_arguments[1];
