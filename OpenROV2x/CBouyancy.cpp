@@ -88,6 +88,8 @@ void CBouyancy::Update( CCommand& commandIn )
        // The initialization code
        m_thrusters.Vertical( newMotor );
        m_ballast.Drive( newBallast );
+       delay(250);
+       m_ballast.Drive(0);
        // while the depth is not yet at about a foot or so
        // 0.3 meters is about 1 foot
        m_TargetDepth = 0.3;
@@ -122,7 +124,8 @@ void CBouyancy::Update( CCommand& commandIn )
            uint32_t turns = 0;
            // break it into 1/4 second intervals to force check pressure
            while (turns < (uint32_t)newBallast) {
-                m_ballast.Drive( drive );
+                // Check if the maximum pressure is exceeded
+                if (m_ballast.Drive( drive )) break;
                 delay(250);
                 turns++;
            }

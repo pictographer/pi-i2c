@@ -13,7 +13,7 @@ public:
     void Update( CCommand& commandIn );
     void Stop();
     uint8_t CheckAndStop();
-    void Drive( int32_t value ); 
+    uint8_t Drive( int32_t value ); 
 
 private:
     pca9685::PCA9685   *m_ballast_pwm;

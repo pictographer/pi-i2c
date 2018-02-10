@@ -199,10 +199,10 @@ uint8_t CBallast::CheckAndStop() {
        return( 0 );
 }
 
-void CBallast::Drive( int32_t value ) {
+uint8_t CBallast::Drive( int32_t value ) {
        m_ballast = value;
        if (CheckAndStop() > 0) {
-           return;
+           return( 1 );
        }
 
        if ((m_ballast_pre <= 0) && (m_ballast >= 0)) {
@@ -236,6 +236,7 @@ void CBallast::Drive( int32_t value ) {
          g_SystemMuxes.SetPath(SCL_NONE);
          m_ballast_pwm->DigitalWrite(pca9685::LED_4, ON_TIME(m_ballast), OFF_TIME(m_ballast));
          m_ballast_pre = m_ballast;
+         return(0);
 }
 
 #endif
