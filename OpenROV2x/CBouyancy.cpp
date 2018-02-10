@@ -160,8 +160,8 @@ double CBouyancy::MotorControlPID( double targetDepth, double actualDepth, doubl
     p_i_err = i_err;
     
     MotorValue = m_KPM*p_err + m_KIM*i_err*DT + m_KDM*d_err/DT;
-    if (MotorValue >  100) MotorValue = 100;
-    if (MotorValue < -100) MotorValue = -100;
+    if (MotorValue >  25) MotorValue = 25;
+    if (MotorValue < -25) MotorValue = -25;
     return(MotorValue);
 }
 //
