@@ -2,6 +2,10 @@
 #if(HAS_EXT_LIGHTS )
 
 // Includes
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <I2C.h>
 
 #include "CExternalLights.h"
@@ -37,8 +41,74 @@ CExternalLights::CExternalLights( uint32_t pinIn )
 #endif
 }
 
+void CExternalLights::getIP( char addressBuffer[INET_ADDRSTRLEN] )
+{
+    struct ifaddrs *ifAddrStruct = NULL, *ifa = NULL;
+    void *tmpAddrPtr = NULL;
+
+    getifaddrs(&ifAddrStruct);
+    for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next) {
+        // IPv4
+        if (ifa->ifa_addr->sa_family == AF_INET) {
+            // wlan0
+            if (strcmp(ifa->ifa_name,"wlan0") == 0) {
+               tmpAddrPtr = &((struct sockaddr_in *) ifa->ifa_addr)->sin_addr;
+               inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN); 
+               break;
+            }
+        }
+    }
+    if (ifAddrStruct != NULL) {
+        freeifaddrs(ifAddrStruct);
+    }
+}
+
+void CExternalLights::snapPhoto( uint32_t camera )
+{
+   char command[512] = {'\0'};
+   // camera 1 and 2 on on RPiA
+   // http port 9091 and 9092
+   // camera 3 and 4 on on RPiB
+   // http port 9091 and 9092
+   // so we need to execute the command line to get the snapshot
+   uint32_t port = 9091 + (camera % 2 != 0 ?  0 : 1);
+   if (camera <= 2) {
+       sprintf(command,"wget http://%s:%d/?action=snapshot -O /home/pi/photos/photo.%d.%u.jpg", m_address_A, port, camera, time(NULL) );
+   } else {
+       sprintf(command,"wget http://%s:%d/?action=snapshot -O /home/pi/photos/photo.%d.%u.jpg", m_address_B, port, camera, time(NULL) );
+   }
+   // execute the command
+   system( command ); 
+}
+
+
 void CExternalLights::Initialize()
 {
+    getIP( m_address );
+    gethostname(m_hostname, HOST_NAME_MAX);
+    // parse out the last triple from the ip address
+    char *p = strrchr( m_address, '.' );
+    // grab those digits and turn them into a number
+    char tmp[16];
+    strcpy( tmp, p+1 );
+    int number = atoi( tmp );
+
+    // OK. Figure out if I am A or B
+    if (strchr( m_hostname, 'A' ) == NULL) {
+       // m_address has IP address of B
+       strcpy( m_address_B, m_address );
+       number = number - 1;
+       *p = '\0';
+       // now build the new ip address
+       sprintf( m_address_A, "%s.%d", m_address, number );
+    } else {
+       // m_address has IP address of A
+       strcpy( m_address_A, m_address );
+       number = number + 1;
+       *p = '\0';
+       // now build the new ip address
+       sprintf( m_address_B, "%s.%d", m_address, number );
+    }
     // enable power to LEDs
 #ifdef OLD_BOARD
     g_SystemMuxes.WriteExtendedGPIO(BAL_LEDS_EN, LOW);
@@ -176,7 +246,24 @@ void CExternalLights::Update( CCommand& commandIn )
 			    Serial.print( m_targetLight );
 			    Serial.print( ';' );
 	                    Serial.print( F( "ENDUPDATE:1;" ) );
-		        }
+		        } else {
+		            if( commandIn.Equals( "ephoto_select" ) )
+		            {
+                                // printf("photo: select %d\n", commandIn.m_arguments[1]);
+			        // Update the target position
+                                // 0: all lights
+                                // 1: camera 1 Front
+                                // 2: camera 2 Side
+                                // 3: camera 3 Top
+                                // 4: camera 4 Bottom
+			        m_targetPhoto = commandIn.m_arguments[1];
+			        Serial.print( F( "ephoto_select:" ) );
+			        Serial.print( m_targetPhoto );
+			        Serial.print( ';' );
+	                        Serial.print( F( "ENDUPDATE:1;" ) );
+                                snapPhoto( m_targetPhoto );
+		            }
+                        }
                 }
 	}
 }
