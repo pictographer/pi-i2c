@@ -50,8 +50,8 @@ void CBouyancy::Initialize()
 void CBouyancy::Update( CCommand& commandIn )
 {
    static int32_t oldBallast = 1;
+   static int32_t newMotor = 10;
    uint32_t startM = 0, nowM = 0, startB = 0, nowB = 0;
-   int32_t newMotor = 30;
    int32_t newBallast = 0;
 
    if( NCommManager::m_isCommandAvailable ) {
@@ -100,6 +100,25 @@ void CBouyancy::Update( CCommand& commandIn )
        m_initialization = 0;
    }
 
+   // check if the pid file is there
+   // read it if it is
+   FILE *fp = fopen("/home/pi/pid.txt","r");
+   if (fp) {
+      fscanf(fp, "%lf\n", &m_KPM );
+      fscanf(fp, "%lf\n", &m_KIM );
+      fscanf(fp, "%lf\n", &m_KDM );
+      fscanf(fp, "%lf\n", &m_KPB );
+      fscanf(fp, "%lf\n", &m_KIB );
+      fscanf(fp, "%lf\n", &m_KDB );
+      fclose(fp);
+      printf( "PM: %lf\n", m_KPM );
+      printf( "IM: %lf\n", m_KIM );
+      printf( "DM: %lf\n", m_KDM );
+      printf( "PB: %lf\n", m_KPB );
+      printf( "IB: %lf\n", m_KIB );
+      printf( "DB: %lf\n", m_KDB );
+   }
+
    // now we are around a foot
    // run the PID to manage the ballast and slow the motor speed
    float actualDepth = m_p86bsd030pa.GetDepth();
@@ -115,11 +134,11 @@ void CBouyancy::Update( CCommand& commandIn )
    // about every 10 seconds
    nowB = millis();
    if ((m_ballastPID) && ((nowB - startB) > 10000)) {
-       newBallast = BallastControlPID( 0, oldBallast, nowB-startB );
+       newBallast = BallastControlPID( 0, newMotor, nowB-startB );
        // Number of 1/4 second intervals to run the ballast pump
        // sign indicates direction
        if (std::abs(newBallast) > 1.0) {
-           int32_t drive = ((newBallast > 0) ? 25 : -25);
+           int32_t drive = ((newBallast > 0) ? 50 : -50);
            newBallast = std::abs(std::round(newBallast)); 
            uint32_t turns = 0;
            // break it into 1/4 second intervals to force check pressure

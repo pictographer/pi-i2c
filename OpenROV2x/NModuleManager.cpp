@@ -56,7 +56,7 @@ namespace NModuleManager
                         // check the ballast as often as possible
                         // and stop it if the pressure exceeds the maximum
                         // safe value
-                        m_ballast.CheckAndStop();
+                        // m_ballast.CheckAndStop();
                         // Time and execute the update functions for this module
                         // start = millis();
                         m_pModules[ i ]->Update( commandIn );

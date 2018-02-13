@@ -116,13 +116,13 @@ EI2CResult I2C::WriteByte( uint8_t slaveAddressIn, uint8_t dataIn, bool issueRep
 {
         if ( ioctl( m_customProperties.m_fileDescriptor, I2C_SLAVE, slaveAddressIn ) < 0 )
         {
-                printf( "Unable to select I2C device: %s\n", strerror( errno ) );
+                // printf( "Unable to select I2C device: %s\n", strerror( errno ) );
                 return HANDLE_RESULT( EI2CResult::RESULT_ERR_FAILED );
         }
         int result = wiringPiI2CWrite( m_customProperties.m_fileDescriptor, dataIn );
         if (result < 0)
         {
-                printf( "Unable to write I2C device: %s\n", strerror(errno) );
+                // printf( "Unable to write I2C device: %s\n", strerror(errno) );
                 return HANDLE_RESULT( EI2CResult::RESULT_ERR_FAILED );
         }
         // Send stop, if requested

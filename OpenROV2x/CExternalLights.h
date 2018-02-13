@@ -42,7 +42,12 @@ private:
     uint32_t    m_targetPower_an = 0;
     uint32_t    m_currentPower_an = 0;
 
+    int         m_streamer1PID = -1;
+    int         m_streamer2PID = -1;
+
     void snapPhoto( uint32_t camera );
     void getIP( char addressBuffer[INET_ADDRSTRLEN] );
+    int getPID( uint32_t camera );
+    void streamerControl( uint32_t camera );
 };
 

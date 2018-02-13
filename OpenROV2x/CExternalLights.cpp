@@ -2,6 +2,8 @@
 #if(HAS_EXT_LIGHTS )
 
 // Includes
+#include <signal.h>
+#include <dirent.h>
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,6 +41,50 @@ CExternalLights::CExternalLights( uint32_t pinIn )
 #else
         m_led_pwm = new pca9685::PCA9685( &I2C0, pca9685::PCA9685_ADDRESS_73 );
 #endif
+}
+
+int CExternalLights::getPID( uint32_t camera )
+{
+    int pid = -1, count = 0;
+    if (camera > 2) {
+       return(pid);
+    }
+    
+    const char *comp = "mjpg_streamer";
+    const char *directory = "/proc";
+    size_t taskNameSize = 4096, size = 0;
+    char *taskName = (char *)calloc(1, taskNameSize);
+
+
+    DIR *dir = opendir(directory);
+    if (dir) {
+       struct dirent *de = NULL;
+       while ((de = readdir(dir)) != 0) {
+            if ((strcmp(de->d_name, ".") == 0) || (strcmp(de->d_name, "..") == 0))
+               continue;
+
+            pid = -1;
+            int res = sscanf(de->d_name, "%d", &pid);
+            if (res == 1) {
+                char cmdline_file[1024] = {0};
+                sprintf(cmdline_file, "%s/%d/cmdline", directory, pid);
+                FILE *cmdline = fopen(cmdline_file, "r");
+                if ((cmdline) && (getline(&taskName, &taskNameSize, cmdline)  > 0)) {
+                   if (strstr(taskName, comp) != 0) {
+                      if (++count == camera) {
+                        fclose(cmdline);
+                        closedir(dir);
+                      	return(pid);
+                      }
+                   }
+                }
+                if (cmdline) fclose(cmdline);
+            }
+       }
+    }
+    closedir(dir);
+    free(taskName);
+    return(-1);
 }
 
 void CExternalLights::getIP( char addressBuffer[INET_ADDRSTRLEN] )
@@ -81,6 +127,40 @@ void CExternalLights::snapPhoto( uint32_t camera )
    system( command ); 
 }
 
+void CExternalLights::streamerControl(uint32_t camera )
+{
+   // active camera is 'camera'
+   if (strchr( m_hostname, 'A' ) != NULL) {
+      if (camera > 2) {
+        if (m_streamer1PID != -1) kill(m_streamer1PID, SIGSTOP);
+        if (m_streamer2PID != -1) kill(m_streamer2PID, SIGSTOP);
+        // and pass on message to RPiB
+      } else {
+         if (camera == 1) {
+            if (m_streamer1PID != -1) kill(m_streamer1PID, SIGCONT);
+            if (m_streamer2PID != -1) kill(m_streamer2PID, SIGSTOP);
+         } else {
+            if (m_streamer1PID != -1) kill(m_streamer1PID, SIGSTOP);
+            if (m_streamer2PID != -1) kill(m_streamer2PID, SIGCONT);
+         }
+      }
+   } else {
+     if (camera <=2 ) {
+        if (m_streamer1PID != -1) kill(m_streamer1PID, SIGSTOP);
+        if (m_streamer2PID != -1) kill(m_streamer2PID, SIGSTOP);
+     } else {
+        if (camera == 3) {
+           if (m_streamer1PID != -1) kill(m_streamer1PID, SIGCONT);
+           if (m_streamer2PID != -1) kill(m_streamer2PID, SIGSTOP);
+        } else {
+           if (m_streamer1PID != -1) kill(m_streamer1PID, SIGSTOP);
+           if (m_streamer2PID != -1) kill(m_streamer2PID, SIGCONT);
+        }
+     }
+   }
+
+
+}
 
 void CExternalLights::Initialize()
 {
@@ -109,6 +189,7 @@ void CExternalLights::Initialize()
        // now build the new ip address
        sprintf( m_address_B, "%s.%d", m_address, number );
     }
+
     // enable power to LEDs
 #ifdef OLD_BOARD
     g_SystemMuxes.WriteExtendedGPIO(BAL_LEDS_EN, LOW);
@@ -136,6 +217,9 @@ void CExternalLights::Initialize()
 
 void CExternalLights::Update( CCommand& commandIn )
 {
+    m_streamer1PID = getPID( 1 );
+    m_streamer2PID = getPID( 2 );
+
 	// Check for messages
 	if( NCommManager::m_isCommandAvailable )
 	{
@@ -246,6 +330,7 @@ void CExternalLights::Update( CCommand& commandIn )
 			    Serial.print( m_targetLight );
 			    Serial.print( ';' );
 	                    Serial.print( F( "ENDUPDATE:1;" ) );
+                            // streamerControl(m_targetLight);
 		        } else {
 		            if( commandIn.Equals( "ephoto_select" ) )
 		            {
