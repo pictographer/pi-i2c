@@ -10,6 +10,7 @@
 
 extern I2C I2C0;
 extern CMuxes g_SystemMuxes;
+extern uint8_t restart;
 
 namespace
 {
@@ -115,7 +116,25 @@ void CLights::Update( CCommand& commandIn )
 		Serial.print( orutil::Encode1K( m_currentPower ) );
 		Serial.print( ';' );
 	        Serial.print( F( "ENDUPDATE:1;" ) );
-	}
+	} else if ( commandIn.Equals( "takeover" ) )
+        {
+                // OK...we want to maybe force the system to
+                // try to takeover
+		uint32_t flag = commandIn.m_arguments[1];
+		Serial.print( F( "takenover:" ) );
+		Serial.print( flag );
+		Serial.print( ';' );
+	        Serial.print( F( "ENDUPDATE:1;" ) );
+                if (flag == 1) {
+                    // force takeover of the I2C bus
+	            m_pinI2C.Write( 1 );
+                } else {
+                    // release the I2C bus
+	            m_pinI2C.Write( 0 );
+                }
+                // make the module loop restart at the next iteration
+                restart = 1;
+        }
 #if 0
 	else if( commandIn.Equals( "wake" ) )
     {

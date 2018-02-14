@@ -21,6 +21,7 @@ class CSocket {
    CSocket();
    int available();
    void begin(int ignore_baud_rate=0);
+   void end();
    int read();
 
    int print(long, CSocket_print_t format=DEC);
@@ -47,6 +48,7 @@ class CSocket {
    uint8_t buf[2000];
    size_t buf_len;
    size_t buf_start;
+   uint8_t socket_ready;
 };
 
 extern CSocket Serial;

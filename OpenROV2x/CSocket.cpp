@@ -12,6 +12,7 @@
 
 CSocket::CSocket() : buf_len(0), buf_start(0) {
    // begin(); // Might be a bad idea to call begin here, but where?
+   socket_ready = 0;
 }
 
 int CSocket::available() {
@@ -33,8 +34,19 @@ int CSocket::available() {
    return buf_len;
 }
 
+void CSocket::end() {
+   puts("Closing socket connection");
+   close(clientfd);
+   close(sockfd);
+   buf_len = 0;
+   buf_start = 0;
+   socket_ready = 0;
+}
+
 // Start the socket listener.
 void CSocket::begin(int) {
+   if (socket_ready == 1) return;
+
    const int default_protocol = 0;
    sockfd = socket(AF_INET, SOCK_STREAM, default_protocol);
    if (sockfd == -1) {
@@ -73,8 +85,7 @@ void CSocket::begin(int) {
       perror("Unable to accept socket connection. Error");
    }
    printf("Socket server connection accepted.\n");
-//   int one = 1;
-//   setsockopt(clientfd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
+   socket_ready = 1;
 }
 
 // If data is available in the buffer, update start, update length, and return

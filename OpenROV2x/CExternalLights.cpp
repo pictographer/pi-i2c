@@ -131,7 +131,8 @@ void CExternalLights::streamerControl(uint32_t camera )
 {
    // active camera is 'camera'
    if (strchr( m_hostname, 'A' ) != NULL) {
-      if (camera > 2) {
+      // PI A
+      if ((camera == 0) || (camera > 2)) {
         if (m_streamer1PID != -1) kill(m_streamer1PID, SIGSTOP);
         if (m_streamer2PID != -1) kill(m_streamer2PID, SIGSTOP);
         // and pass on message to RPiB
@@ -145,6 +146,7 @@ void CExternalLights::streamerControl(uint32_t camera )
          }
       }
    } else {
+     // PI B
      if (camera <=2 ) {
         if (m_streamer1PID != -1) kill(m_streamer1PID, SIGSTOP);
         if (m_streamer2PID != -1) kill(m_streamer2PID, SIGSTOP);

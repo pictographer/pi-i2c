@@ -24,6 +24,8 @@ long map(long x, long in_min, long in_max, long out_min, long out_max)
 // Make the high level system muxes accessible all over
 //
 CMuxes g_SystemMuxes;
+// The global restart system flag
+uint8_t restart;
 
 void setup()
 {
@@ -52,6 +54,8 @@ void setup()
         // Boot complete
         Serial.print( F( "boot:1;" ) );
         Serial.print( F( "ENDUPDATE:1;" ) );
+        // we have initiated restart
+        restart = 0;
 }
 
 void loop()
@@ -74,7 +78,15 @@ void loop()
 }
 
 int main(int, char**) {
-   setup();
-   while (1) loop();
+   // restart is a global variable modified by a command from the client
+   // to force a system restart. This will be enabled when one PI is
+   // commanded to take over the ROV operation
+   restart = 1;
+   while (restart == 1) {
+       // restart is set to 0 in setup()
+       setup();
+       // the takeover() command will set restart to 1
+       while (restart == 0) loop();
+   }
    return 0; // not reached
 }

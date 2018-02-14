@@ -470,9 +470,7 @@ void P89BSD012BS::ProcessData()
     // convert bar to psi
     m_P       = m_P * 14.5038;
     // calculate max pressure allowed in psi based on data from SRC
-    m_MaxP    = ((m_TEMP - 145.41)/(-5.917)); // max pressure in psi
-    // derate maximum pressure to add safety margin
-    m_MaxP    = 0.9*m_MaxP;
+    m_MaxP    = ((m_TEMP - 148.41)/(-5.917)); // max pressure in psi
 
     // printf("Measured Pressure: %f Max Pressure: %f\n", m_P, m_MaxP );
 
