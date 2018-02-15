@@ -261,21 +261,21 @@ void CExternalLights::Update( CCommand& commandIn )
 #endif
                         if (m_currentPower_an == 0) {
                             // bottom
-                            if ((m_targetLight == 0) || (m_targetLight == 4))
+                            if ((m_targetLight == 0) || (m_targetLight == 3))
                                m_led_pwm->DigitalWriteLow(pca9685::LED_10);
                             // side
-                            if ((m_targetLight == 0) || (m_targetLight == 2))
+                            if ((m_targetLight == 0) || (m_targetLight == 1))
                                m_led_pwm->DigitalWriteLow(pca9685::LED_11);
                             // top
-                            if ((m_targetLight == 0) || (m_targetLight == 3))
+                            if ((m_targetLight == 0) || (m_targetLight == 4))
                                m_led_pwm->DigitalWriteLow(pca9685::LED_12);
                             // front
-                            if ((m_targetLight == 0) || (m_targetLight == 1))
+                            if ((m_targetLight == 0) || (m_targetLight == 2))
                                m_led_pwm->DigitalWriteLow(pca9685::LED_13);
                         } else {
                             // range 0-255 m_targetPower
                             // bottom
-                            if ((m_targetLight == 0) || (m_targetLight == 4)) {
+                            if ((m_targetLight == 0) || (m_targetLight == 3)) {
                                m_led_pwm->DigitalWrite(pca9685::LED_10, ON_TIME(m_currentPower_an), OFF_TIME(m_currentPower_an));
                                if (m_targetLight != 0) {
                                    m_led_pwm->DigitalWriteLow(pca9685::LED_11);
@@ -284,7 +284,7 @@ void CExternalLights::Update( CCommand& commandIn )
                                }
                             }
                             // side
-                            if ((m_targetLight == 0) || (m_targetLight == 2)) {
+                            if ((m_targetLight == 0) || (m_targetLight == 1)) {
                                m_led_pwm->DigitalWrite(pca9685::LED_11, ON_TIME(m_currentPower_an), OFF_TIME(m_currentPower_an));
                                if (m_targetLight != 0) {
                                    m_led_pwm->DigitalWriteLow(pca9685::LED_10);
@@ -293,7 +293,7 @@ void CExternalLights::Update( CCommand& commandIn )
                                }
                             }
                             // top
-                            if ((m_targetLight == 0) || (m_targetLight == 3)) {
+                            if ((m_targetLight == 0) || (m_targetLight == 4)) {
                                m_led_pwm->DigitalWrite(pca9685::LED_12, ON_TIME(m_currentPower_an), OFF_TIME(m_currentPower_an));
                                if (m_targetLight != 0) {
                                    m_led_pwm->DigitalWriteLow(pca9685::LED_10);
@@ -302,7 +302,7 @@ void CExternalLights::Update( CCommand& commandIn )
                                }
                             }
                             // front
-                            if ((m_targetLight == 0) || (m_targetLight == 1)) {
+                            if ((m_targetLight == 0) || (m_targetLight == 2)) {
                                m_led_pwm->DigitalWrite(pca9685::LED_13, ON_TIME(m_currentPower_an), OFF_TIME(m_currentPower_an));
                                if (m_targetLight != 0) {
                                    m_led_pwm->DigitalWriteLow(pca9685::LED_10);
@@ -323,10 +323,10 @@ void CExternalLights::Update( CCommand& commandIn )
                             // printf("lights: select %d\n", commandIn.m_arguments[1]);
 			    // Update the target position
                             // 0: all lights
-                            // 1: camera 1 Front
-                            // 2: camera 2 Side
-                            // 3: camera 3 Top
-                            // 4: camera 4 Bottom
+                            // 2: camera 1 Front
+                            // 1: camera 2 Side
+                            // 4: camera 3 Top
+                            // 3: camera 4 Bottom
 			    m_targetLight = commandIn.m_arguments[1];
 			    Serial.print( F( "elights_select:" ) );
 			    Serial.print( m_targetLight );
@@ -339,10 +339,10 @@ void CExternalLights::Update( CCommand& commandIn )
                                 // printf("photo: select %d\n", commandIn.m_arguments[1]);
 			        // Update the target position
                                 // 0: all lights
-                                // 1: camera 1 Front
-                                // 2: camera 2 Side
-                                // 3: camera 3 Top
-                                // 4: camera 4 Bottom
+                                // 2: camera 1 Front
+                                // 1: camera 2 Side
+                                // 4: camera 3 Top
+                                // 3: camera 4 Bottom
 			        m_targetPhoto = commandIn.m_arguments[1];
 			        Serial.print( F( "ephoto_select:" ) );
 			        Serial.print( m_targetPhoto );
