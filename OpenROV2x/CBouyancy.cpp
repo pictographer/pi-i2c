@@ -25,6 +25,7 @@ CBouyancy::CBouyancy()
    m_motorPID = 1;
    m_ballastPID = 1;
    m_startUp = 0;
+   m_wasRunning = 0;
 }
 
 void CBouyancy::Initialize()
@@ -50,8 +51,6 @@ void CBouyancy::Initialize()
 void CBouyancy::Update( CCommand& commandIn )
 {
    static int32_t oldBallast = 1;
-   static int32_t newMotor = 10;
-   uint32_t startM = 0, nowM = 0, startB = 0, nowB = 0;
    int32_t newBallast = 0;
 
    if( NCommManager::m_isCommandAvailable ) {
@@ -80,13 +79,23 @@ void CBouyancy::Update( CCommand& commandIn )
       }
    }
 
-   if (m_startUp == 0) return;
+   if (m_startUp == 0) {
+      if (m_wasRunning > 0) {
+         m_wasRunning = 0;
+         m_ballast.Drive(0);
+         m_thrusters.Vertical(0);
+         m_thrusters.Enable(1);
+      }
+      return;
+   }
+
+   m_wasRunning = 1;
 
    if (m_initialization) {
        // turn off thruster control
        m_thrusters.Enable(0);
        // The initialization code
-       m_thrusters.Vertical( newMotor );
+       m_thrusters.Vertical( m_newMotor );
        m_ballast.Drive( newBallast );
        delay(250);
        m_ballast.Drive(0);
@@ -121,20 +130,12 @@ void CBouyancy::Update( CCommand& commandIn )
 
    // now we are around a foot
    // run the PID to manage the ballast and slow the motor speed
-   float actualDepth = m_p86bsd030pa.GetDepth();
-
-   // about every 50 msec (but motors won't respond if every 20 msec or so)
-   nowM = millis();
-   if ((m_motorPID)  && ((nowM - startM) > 50)) {
-       newMotor = MotorControlPID( m_TargetDepth, actualDepth, nowM-startM );
-       m_thrusters.Vertical( newMotor );
-       startM = nowM;
-   }
+   float actualDepth = RunMotor();
 
    // about every 10 seconds
-   nowB = millis();
-   if ((m_ballastPID) && ((nowB - startB) > 10000)) {
-       newBallast = BallastControlPID( 0, newMotor, nowB-startB );
+   m_nowB = millis();
+   if ((m_ballastPID) && ((m_nowB - m_startB) > 10000)) {
+       newBallast = BallastControlPID( 0, m_newMotor, m_nowB-m_startB );
        // Number of 1/4 second intervals to run the ballast pump
        // sign indicates direction
        if (std::abs(newBallast) > 1.0) {
@@ -146,12 +147,13 @@ void CBouyancy::Update( CCommand& commandIn )
                 // Check if the maximum pressure is exceeded
                 if (m_ballast.Drive( drive )) break;
                 delay(250);
+                actualDepth = RunMotor();
                 turns++;
            }
            m_ballast.Drive( 0 );
        }
        oldBallast = newBallast;
-       startB = nowB;
+       m_startB = millis();
    }
 
    // if we are close to the target depth
@@ -160,9 +162,22 @@ void CBouyancy::Update( CCommand& commandIn )
    // to control things again
    //
    if ((std::abs(m_TargetDepth - actualDepth) < 0.15) &&
-       (std::abs(newMotor) < 10)) {
+       (std::abs(m_newMotor) < 10)) {
+       m_thrusters.Vertical( 0 );
        m_thrusters.Enable(1);
    }
+}
+
+float CBouyancy::RunMotor() {
+   float actualDepth = m_p86bsd030pa.GetDepth();
+   // about every 50 msec (but motors won't respond if every 20 msec or so)
+   m_nowM = millis();
+   if ((m_motorPID)  && ((m_nowM - m_startM) > 50)) {
+       m_newMotor = MotorControlPID( m_TargetDepth, actualDepth, m_nowM-m_startM );
+       m_thrusters.Vertical( m_newMotor );
+       m_startM = millis();
+   }
+   return( actualDepth );
 }
 
 // 
@@ -187,20 +202,20 @@ double CBouyancy::MotorControlPID( double targetDepth, double actualDepth, doubl
 // This PID is used to control the ballast motor
 // and used to acheive balance
 // DT is the time since the last call to the PID
-double CBouyancy::BallastControlPID( double targetDepth, double actualDepth, double DT ) {
+double CBouyancy::BallastControlPID( double targetMotor, double actualMotor, double DT ) {
     static double p_p_err = 0, p_i_err = 0;
-    double MotorValue, p_err = 0, i_err = 0, d_err = 0;
+    double MotorTurnTime, p_err = 0, i_err = 0, d_err = 0;
 
-    p_err = targetDepth - actualDepth;
+    p_err = targetMotor - actualMotor;
     i_err = p_err + p_i_err; 
     d_err = p_err - p_p_err; 
     p_p_err = p_err;
     p_i_err = i_err;
     
-    MotorValue = m_KPB*p_err + m_KIB*i_err*DT + m_KDB*d_err/DT;
-    if (MotorValue >  100) MotorValue = 100;
-    if (MotorValue < -100) MotorValue = -100;
-    return(MotorValue);
+    MotorTurnTime = m_KPB*p_err + m_KIB*i_err*DT + m_KDB*d_err/DT;
+    if (MotorTurnTime >  8) MotorTurnTime = 8;
+    if (MotorTurnTime < -8) MotorTurnTime = -8;
+    return(MotorTurnTime);
 }
 
 void CBouyancy::SetTargetDepth( float targetDepth ) {

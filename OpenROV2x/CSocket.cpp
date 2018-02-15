@@ -17,7 +17,7 @@ CSocket::CSocket() : buf_len(0), buf_start(0) {
 
 int CSocket::available() {
    if (buf_len == 0) {
-      buf_len = recv(clientfd, buf, 2000, 0);
+      buf_len = recv(clientfd, buf, 4096, 0);
 
       buf[buf_len] = 0;
 

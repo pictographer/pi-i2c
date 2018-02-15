@@ -45,7 +45,7 @@ class CSocket {
    int clientfd;
    struct sockaddr_in server_in, client_in;
 
-   uint8_t buf[2000];
+   uint8_t buf[4096];
    size_t buf_len;
    size_t buf_start;
    uint8_t socket_ready;
