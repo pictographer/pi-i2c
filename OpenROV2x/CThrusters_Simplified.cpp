@@ -234,13 +234,12 @@ void CThrusters::Update( CCommand& command )
     // check if the lift is zero and how long it has been zero
     // how long the lift has been zero
     uint32_t now = millis();
-    if ((p_trg_lift == 0) && (m_lift_zero_time != (uint32_t) -1) && ((now - m_lift_zero_time) > 3000)) {
+    if (m_bouyancy.BouyancyActive() && (p_trg_lift == 0) && (m_lift_zero_time != (uint32_t) -1) && ((now - m_lift_zero_time) > 500)) {
        float newTargetDepth = m_p86bsd030pa.GetDepth();
        // we've been at zero for a while, let's see if we have dropped
-       if (std::abs(newTargetDepth - m_lastTargetDepth) > 0.15) {
-           // disable thrusters and get the system stable at this
+       if (std::abs(newTargetDepth - m_lastTargetDepth) > 0.01) {
+           // get the system stable at this
            // depth
-           m_enable = 0;
            m_bouyancy.SetTargetDepth( newTargetDepth );
            // make sure the PIDs are running
            m_bouyancy.RunPID( 1, 1 );
@@ -564,6 +563,8 @@ void CThrusters::Update( CCommand& command )
                  m_first_zero++;
              }
           } else {
+             // turn off PIDs if user changes depth
+             m_bouyancy.RunPID( 0, 0 );
              m_first_zero = 0;
              m_lift_zero_time = (uint32_t) -1;
           }

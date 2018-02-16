@@ -14,14 +14,15 @@ public:
     void SetTargetDepth( float targetDepth );
     void RunPID( uint8_t motor, uint8_t ballast );
     float RunMotor( void ); 
+    uint8_t BouyancyActive( void );
 
 private:
     const double m_KPM = 50.0;
-    const double m_KIM = 5.0;
+    const double m_KIM = 2.0;
     const double m_KDM = 0.05;
     const double m_KPB = 0.1;
     const double m_KIB = 0.01;
-    const double m_KDB = 0.01;
+    const double m_KDB = 4.0;
 
     int32_t m_newMotor = 10;
     uint32_t m_startM = 0, m_nowM = 0, m_startB = 0, m_nowB = 0;
@@ -34,6 +35,7 @@ private:
 
     double BallastControlPID( double targetDepth, double actualDepth, double DT );
     double MotorControlPID( double targetDepth, double actualDepth, double DT );
+    uint8_t Check( float actualDepth );
 
 };
 
