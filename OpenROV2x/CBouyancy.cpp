@@ -140,6 +140,7 @@ void CBouyancy::Update( CCommand& commandIn )
    if ((m_ballastPID) && ((m_nowB - m_startB) > 10000)) {
        newBallast = m_newMotor/m_KDB; // BallastControlPID( 0, m_newMotor, m_nowB-m_startB );
        // Number of 1/4 second intervals to run the ballast pump
+       printf("Ballast: newBallast %f dT %f \n", newBallast, m_nowB - m_startB );
        // sign indicates direction
        if (std::abs(newBallast) > 1.0) {
            int32_t drive = ((newBallast > 0) ? 50 : -50);
@@ -214,7 +215,7 @@ double CBouyancy::MotorControlPID( double targetDepth, double actualDepth, doubl
     p_i_err = i_err;
     
     MotorValue = m_KPM*p_err + i_term + m_KDM*d_err/DT;
-    printf("Motor p_err: %f i_err %f i_term %f d_err %f DT %f Motor %f\n",
+    printf("Motor: p_err: %f i_err %f i_term %f d_err %f DT %f Motor %f\n",
             p_err, i_err, i_term, d_err, DT, MotorValue );
     if (MotorValue >  100) MotorValue = 100;
     if (MotorValue < -100) MotorValue = -100;

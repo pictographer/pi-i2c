@@ -147,14 +147,9 @@ void CP86BSD030PA::Update( CCommand& commandIn )
 	// Emit telemetry
 	if( m_telemetryTimer.HasElapsed( kTelemetryDelay_ms ) )
 	{
-		if( m_device.m_data.SampleAvailable() )
-		{
-			// Report results
-			Serial.print( F( "depth_t:" ) );	Serial.print( orutil::Encode1K( m_device.m_data.temperature_c ) ); 	Serial.print( ';' );
-			Serial.print( F( "depth_p:" ) );	Serial.print( orutil::Encode1K( m_device.m_data.pressure_mbar ) ); 	Serial.print( ';' );
-			Serial.print( F( "depth_d:" ) );	Serial.print( orutil::Encode1K( m_device.m_data.depth_m ) ); 		Serial.print( ';' );
-	                Serial.print( F( "ENDUPDATE:1;" ) );
-		}
+            if (m_device.m_data.SampleAvailable()) {
+                ReportResults();
+            }
 	}
 }
 
@@ -168,6 +163,16 @@ float CP86BSD030PA::GetDepth( void )
              delay(10);
 	     m_device.Tick();
         }
+        ReportResults();
         return(m_device.m_data.depth_m);
+}
+
+void CP86BSD030PA::ReportResults( void )
+{
+	// Report results
+	Serial.print( F( "depth_t:" ) );	Serial.print( orutil::Encode1K( m_device.m_data.temperature_c ) ); 	Serial.print( ';' );
+	Serial.print( F( "depth_p:" ) );	Serial.print( orutil::Encode1K( m_device.m_data.pressure_mbar ) ); 	Serial.print( ';' );
+	Serial.print( F( "depth_d:" ) );	Serial.print( orutil::Encode1K( m_device.m_data.depth_m ) ); 		Serial.print( ';' );
+        Serial.print( F( "ENDUPDATE:1;" ) );
 }
 #endif

@@ -12,7 +12,7 @@ public:
 	void Initialize();
 	void Update( CCommand& commandIn );
         float GetDepth( void );
-
+        void ReportResults( void );
 private:
 	// Device driver
 	p86bsd030pa::P86BSD030PA m_device;
