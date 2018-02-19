@@ -359,7 +359,6 @@ void CThrusters::Update( CCommand& command )
                    // Now Motors C and D
                    g_SystemMuxes.SetPath(SCL_NONE);
                    motor_signals->DigitalWriteLow(pca9685::LED_2);
-                   motor_signals->DigitalWriteLow(pca9685::LED_3);
                    delay(10);
 #endif
                 } else {
@@ -373,7 +372,6 @@ void CThrusters::Update( CCommand& command )
                       // Now Motors C and D
                       g_SystemMuxes.SetPath(SCL_NONE);
                       motor_signals->DigitalWriteLow(pca9685::LED_2);
-                      motor_signals->DigitalWriteLow(pca9685::LED_3);
                       delay(10);
 #endif
                    }
@@ -387,7 +385,6 @@ void CThrusters::Update( CCommand& command )
                    // Now Motors C and D
                    g_SystemMuxes.SetPath(SCL_NONE);
                    motor_signals->DigitalWriteHigh(pca9685::LED_7);
-                   motor_signals->DigitalWriteLow(pca9685::LED_8);
 #endif
                 } else {
 #ifdef OLD_BOARD
@@ -398,7 +395,6 @@ void CThrusters::Update( CCommand& command )
                    // Now Motors C and D
                    g_SystemMuxes.SetPath(SCL_NONE);
                    motor_signals->DigitalWriteLow(pca9685::LED_7);
-                   motor_signals->DigitalWriteHigh(pca9685::LED_8);
 #endif
                 }
                 // -backwards +forwards
@@ -412,7 +408,6 @@ void CThrusters::Update( CCommand& command )
                 delay(10);
                 g_SystemMuxes.SetPath(SCL_NONE);
                 motor_signals->DigitalWrite(pca9685::LED_2, ON_TIME(trg_throttle), OFF_TIME(trg_throttle));
-                motor_signals->DigitalWrite(pca9685::LED_3, ON_TIME(trg_throttle), OFF_TIME(trg_throttle));
 #endif
                 // both vertical motors drive in the same direction
                 p_trg_throttle = trg_throttle;
@@ -435,7 +430,6 @@ void CThrusters::Update( CCommand& command )
 #else
                    // Now Motors C and D
                    g_SystemMuxes.SetPath(SCL_NONE);
-                   motor_signals->DigitalWriteLow(pca9685::LED_2);
                    motor_signals->DigitalWriteLow(pca9685::LED_3);
                    delay(10);
 #endif
@@ -449,7 +443,6 @@ void CThrusters::Update( CCommand& command )
 #else
                       // Now Motors C and D
                       g_SystemMuxes.SetPath(SCL_NONE);
-                      motor_signals->DigitalWriteLow(pca9685::LED_2);
                       motor_signals->DigitalWriteLow(pca9685::LED_3);
                       delay(10);
 #endif
@@ -469,10 +462,8 @@ void CThrusters::Update( CCommand& command )
 #else
                    // Now Motors C and D
                    g_SystemMuxes.SetPath(SCL_NONE);
-                   motor_signals->DigitalWriteLow(pca9685::LED_7);
                    motor_signals->DigitalWriteLow(pca9685::LED_8);
                    delay(10);
-                   motor_signals->DigitalWrite(pca9685::LED_2, ON_TIME(trg_yaw), OFF_TIME(trg_yaw));
                    motor_signals->DigitalWrite(pca9685::LED_3, ON_TIME(trg_yaw), OFF_TIME(trg_yaw));
 #endif
                 } else {
@@ -487,10 +478,8 @@ void CThrusters::Update( CCommand& command )
 #else
                    // Now Motors C and D
                    g_SystemMuxes.SetPath(SCL_NONE);
-                   motor_signals->DigitalWriteHigh(pca9685::LED_7);
                    motor_signals->DigitalWriteHigh(pca9685::LED_8);
                    delay(10);
-                   motor_signals->DigitalWrite(pca9685::LED_2, ON_TIME(trg_yaw), OFF_TIME(trg_yaw));
                    motor_signals->DigitalWrite(pca9685::LED_3, ON_TIME(trg_yaw), OFF_TIME(trg_yaw));
 #endif
                 }
