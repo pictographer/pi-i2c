@@ -13,8 +13,8 @@
 #include "CPin.h"
 #include <orutil.h>
 
-// Out of 255 maximum swing
-#define MAX_ALLOWED_POWER 16
+// Map to 10 discrete steps
+#define MAX_ALLOWED_POWER 10
 
 class CExternalLights : public CModule
 {
@@ -44,6 +44,8 @@ private:
 
     int         m_streamer1PID = -1;
     int         m_streamer2PID = -1;
+
+    uint8_t     pwm_map[11] = { 0, 16, 22, 30, 40, 55, 75, 101, 138, 187, 255 };
 
     void snapPhoto( uint32_t camera );
     void getIP( char addressBuffer[INET_ADDRSTRLEN] );

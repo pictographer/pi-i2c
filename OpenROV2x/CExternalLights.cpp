@@ -18,7 +18,7 @@ extern CMuxes g_SystemMuxes;
 extern I2C I2C0;
 
 // delay to OFF time
-#define OFF_TIME( value ) ((4095/255)*value)
+#define OFF_TIME( value ) (pwm_map[value])
 // delay to ON time
 #define ON_TIME( value )  (0)
 
