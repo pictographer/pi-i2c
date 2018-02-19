@@ -172,6 +172,7 @@ uint8_t CBouyancy::Check( float actualDepth ) {
    //
    if ((std::abs(m_TargetDepth - actualDepth) < 0.15) &&
        (std::abs(m_newMotor) < 10)) {
+       printf( "Target Acheived!\n" );
        m_thrusters.Vertical( 0 );
        m_thrusters.Enable(1);
        return(1);
