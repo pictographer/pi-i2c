@@ -16,11 +16,8 @@ namespace bq34z100
 
 	    uint32_t Read( uint8_t address, uint8_t length);
             //Private member functions
-            int32_t ReadByte( uint8_t addressIn, uint8_t& dataOut );
-            int32_t ReadNBytes( uint8_t addressIn, uint8_t* dataOut, uint8_t byteCountIn );
-            int32_t WriteByte( uint8_t addressIn, uint8_t dataIn );
             int32_t WriteWord( uint8_t addressIn, uint16_t dataIn );
-            int32_t WriteNBytes( uint8_t *dataOut, uint8_t numberBytesOut ); 
+            int32_t WriteRegisterBytes( uint8_t addressIn, uint8_t *dataIn, uint8_t numberBytesIn );
 
             //Private member attributes
             uint8_t m_i2cAddress;
@@ -30,6 +27,11 @@ namespace bq34z100
 	public:
 	    BQ34Z100( I2C* i2cInterfaceIn );
 	    void begin();
+            void setI2CAddress( uint8_t address );
+            int32_t ReadByte( uint8_t addressIn, uint8_t& dataOut );
+            int32_t WriteByte( uint8_t addressIn, uint8_t dataIn );
+            int32_t ReadNBytes( uint8_t addressIn, uint8_t* dataOut, uint8_t byteCountIn );
+            int32_t WriteNBytes( uint8_t *dataOut, uint8_t numberBytesOut ); 
 	    int writeConfig();//should only be done once
 	    uint8_t getSOC();//gets the current state of charge %
 	    int getTemp();//returns the temperature in C

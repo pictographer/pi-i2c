@@ -2,6 +2,10 @@
 #if( HAS_OROV_CONTROLLERBOARD_25 )
 
 // Includes
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <Arduino.h>
 #include "NDataManager.h"
 #include "CControllerBoard.h"
@@ -87,7 +91,136 @@ void CControllerBoard::Initialize()
         {
                 readings[ thisReading ] = 0;
         }
+
+        g_SystemMuxes.SetPath(SCL_BATT);
+        //LoadFsFile(m_chargeSense, "/home/pi/pi-i2c/bq.fs");
+        LoadFsFile(m_chargeSense, "/home/pi/pi-i2c/df.fs");
 }
+
+void CControllerBoard::LoadFsFile( bq34z100::BQ34Z100 *chargeSense, const char *filename ) {
+    struct stat st;
+    int nSourceFile;
+    int nLength;
+    int nDataLength;
+    char pBuf[32];
+    char pData[64];
+    int n, m, a;
+    char *pEnd = NULL;
+    char *pErr;
+    char *pFS, *opFS;
+    bool bWriteCmd = false;
+    unsigned char nRegister;
+    unsigned char nAddress;
+
+    // char *pFS: zero terminated buffer with flashstream file
+    printf("BQ34Z100 initialization...\n"); 
+    if (stat(filename, &st) != 0) {
+      printf("Skipping BQ34Z100 initialization\n"); 
+      return;
+    };
+
+    printf("source file '%s', size = %d\n\r", filename, st.st_size);
+    if ((nSourceFile = open(filename, O_RDONLY)) <  0)
+    {
+        printf("cannot open data classes source file\n\r");
+        return;
+    }
+    opFS = (char *) malloc(st.st_size);
+    if (!opFS) return;
+    pFS = opFS;
+    read(nSourceFile, pFS, st.st_size);
+    close(nSourceFile);
+    nLength = strlen(pFS);
+
+    // *pHandle: handle to communications adapter
+
+    m = 0;
+    for (n = 0; n < nLength; n++)
+        if (pFS[n] != ' ') pFS[m++] = pFS[n];
+    pEnd = pFS + m;
+    pEnd[0] = 0;
+
+    do {
+        switch (*pFS)
+        {
+            case ';':
+                break;
+            case 'W':
+            case 'C':
+                bWriteCmd = *pFS == 'W';
+                pFS++;
+                if ((*pFS) != ':') return;
+                pFS++;
+                n = 0;
+                while ((pEnd - pFS > 2) && (n < sizeof(pData) + 2) &&(*pFS != '\n'))
+                {
+                    pBuf[0] = *(pFS++);
+                    pBuf[1] = *(pFS++);
+                    pBuf[2] = 0;
+                    m = strtoul(pBuf, &pErr, 16);
+                    if (*pErr) return; 
+                    if (n == 0) { nAddress = m; chargeSense->setI2CAddress(m); } // this sets the I2C address which changes when in ROM mode
+                    if (n == 1) nRegister = m;
+                    if (n > 1) pData[n - 2] = m;
+                    n++;
+                }
+                if (n < 3) return;
+                nDataLength = n - 2;
+                if (bWriteCmd) {
+                    // add the register address to the data stream
+                    for (m = nDataLength; m != 0; m--) {
+                        pData[m] = pData[m-1];
+                    }
+                    pData[m] = nRegister;
+                    nDataLength++;
+                    // swap if addressing control register in normal mode
+                    for (m = 1; m < nDataLength; m++) {
+                       // swap the control bytes
+                       chargeSense->WriteByte(pData[0] + (m-1), pData[m]);
+                    } 
+                } else {
+                    char pDataFromGauge[nDataLength];
+                    uint8_t data;
+                    // TI documents Updating the bq275xx Firmware at Production
+                    // SLUA541A indicates that "C" commands should be a checkpoint
+                    // to indicate whether to start again
+                    for (m = 0; m < nDataLength; m++) {
+                        chargeSense->ReadByte(nRegister+m, data);
+                        pDataFromGauge[m] = (char) data;
+                    }
+                    if (memcmp(pData, pDataFromGauge, nDataLength) != 0) {
+                        printf("No match: address: %x register: %x nDataLength: %d\n", nAddress, nRegister, nDataLength );
+                    }
+                }
+                break;
+           case 'X':
+                pFS++;
+                if ((*pFS) != ':') return;
+                pFS++;
+                n = 0;
+                while ((pFS != pEnd) && (*pFS != '\n') &&(n <sizeof(pBuf) - 1))
+                {
+                    pBuf[n++] = *pFS;
+                    pFS++; 
+                }
+                pBuf[n] = 0;
+                n = atoi(pBuf);
+                delay(n);
+                break;
+           default: 
+                break;
+        }
+        while ((pFS != pEnd) && (*pFS != '\n')) pFS++; //skip to next line
+        if (pFS != pEnd) pFS++;
+       } while (pFS != pEnd);
+
+       free(opFS);
+       // change back to the default I2C address
+       chargeSense->setI2CAddress((BQ34Z100_ADDRESS<<1));
+       
+       return; 
+}
+
 
 long CControllerBoard::readLeakDetector()
 {

@@ -24,6 +24,11 @@ BQ34Z100::BQ34Z100( I2C* i2cInterfaceIn )
 }
 
 
+void BQ34Z100::setI2CAddress( uint8_t address ) {
+        // the ds file has the I2C address shifted left 1 bit
+        m_i2cAddress = (address>>1);
+}
+
 int32_t BQ34Z100::WriteWord( uint8_t addressIn, uint16_t dataIn )
 {
         return (int32_t) m_pI2C->WriteRegisterWord( m_i2cAddress, (uint8_t) addressIn, dataIn );
@@ -32,6 +37,11 @@ int32_t BQ34Z100::WriteWord( uint8_t addressIn, uint16_t dataIn )
 int32_t BQ34Z100::WriteByte( uint8_t addressIn, uint8_t dataIn )
 {
         return (int32_t)m_pI2C->WriteRegisterByte( m_i2cAddress, (uint8_t)addressIn, dataIn );
+}
+
+int32_t BQ34Z100::WriteRegisterBytes( uint8_t addressIn, uint8_t *dataIn, uint8_t numberBytesIn )
+{
+        return (int32_t)m_pI2C->WriteRegisterBytes( m_i2cAddress, (uint8_t)addressIn, dataIn, numberBytesIn );
 }
 
 int32_t BQ34Z100::WriteNBytes( uint8_t *dataOut, uint8_t numberBytesOut ) 
@@ -46,7 +56,7 @@ int32_t BQ34Z100::ReadByte( uint8_t addressIn, uint8_t &dataOut )
 
 int32_t BQ34Z100::ReadNBytes( uint8_t addressIn, uint8_t* dataOut, uint8_t byteCountIn )
 {
-    return (int32_t)m_pI2C->ReadRegisterBytes( m_i2cAddress, (uint8_t)addressIn, dataOut, byteCountIn );
+    return (int32_t)m_pI2C->ReadRegisterNBytes( m_i2cAddress, (uint8_t)addressIn, dataOut, byteCountIn );
 }
 
 //read a standard normal access value (the common ones you need)

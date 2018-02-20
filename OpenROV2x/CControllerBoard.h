@@ -25,4 +25,5 @@ private:
     long readLeakDetector();
     float read20Volts();
     float readPiCurrent( uint8_t thePI );
+    void LoadFsFile( bq34z100::BQ34Z100 *chargeSense, const char *filename );
 };
