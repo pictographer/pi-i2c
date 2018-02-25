@@ -22,6 +22,7 @@ public:
     CExternalLights( uint32_t pinIn );
     void Initialize();
     void Update( CCommand& commandIn );
+    void SetLight( void );
 
 private:
     orutil::CTimer      m_controlTimer;

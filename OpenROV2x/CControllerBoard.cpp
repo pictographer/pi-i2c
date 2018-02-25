@@ -3,6 +3,7 @@
 
 // Includes
 #include <sys/stat.h>
+#include <math.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -67,6 +68,9 @@ CControllerBoard::CControllerBoard()
 {
     m_powerSense = NULL;
     m_chargeSense = NULL;
+    m_use_max = 0;
+    m_s_idx = 0;
+    m_samples = new float[m_s_max];
 }
 
 void CControllerBoard::Initialize()
@@ -93,11 +97,16 @@ void CControllerBoard::Initialize()
         }
 
         g_SystemMuxes.SetPath(SCL_BATT);
-        //LoadFsFile(m_chargeSense, "/home/pi/pi-i2c/bq.fs");
-        LoadFsFile(m_chargeSense, "/home/pi/pi-i2c/df.fs");
+        //LoadFsFile(m_chargeSense, BQ_FS_FILENAME);
+        if (LoadFsFile(m_chargeSense, DF_FS_FILENAME) == 0) {
+            // if successfully loaded then rename file
+            // to disable future loads
+            // "name" to "name.loaded"
+       
+        }
 }
 
-void CControllerBoard::LoadFsFile( bq34z100::BQ34Z100 *chargeSense, const char *filename ) {
+uint8_t CControllerBoard::LoadFsFile( bq34z100::BQ34Z100 *chargeSense, const char *filename ) {
     struct stat st;
     int nSourceFile;
     int nLength;
@@ -116,17 +125,17 @@ void CControllerBoard::LoadFsFile( bq34z100::BQ34Z100 *chargeSense, const char *
     printf("BQ34Z100 initialization...\n"); 
     if (stat(filename, &st) != 0) {
       printf("Skipping BQ34Z100 initialization\n"); 
-      return;
+      return(0);
     };
 
     printf("source file '%s', size = %d\n\r", filename, st.st_size);
     if ((nSourceFile = open(filename, O_RDONLY)) <  0)
     {
         printf("cannot open data classes source file\n\r");
-        return;
+        return(1);
     }
     opFS = (char *) malloc(st.st_size);
-    if (!opFS) return;
+    if (!opFS) return(2);
     pFS = opFS;
     read(nSourceFile, pFS, st.st_size);
     close(nSourceFile);
@@ -140,6 +149,17 @@ void CControllerBoard::LoadFsFile( bq34z100::BQ34Z100 *chargeSense, const char *
     pEnd = pFS + m;
     pEnd[0] = 0;
 
+    // unseal device
+    // unseal key 1
+    chargeSense->WriteByte(0x00, 0x04);
+    chargeSense->WriteByte(0x01, 0x14);
+    // unseal key 2
+    chargeSense->WriteByte(0x00, 0x36);
+    chargeSense->WriteByte(0x01, 0x72);
+    // read in file
+    // file contains codes to go to
+    // full access mode
+
     do {
         switch (*pFS)
         {
@@ -149,7 +169,7 @@ void CControllerBoard::LoadFsFile( bq34z100::BQ34Z100 *chargeSense, const char *
             case 'C':
                 bWriteCmd = *pFS == 'W';
                 pFS++;
-                if ((*pFS) != ':') return;
+                if ((*pFS) != ':') return(3);
                 pFS++;
                 n = 0;
                 while ((pEnd - pFS > 2) && (n < sizeof(pData) + 2) &&(*pFS != '\n'))
@@ -158,13 +178,13 @@ void CControllerBoard::LoadFsFile( bq34z100::BQ34Z100 *chargeSense, const char *
                     pBuf[1] = *(pFS++);
                     pBuf[2] = 0;
                     m = strtoul(pBuf, &pErr, 16);
-                    if (*pErr) return; 
+                    if (*pErr) return(4); 
                     if (n == 0) { nAddress = m; chargeSense->setI2CAddress(m); } // this sets the I2C address which changes when in ROM mode
                     if (n == 1) nRegister = m;
                     if (n > 1) pData[n - 2] = m;
                     n++;
                 }
-                if (n < 3) return;
+                if (n < 3) return(5);
                 nDataLength = n - 2;
                 if (bWriteCmd) {
                     // add the register address to the data stream
@@ -195,7 +215,7 @@ void CControllerBoard::LoadFsFile( bq34z100::BQ34Z100 *chargeSense, const char *
                 break;
            case 'X':
                 pFS++;
-                if ((*pFS) != ':') return;
+                if ((*pFS) != ':') return(6);
                 pFS++;
                 n = 0;
                 while ((pFS != pEnd) && (*pFS != '\n') &&(n <sizeof(pBuf) - 1))
@@ -217,8 +237,16 @@ void CControllerBoard::LoadFsFile( bq34z100::BQ34Z100 *chargeSense, const char *
        free(opFS);
        // change back to the default I2C address
        chargeSense->setI2CAddress((BQ34Z100_ADDRESS<<1));
-       
-       return; 
+
+       // reset the device to enable the new parameters
+       chargeSense->WriteByte(0x00, 0x00);
+       chargeSense->WriteByte(0x01, 0x41);
+       delay(100);
+       // reseal the device
+       chargeSense->WriteByte(0x00, 0x00);
+       chargeSense->WriteByte(0x01, 0x20);
+
+       return(0); 
 }
 
 
@@ -231,6 +259,42 @@ long CControllerBoard::readLeakDetector()
              leak = g_SystemMuxes.ReadExtendedGPIO(LEAK_SW2);
 #endif
              return(((leak == 0) ? 1 : 0));
+}
+
+float CControllerBoard::getAverage( float value )
+{
+     float denom, total = 0.0;
+
+     m_samples[m_s_idx] = value;
+     if (++m_s_idx == m_s_max) {
+         m_s_idx = 0;
+         m_use_max = 1;
+     } 
+
+     if (m_use_max == 1) {
+        denom = (float) m_s_max;
+     } else {
+        denom = (float) m_s_idx;
+     }
+
+     for (int i = 0; i < (int) denom; i++ ) {
+          total += m_samples[i];
+     }
+     return(total/denom);
+
+}
+
+long CControllerBoard::estimateCharge()
+{
+      float value;
+      float volts = read20Volts();
+      // 300 samples averaged
+      value = 5.97*log(volts) - 14.761; 
+      value *= 100;
+      if (value < 3) value = 3;
+      if (value > 99) value = 99;
+      value = getAverage(value);
+      return((long)value);
 }
 
 long CControllerBoard::readCharge() 
@@ -319,7 +383,8 @@ void CControllerBoard::Update( CCommand& commandIn )
                 Serial.print( readLeakDetector() );
                 Serial.print( ';' );
                 Serial.print( F( "CHARGE:" ) );
-                Serial.print( readCharge() );
+//                Serial.print( readCharge() );
+                Serial.print( estimateCharge() );
                 Serial.print( ';' );
                 Serial.print( F( "BRDI:" ) );
                 Serial.print( readBrdCurrent( A0 ) );
