@@ -46,7 +46,7 @@ private:
     int         m_streamer1PID = -1;
     int         m_streamer2PID = -1;
 
-    uint8_t     pwm_map[11] = { 0, 16, 22, 30, 40, 55, 75, 101, 138, 187, 255 };
+    uint8_t     pwm_map[11] = { 0, 106, 148, 205, 285, 396, 550, 764, 1062, 1475, 2048 };
 
     void snapPhoto( uint32_t camera );
     void getIP( char addressBuffer[INET_ADDRSTRLEN] );
