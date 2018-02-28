@@ -125,11 +125,14 @@ void CExternalLights::snapPhoto( uint32_t camera )
 {
    char command[512] = {'\0'};
    // camera 1 and 2 on on RPiA
-   // http port 9091 and 9092
+   // http port 9092 and 9091
    // camera 3 and 4 on on RPiB
-   // http port 9091 and 9092
+   // http port 9092 and 9091
+   // make sure the directory exists
+   sprintf(command, "mkdir -p /home/pi/photos");
+   system( command ); 
    // so we need to execute the command line to get the snapshot
-   uint32_t port = 9091 + (camera % 2 != 0 ?  0 : 1);
+   uint32_t port = 9091 + (camera % 2 != 0 ?  1 : 0);
    if (camera <= 2) {
        sprintf(command,"wget http://%s:%d/?action=snapshot -O /home/pi/photos/photo.%d.%u.jpg", m_address_A, port, camera, time(NULL) );
    } else {

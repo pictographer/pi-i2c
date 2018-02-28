@@ -430,12 +430,12 @@ float P86BSD030PA::CalculateDepth( float pressure, float temp )
 
 void P86BSD030PA::ProcessData()
 {
-    m_TEMP2 = ((int32_t) ((m_D2*200)/2047)) - 50; // degrees C
+    m_TEMP2 = ((((float)m_D2)*200.0)/2047.0) - 50.0; // degrees C
     m_P = (((((float)m_D1) - (0.1*16383.0))*(27.0-3.0))/(0.8*16383.0)) + 3.0; // psi
     m_P *= 68.9476; // psi to mbar
 	
     // Create data sample with calculated parameters
-    m_data.Update(  ( (float)m_TEMP2 / 1.0f ),    // Temperature
+    m_data.Update(  m_TEMP2,    // Temperature
                     m_P,         // Pressure
                     CalculateDepth( m_P, (float) m_TEMP2 ) );
 }

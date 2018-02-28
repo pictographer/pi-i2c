@@ -10,6 +10,7 @@
 #define RPB 1
 #define BQ_FS_FILENAME ((char *) "/home/pi/pi-i2c/bq.fs")
 #define DF_FS_FILENAME ((char *) "/home/pi/pi-i2c/df.fs")
+#define DF_FS_LOADED_FILENAME ((char *) "/home/pi/pi-i2c/df.loaded.fs")
 
 class CControllerBoard : public CModule
 {
@@ -29,8 +30,8 @@ private:
     int m_use_max;
     float *m_samples;
 
-    long readCharge();
-    long estimateCharge();
+    float readCharge();
+    float estimateCharge();
     long readVcc();
     long readLeakDetector();
     float read20Volts();

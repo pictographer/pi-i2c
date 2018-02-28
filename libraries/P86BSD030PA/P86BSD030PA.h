@@ -73,7 +73,7 @@ namespace p86bsd030pa
         
         int64_t     m_OFF2      = 0;    // Second order final off 
         int64_t     m_SENS2     = 0;    // Second order final sens
-        int64_t     m_TEMP2     = 0;    // Second order final temp
+        float       m_TEMP2     = 0;    // Second order final temp
         
         float       m_P         = 0;    // Temperature compensated pressure
         

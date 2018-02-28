@@ -102,7 +102,7 @@ void CControllerBoard::Initialize()
             // if successfully loaded then rename file
             // to disable future loads
             // "name" to "name.loaded"
-       
+            rename(DF_FS_FILENAME, DF_FS_LOADED_FILENAME);
         }
 }
 
@@ -187,12 +187,12 @@ uint8_t CControllerBoard::LoadFsFile( bq34z100::BQ34Z100 *chargeSense, const cha
                 if (n < 3) return(5);
                 nDataLength = n - 2;
                 if (bWriteCmd) {
+                    nDataLength++;
                     // add the register address to the data stream
                     for (m = nDataLength; m != 0; m--) {
                         pData[m] = pData[m-1];
                     }
                     pData[m] = nRegister;
-                    nDataLength++;
                     // swap if addressing control register in normal mode
                     for (m = 1; m < nDataLength; m++) {
                        // swap the control bytes
@@ -284,20 +284,20 @@ float CControllerBoard::getAverage( float value )
 
 }
 
-long CControllerBoard::estimateCharge()
+float CControllerBoard::estimateCharge()
 {
       float value;
       float volts = read20Volts();
       // 300 samples averaged
       value = 5.97*log(volts) - 14.761; 
       value *= 100;
-      if (value < 3) value = 3;
+      if (value < 0) value = 0;
       if (value > 99) value = 99;
       value = getAverage(value);
-      return((long)value);
+      return(value);
 }
 
-long CControllerBoard::readCharge() 
+float CControllerBoard::readCharge() 
 {
              // percent remaining charge
              g_SystemMuxes.SetPath(SCL_BATT);
