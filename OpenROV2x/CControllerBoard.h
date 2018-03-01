@@ -29,6 +29,7 @@ private:
     int m_s_idx;
     int m_use_max;
     float *m_samples;
+    float m_boardTemperature;
 
     float readCharge();
     float estimateCharge();
@@ -38,4 +39,7 @@ private:
     float readPiCurrent( uint8_t thePI );
     float getAverage( float value );
     uint8_t LoadFsFile( bq34z100::BQ34Z100 *chargeSense, const char *filename );
+    float readTemp();
+    float readCurrent( int pin );
+    float readBrdCurrent( int pin );
 };

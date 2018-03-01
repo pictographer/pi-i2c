@@ -39,30 +39,62 @@ namespace
         int average                     = 0;                    // the average
         int temppin                     = A8;
 
-        float celsiusTempRead;
-
         float mapf( long x, long in_min, long in_max, long out_min, long out_max )
         {
                 return ( float )( x - in_min ) * ( out_max - out_min ) / ( float )( in_max - in_min ) + out_min;
         }
-
-        void readTemp()
-        {
-                float volt = mapf( (float)analogRead( temppin ), 0.0f, 1023.0f, 0.0f, 5.0f );
-                celsiusTempRead = ( volt - 0.4f ) * 51.28f;
-        }
-
-        float readCurrent( int pin )
-        {
-                return mapf( (float)analogRead( pin ), 0.0f, 1023.0f, 0.0f, 10.0f );
-        }
-
-        float readBrdCurrent( int pin )
-        {
-                return mapf( (float)analogRead( pin ), 0.0f, 1023.0f, 0.0f, 2.0f );
-        }
-
 }
+
+float CControllerBoard::readTemp()
+{
+      float systemp, millideg;
+      FILE *thermal;
+      int n;
+
+      thermal = fopen("/sys/class/thermal/thermal_zone0/temp","r");
+      n = fscanf(thermal,"%f",&millideg);
+      fclose(thermal);
+      systemp = millideg / 1000;
+      return(systemp);
+}
+
+float CControllerBoard::readCurrent( int pin )
+{
+      float f_ma = 0.0f;
+      uint32_t ma =  5000;
+
+      // pin == A1 ballast supply current
+      // pin == A2 motor supply current
+      // pin == A3 critical supply current
+      switch (pin) {
+         case A1:
+           g_SystemMuxes.SetPath(SCL_BAL);
+           break;
+         case A2:
+           g_SystemMuxes.SetPath(SCL_ME);
+           break;
+         case A3:
+           g_SystemMuxes.SetPath(SCL_CRIT);
+           break;
+         default:
+           break;
+      }
+      m_powerSense->Cmd_ReadCurrent(&ma);
+      f_ma = (1.0f * ma)/1000.0f;
+      return(f_ma);
+}
+
+// reads charger current
+float CControllerBoard::readBrdCurrent( int pin )
+{
+      float f_ma = 0.0f;
+      uint32_t ma =  5000;
+      g_SystemMuxes.SetPath(SCL_CHG);
+      m_powerSense->Cmd_ReadCurrent(&ma);
+      f_ma = (1.0f * ma)/1000.0f;
+      return(f_ma);
+}
+
 
 CControllerBoard::CControllerBoard()
 {
@@ -80,12 +112,21 @@ void CControllerBoard::Initialize()
         statustime2.Reset();
         onesecondtimer.Reset();
 
+        // initialize all the power measurement devices
         m_powerSense = new INA260( &I2C0 );
         g_SystemMuxes.SetPath(SCL_5V_SYS);
         m_powerSense->Cmd_SetConfig( 0x6727 );
         g_SystemMuxes.SetPath(SCL_12V_RPA);
         m_powerSense->Cmd_SetConfig( 0x6727 );
         g_SystemMuxes.SetPath(SCL_12V_RPB);
+        m_powerSense->Cmd_SetConfig( 0x6727 );
+        g_SystemMuxes.SetPath(SCL_CHG);
+        m_powerSense->Cmd_SetConfig( 0x6727 );
+        g_SystemMuxes.SetPath(SCL_BAL);
+        m_powerSense->Cmd_SetConfig( 0x6727 );
+        g_SystemMuxes.SetPath(SCL_ME);
+        m_powerSense->Cmd_SetConfig( 0x6727 );
+        g_SystemMuxes.SetPath(SCL_CRIT);
         m_powerSense->Cmd_SetConfig( 0x6727 );
 
         m_chargeSense = new BQ34Z100( &I2C0 );
@@ -363,9 +404,9 @@ void CControllerBoard::Update( CCommand& commandIn )
 
         if( onesecondtimer.HasElapsed( 1000 ) )
         {
-                readTemp();
+                m_boardTemperature = readTemp();
                 Serial.print( F( "BRDT:" ) );
-                Serial.print( celsiusTempRead );
+                Serial.print( m_boardTemperature );
                 Serial.print( ';' );
                 Serial.print( F( "BT1I:" ) );
                 Serial.print( readPiCurrent( RPA ) );
