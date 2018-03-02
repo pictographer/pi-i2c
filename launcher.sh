@@ -1,8 +1,8 @@
 #!/bin/sh
 # launcher.sh
 #
-mkdir -f /home/pi/videos
-mkdir -f /home/pi/photos
+mkdir -p /home/pi/videos
+mkdir -p /home/pi/photos
 cd /
 cd home/pi
 sudo python pin_toggler.py &
