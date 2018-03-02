@@ -11,7 +11,7 @@ cd home/pi/pi-i2c
 sleep 5
 sudo ./rovdrv &
 #If this is RPiA wait for RPiB to get its cameras up and running
-if [ "$HOSTNAME" contains "stir01A" ]
+if [ "$HOSTNAME" contains "A" ];
 then
     sleep 15
 fi
