@@ -340,9 +340,11 @@ float CControllerBoard::estimateCharge()
 
 float CControllerBoard::readCharge() 
 {
+             float f_val = 0;
              // percent remaining charge
              g_SystemMuxes.SetPath(SCL_BATT);
-             return m_chargeSense->getRemaining();
+             f_val = (float) m_chargeSense->getSOC();
+             return( f_val );
 }
 
 long CControllerBoard::readVcc()
@@ -424,8 +426,8 @@ void CControllerBoard::Update( CCommand& commandIn )
                 Serial.print( readLeakDetector() );
                 Serial.print( ';' );
                 Serial.print( F( "CHARGE:" ) );
-//                Serial.print( readCharge() );
-                Serial.print( estimateCharge() );
+                Serial.print( readCharge() );
+//                Serial.print( estimateCharge() );
                 Serial.print( ';' );
                 Serial.print( F( "BRDI:" ) );
                 Serial.print( readBrdCurrent( A0 ) );

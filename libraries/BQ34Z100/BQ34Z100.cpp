@@ -124,25 +124,25 @@ int BQ34Z100::getTemp()
 
 uint8_t BQ34Z100::getSOC()
 {
-    return Read(0x02, 2) ; //return temp in x10 format
+    return Read(0x02, 1) ; //
 }
 
 int BQ34Z100::getVoltage()
 {
-    return Read(0x08, 2) ; //return temp in x10 format
+    return Read(0x08, 2) ; //
 }
 
 int BQ34Z100::getCapacity()
 {
-    return Read(0x06, 2) ; //return temp in x10 format
+    return Read(0x06, 2) ; //
 }
 int BQ34Z100::getRemaining()
 {
-    return Read(0x04, 2) ; //return temp in x10 format
+    return Read(0x04, 2) ; //
 }
 int BQ34Z100::getCurrent()
 {
-    return Read(0x0a, 2) ; //return temp in x10 format
+    return Read(0x0a, 2) ; //
 }
 int BQ34Z100::getStatus()
 {
