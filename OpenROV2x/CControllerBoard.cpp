@@ -153,7 +153,7 @@ uint8_t CControllerBoard::LoadFsFile( bq34z100::BQ34Z100 *chargeSense, const cha
     int nLength;
     int nDataLength;
     char pBuf[32];
-    char pData[64];
+    char pData[256];
     int n, m, a;
     char *pEnd = NULL;
     char *pErr;
