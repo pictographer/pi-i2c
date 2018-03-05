@@ -13,9 +13,8 @@ sudo ./rovdrv &
 cd /
 # If this is RPiA wait for RPiB to get its cameras up and running
 if [ "$HOSTNAME" != "${HOSTNAME%"B"*}" ]; then
-    sleep 20
+    sleep 30
 fi
 cd home/pi/openrov-cockpit
-sleep 5
 sudo PLATFORM=raspberrypi node src/cockpit.js &
 cd /
