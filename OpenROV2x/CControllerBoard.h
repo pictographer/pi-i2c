@@ -2,6 +2,7 @@
 
 // Includes
 #include <I2C.h>
+#include <limits.h>
 #include "CModule.h"
 #include "INA260.h"
 #include "BQ34Z100.h"
@@ -25,6 +26,8 @@ private:
 
     ina260::INA260 *m_powerSense;
     bq34z100::BQ34Z100 *m_chargeSense;
+
+    char m_hostname[HOST_NAME_MAX];
 
     int m_s_idx;
     int m_use_max;

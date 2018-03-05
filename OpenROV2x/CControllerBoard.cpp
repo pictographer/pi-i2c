@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <Arduino.h>
 #include "NDataManager.h"
 #include "CControllerBoard.h"
@@ -138,12 +139,16 @@ void CControllerBoard::Initialize()
         }
 
         g_SystemMuxes.SetPath(SCL_BATT);
-        //LoadFsFile(m_chargeSense, BQ_FS_FILENAME);
-        if (LoadFsFile(m_chargeSense, DF_FS_FILENAME) == 0) {
-            // if successfully loaded then rename file
-            // to disable future loads
-            // "name" to "name.loaded"
-            rename(DF_FS_FILENAME, DF_FS_LOADED_FILENAME);
+        // Make PI A the only processor responsible for initializing the gas gauge
+        gethostname(m_hostname, HOST_NAME_MAX);
+        if (strchr( m_hostname, 'A' ) != NULL) {
+           //LoadFsFile(m_chargeSense, BQ_FS_FILENAME);
+           if (LoadFsFile(m_chargeSense, DF_FS_FILENAME) == 0) {
+               // if successfully loaded then rename file
+               // to disable future loads
+               // "name" to "name.loaded"
+               rename(DF_FS_FILENAME, DF_FS_LOADED_FILENAME);
+           }
         }
 }
 

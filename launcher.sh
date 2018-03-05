@@ -12,8 +12,8 @@ sleep 5
 sudo ./rovdrv &
 cd /
 # If this is RPiA wait for RPiB to get its cameras up and running
-if [ "$HOSTNAME" != "${HOSTNAME%"A"*}" ]; then
-    sleep 15
+if [ "$HOSTNAME" != "${HOSTNAME%"B"*}" ]; then
+    sleep 20
 fi
 cd home/pi/openrov-cockpit
 sleep 5
