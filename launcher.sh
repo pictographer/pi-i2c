@@ -15,6 +15,7 @@ cd /
 if [ "$HOSTNAME" != "${HOSTNAME%"B"*}" ]; then
     sleep 30
 fi
+sleep 5
 cd home/pi/openrov-cockpit
 sudo PLATFORM=raspberrypi node src/cockpit.js &
 cd /
