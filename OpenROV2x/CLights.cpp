@@ -54,6 +54,8 @@ void CLights::Initialize()
    m_pin.Reset();
    m_pin.Write( 0 );
 
+   gethostname(m_hostname, HOST_NAME_MAX);
+
    // Reset timers
    m_controlTimer.Reset();
    m_telemetryTimer.Reset();
@@ -70,6 +72,7 @@ void CLights::Update( CCommand& commandIn )
 	// Handle messages
 	if( commandIn.Equals( "lights_tpow" ) )
 	{
+                // This is actually the KILL command
 		// Update the target position
 		m_targetPower = orutil::Decode1K( commandIn.m_arguments[1] );
 
@@ -125,15 +128,29 @@ void CLights::Update( CCommand& commandIn )
 		Serial.print( flag );
 		Serial.print( ';' );
 	        Serial.print( F( "ENDUPDATE:1;" ) );
-                if (flag == 1) {
-                    // force takeover of the I2C bus
-	            m_pinI2C.Write( 1 );
+                // if we are PI A and get this command then 
+                // release the I2C bus
+                // If we are PI B and get this command then
+                // take over the I2C bus and force a restart
+                if (strchr( m_hostname, 'A' ) != NULL) {
+                    if (flag == 1) {
+                        // release the I2C bus
+        	        m_pinI2C.Write( 0 );
+                    } else {
+                        // force takeover of the I2C bus
+	                m_pinI2C.Write( 1 );
+                    }
                 } else {
-                    // release the I2C bus
-	            m_pinI2C.Write( 0 );
+                    if (flag == 1) {
+                        // force takeover of the I2C bus
+        	        m_pinI2C.Write( 1 );
+                    } else {
+                        // release the I2C bus
+	                m_pinI2C.Write( 0 );
+                    }
+                    // make the module loop restart at the next iteration
+                    restart = 1;
                 }
-                // make the module loop restart at the next iteration
-                restart = 1;
         }
 #if 0
 	else if( commandIn.Equals( "wake" ) )
