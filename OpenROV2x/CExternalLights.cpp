@@ -129,16 +129,25 @@ void CExternalLights::snapPhoto( uint32_t camera )
    // camera 3 and 4 on on RPiB
    // http port 9092 and 9091
    // make sure the directory exists
-   sprintf(command, "mkdir -p /home/pi/photos");
+   sprintf(command, "mkdir -p /home/stir/photos");
+   system( command ); 
+   sprintf(command, "chgrp stir /home/stir/photos");
+   system( command ); 
+   sprintf(command, "chown stir /home/stir/photos");
    system( command ); 
    // so we need to execute the command line to get the snapshot
    uint32_t port = 9091 + (camera % 2 != 0 ?  1 : 0);
+   time_t t = time(NULL);
    if (camera <= 2) {
-       sprintf(command,"wget http://%s:%d/?action=snapshot -O /home/pi/photos/photo.%d.%u.jpg", m_address_A, port, camera, time(NULL) );
+       sprintf(command,"wget http://%s:%d/?action=snapshot -O /home/stir/photos/photo.%d.%u.jpg", m_address_A, port, camera, t );
    } else {
-       sprintf(command,"wget http://%s:%d/?action=snapshot -O /home/pi/photos/photo.%d.%u.jpg", m_address_B, port, camera, time(NULL) );
+       sprintf(command,"wget http://%s:%d/?action=snapshot -O /home/stir/photos/photo.%d.%u.jpg", m_address_B, port, camera, t );
    }
    // execute the command
+   system( command ); 
+   sprintf(command, "chgrp stir /home/stir/photos/photo.%d.%u.jpg", camera, t );
+   system( command ); 
+   sprintf(command, "chown stir /home/stir/photos/photo.%d.%u.jpg", camera, t );
    system( command ); 
 }
 
