@@ -157,6 +157,7 @@ uint8_t CControllerBoard::LoadFsFile( bq34z100::BQ34Z100 *chargeSense, const cha
     int nSourceFile;
     int nLength;
     int nDataLength;
+    int nLine = 0;
     char pBuf[32];
     char pData[256];
     int n, m, a;
@@ -230,6 +231,7 @@ uint8_t CControllerBoard::LoadFsFile( bq34z100::BQ34Z100 *chargeSense, const cha
                     if (n > 1) pData[n - 2] = m;
                     n++;
                 }
+                if (*pFS == '\n') nLine++;
                 if (n < 3) return(5);
                 nDataLength = n - 2;
                 if (bWriteCmd) {
@@ -255,7 +257,7 @@ uint8_t CControllerBoard::LoadFsFile( bq34z100::BQ34Z100 *chargeSense, const cha
                         pDataFromGauge[m] = (char) data;
                     }
                     if (memcmp(pData, pDataFromGauge, nDataLength) != 0) {
-                        printf("No match: address: %x register: %x nDataLength: %d\n", nAddress, nRegister, nDataLength );
+                        printf("'%d': No match: address: %x register: %x nDataLength: %d\n", nLine, nAddress, nRegister, nDataLength );
                     }
                 }
                 break;
@@ -269,8 +271,10 @@ uint8_t CControllerBoard::LoadFsFile( bq34z100::BQ34Z100 *chargeSense, const cha
                     pBuf[n++] = *pFS;
                     pFS++; 
                 }
+                if (*pFS == '\n') nLine++;
                 pBuf[n] = 0;
                 n = atoi(pBuf);
+                if (n < 500) n = 500;
                 delay(n);
                 break;
            default: 
@@ -287,7 +291,7 @@ uint8_t CControllerBoard::LoadFsFile( bq34z100::BQ34Z100 *chargeSense, const cha
        // reset the device to enable the new parameters
        chargeSense->WriteByte(0x00, 0x00);
        chargeSense->WriteByte(0x01, 0x41);
-       delay(100);
+       delay(500);
        // reseal the device
        chargeSense->WriteByte(0x00, 0x00);
        chargeSense->WriteByte(0x01, 0x20);
