@@ -294,16 +294,16 @@ void CExternalLights::Update( CCommand& commandIn )
                             // 1: camera 2 Side
                             // 4: camera 3 Top
                             // 3: camera 4 Bottom
-			    m_targetLight = commandIn.m_arguments[1];
-			    Serial.print( F( "elights_select:" ) );
-			    Serial.print( m_targetLight );
-			    Serial.print( ';' );
-	                    Serial.print( F( "ENDUPDATE:1;" ) );
-                            // streamerControl(m_targetLight);
                             // force all LEDs on by making
                             // m_targetLight equal to zero
+			    uint32_t r_targetLight = commandIn.m_arguments[1];
                             m_targetLight = 0;
                             SetLight();
+                            delay(50);
+			    Serial.print( F( "elights_select:" ) );
+			    Serial.print( r_targetLight );
+			    Serial.print( ';' );
+	                    Serial.print( F( "ENDUPDATE:1;" ) );
 		        } else {
 		            if( commandIn.Equals( "ephoto_select" ) )
 		            {
@@ -315,11 +315,12 @@ void CExternalLights::Update( CCommand& commandIn )
                                 // 4: camera 3 Top
                                 // 3: camera 4 Bottom
 			        m_targetPhoto = commandIn.m_arguments[1];
+                                snapPhoto( m_targetPhoto );
+                                delay(50);
 			        Serial.print( F( "ephoto_select:" ) );
 			        Serial.print( m_targetPhoto );
 			        Serial.print( ';' );
 	                        Serial.print( F( "ENDUPDATE:1;" ) );
-                                snapPhoto( m_targetPhoto );
 		            }
                         }
                 }

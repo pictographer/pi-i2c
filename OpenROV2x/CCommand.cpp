@@ -80,7 +80,7 @@ namespace
                                 {
                                         dataBuffer[dataBufferIndex++] = incomingbyte;
                                         dataBuffer[dataBufferIndex] = 0; //null terminate the C string
-                                        printf("command: %s\n", dataBuffer );
+                                        // printf("command: %s\n", dataBuffer );
                                         storeString = false;
 
                                         //Our data string is complete.  return true

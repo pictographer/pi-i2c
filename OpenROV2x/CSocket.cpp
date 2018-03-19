@@ -22,13 +22,13 @@ int CSocket::available() {
       buf[buf_len] = 0;
 
       buf_start = 0;
-      if (0 < buf_len) {
-         buf_start = 0;
-      } else if (buf_len == 0) {
+      if (buf_len == 0) {
          printf("Socket client disconnected.\n");
          fflush(stdout);
       } else if (buf_len == -1) {
          perror("Socket recv failed. Error");
+      } else if (buf_len < 0) {
+         buf_len = 0;
       }
    }
    return buf_len;
