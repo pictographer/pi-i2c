@@ -1,11 +1,27 @@
 #!/bin/sh
 # launcher.sh
 #
-mkdir -p /home/pi/videos
-mkdir -p /home/pi/photos
+# Setup photo and video directories
+# for stir user but first check 
+# if user exists
+#
+if id "stir"; then
+sudo mkdir -p /home/stir/videos
+sudo mkdir -p /home/stir/photos
+sudo chown stir /home/stir/videos
+sudo chown stir /home/stir/photos
+sudo chgrp stir /home/stir/videos
+sudo chgrp stir /home/stir/photos
+else
+echo "No user named 'stir' on RPi"
+fi
+#
+# start the system and applications
+#
 cd /
 cd home/pi
 sudo python pin_toggler.py &
+exit
 cd /
 cd home/pi/pi-i2c
 sleep 5
