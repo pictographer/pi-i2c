@@ -20,8 +20,6 @@ namespace NVehicleManager
         // Variable initialization
         // ---------------------------------------------------------
 
-        orutil::CTimer reporttimer;
-        
         // TODO: Move
         uint32_t m_throttleSmoothingIncrement   = 40;
         uint32_t m_deadZoneMin                                  = 50;
@@ -33,15 +31,10 @@ namespace NVehicleManager
 
         void Initialize()
         {
-             reporttimer.Reset();
         }
 
         void HandleMessages( CCommand &commandIn )
         {
-                // handle secret report generation
-                // dump data once per minute
-                if (reporttimer.HasElapsed( 60000 ) ) {
-                }
 
                 // check for incoming command
                 if( NCommManager::m_isCommandAvailable )

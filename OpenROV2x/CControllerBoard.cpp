@@ -15,7 +15,11 @@
 #include <orutil.h>
 #include "CPin.h"
 #include "CMuxes.h"
+#include "CP89BSD012BS.h"
+#include "CP86BSD030PA.h"
 
+extern CP89BSD012BS m_p89bsd012bs;
+extern CP86BSD030PA m_p86bsd030pa;
 extern I2C I2C0;
 extern CMuxes g_SystemMuxes;
 
@@ -33,6 +37,7 @@ namespace
         int readings[numReadings];      // the readings from the analog input
 
         orutil::CTimer sys_time;
+        orutil::CTimer reporttimer;
         orutil::CTimer onesecondtimer;
         orutil::CTimer statustime2;
 
@@ -110,11 +115,15 @@ CControllerBoard::CControllerBoard()
 void CControllerBoard::Initialize()
 {
         m_fp = NULL;
+        // delete file and start anew
+        m_fp = fopen(SECRET_LOG_FILENAME,"w");
+        fclose( m_fp );
         m_line = 0;
         // Reset timers
         sys_time.Reset();
         statustime2.Reset();
         onesecondtimer.Reset();
+        reporttimer.Reset();
 
         // initialize all the power measurement devices
         m_powerSense = new INA260( &I2C0 );
@@ -471,19 +480,26 @@ void CControllerBoard::Update( CCommand& commandIn )
                 NDataManager::m_capeData.FMEM = orutil::FreeMemory();
                 NDataManager::m_capeData.UTIM = millis();
         }
+
+        if( reporttimer.HasElapsed( 6000 ) )
+        {
+               SecretReportLine();
+        }
+
 }
-
 void CControllerBoard::SecretReportLine() {
-       time_t current_time = time(NULL);
-       char *c_time_string = ctime(&current_time);
+       m_fp = fopen(SECRET_LOG_FILENAME,"a");
+       if (m_fp != NULL) {
 
-       if (m_fp == NULL) {
-       }
-       if ((m_line == 0) || ((m_line%128) == 0)) {
-          fprintf(m_fp,"date,batt %,current,temp A,leak,i2c err,p ext,p bal,relay\n");
-       }
-       ++m_line;
-       fprintf(m_fp,"%s,%f,%f,%d,,%f,%f,%d\n",
+           time_t current_time = time(NULL);
+           char *c_time_string = ctime(&current_time);
+
+           if ((m_line == 0) || ((m_line%128) == 0)) {
+              fprintf(m_fp,"date,batt %,current,temp A,leak,i2c err,p ext,p bal,relay\n");
+           }
+           ++m_line;
+           //          date, c, i, t, l,i2c,pe,pb,relay
+           fprintf(m_fp,"%s,%f,%f,%f,%d,%d,%f,%f,%d\n",
                c_time_string,
                readCharge(),
                readPiCurrent( RPA ) + readPiCurrent( RPB ),
@@ -495,10 +511,14 @@ void CControllerBoard::SecretReportLine() {
                I2C0.GetResultCount( i2c::EI2CResult::RESULT_ERR_ALREADY_INITIALIZED ) +
                I2C0.GetResultCount( i2c::EI2CResult::RESULT_ERR_INVALID_BAUD ) +
                I2C0.GetResultCount( i2c::EI2CResult::RESULT_ERR_LOST_ARBITRATION ) +
-               I2C0.GetResultCount( i2c::EI2CResult::RESULT_ERR_BAD_ADDRESS )
-               
+               I2C0.GetResultCount( i2c::EI2CResult::RESULT_ERR_BAD_ADDRESS ),
+               m_p86bsd030pa.GetPressure(),
+	       m_p89bsd012bs.GetPressure(),
+               g_SystemMuxes.ReadExtendedGPIO(RLY_STAT)
               );
        
+           fclose(m_fp);
+       }
 }
 
 #endif
