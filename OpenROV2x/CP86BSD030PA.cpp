@@ -167,6 +167,19 @@ float CP86BSD030PA::GetDepth( void )
         return(m_device.m_data.depth_m);
 }
 
+float CP86BSD030PA::GetPressure( void )
+{
+        uint8_t count = 0;
+
+        // set path to enable access to sensor
+        g_SystemMuxes.SetPath(SCL_PXDCR);
+        while(!m_device.m_data.SampleAvailable() && (count++ < 16)) {
+             delay(10);
+	     m_device.Tick();
+        }
+        return(m_device.m_data.pressure_mbar);
+}
+
 void CP86BSD030PA::ReportResults( void )
 {
 	// Report results

@@ -171,6 +171,12 @@ void CP89BSD012BS::Update( CCommand& commandIn )
 	}
 }
 
+float CP89BSD012BS::GetPressure( void )
+{
+    ForcePressureMeasurement();
+    return(  m_device.m_data.pressure_psi );
+}
+
 void CP89BSD012BS::ForcePressureMeasurement( void )
 {
     uint8_t count = 0;

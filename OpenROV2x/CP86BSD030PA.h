@@ -12,6 +12,7 @@ public:
 	void Initialize();
 	void Update( CCommand& commandIn );
         float GetDepth( void );
+        float GetPressure( void );
         void ReportResults( void );
 private:
 	// Device driver

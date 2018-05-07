@@ -12,6 +12,7 @@ public:
 	void Initialize();
 	void Update( CCommand& commandIn );
         uint8_t GetMaxPressureFlag( void );
+        float GetPressure( void );
         void ForcePressureMeasurement( void );
 
 private:

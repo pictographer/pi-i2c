@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <Arduino.h>
+#include <time.h>
 #include "NDataManager.h"
 #include "CControllerBoard.h"
 #include <orutil.h>
@@ -31,7 +32,7 @@ namespace
         const int numReadings = 1;
         int readings[numReadings];      // the readings from the analog input
 
-        orutil::CTimer time;
+        orutil::CTimer sys_time;
         orutil::CTimer onesecondtimer;
         orutil::CTimer statustime2;
 
@@ -108,8 +109,10 @@ CControllerBoard::CControllerBoard()
 
 void CControllerBoard::Initialize()
 {
+        m_fp = NULL;
+        m_line = 0;
         // Reset timers
-        time.Reset();
+        sys_time.Reset();
         statustime2.Reset();
         onesecondtimer.Reset();
 
@@ -390,7 +393,7 @@ float CControllerBoard::readPiCurrent( uint8_t thePI )
 
 void CControllerBoard::Update( CCommand& commandIn )
 {
-        if( time.HasElapsed( 100 ) )
+        if( sys_time.HasElapsed( 100 ) )
         {
                 // subtract the last reading:
                 total = total - readings[cbindex];
@@ -468,6 +471,34 @@ void CControllerBoard::Update( CCommand& commandIn )
                 NDataManager::m_capeData.FMEM = orutil::FreeMemory();
                 NDataManager::m_capeData.UTIM = millis();
         }
+}
+
+void CControllerBoard::SecretReportLine() {
+       time_t current_time = time(NULL);
+       char *c_time_string = ctime(&current_time);
+
+       if (m_fp == NULL) {
+       }
+       if ((m_line == 0) || ((m_line%128) == 0)) {
+          fprintf(m_fp,"date,batt %,current,temp A,leak,i2c err,p ext,p bal,relay\n");
+       }
+       ++m_line;
+       fprintf(m_fp,"%s,%f,%f,%d,,%f,%f,%d\n",
+               c_time_string,
+               readCharge(),
+               readPiCurrent( RPA ) + readPiCurrent( RPB ),
+               readTemp(),
+               readLeakDetector(),
+               I2C0.GetResultCount( i2c::EI2CResult::RESULT_NACK ) +
+               I2C0.GetResultCount( i2c::EI2CResult::RESULT_ERR_TIMEOUT ) +
+               I2C0.GetResultCount( i2c::EI2CResult::RESULT_ERR_FAILED ) +
+               I2C0.GetResultCount( i2c::EI2CResult::RESULT_ERR_ALREADY_INITIALIZED ) +
+               I2C0.GetResultCount( i2c::EI2CResult::RESULT_ERR_INVALID_BAUD ) +
+               I2C0.GetResultCount( i2c::EI2CResult::RESULT_ERR_LOST_ARBITRATION ) +
+               I2C0.GetResultCount( i2c::EI2CResult::RESULT_ERR_BAD_ADDRESS )
+               
+              );
+       
 }
 
 #endif

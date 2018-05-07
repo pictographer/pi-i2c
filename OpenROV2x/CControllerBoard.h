@@ -3,12 +3,14 @@
 // Includes
 #include <I2C.h>
 #include <limits.h>
+#include <stdio.h>
 #include "CModule.h"
 #include "INA260.h"
 #include "BQ34Z100.h"
 
 #define RPA 0
 #define RPB 1
+#define SECRET_LOG_FILENAME ((char *) "/home/pi/logs/stats.log")
 #define BQ_FS_FILENAME ((char *) "/home/pi/pi-i2c/bq.fs")
 #define DF_FS_FILENAME ((char *) "/home/pi/pi-i2c/df.fs")
 #define DF_FS_LOADED_FILENAME ((char *) "/home/pi/pi-i2c/df.loaded.fs")
@@ -21,6 +23,7 @@ public:
     // Methods
     virtual void Initialize();
     virtual void Update( CCommand& commandIn );
+    void SecretReportLine( void );
 private:
     const int m_s_max = 300;
 
@@ -28,6 +31,9 @@ private:
     bq34z100::BQ34Z100 *m_chargeSense;
 
     char m_hostname[HOST_NAME_MAX];
+
+    FILE *m_fp;
+    int m_line;
 
     int m_s_idx;
     int m_use_max;
