@@ -103,13 +103,19 @@ void CLights::Update( CCommand& commandIn )
 	            m_pinI2C.Write( 1 );
                     // Go through power disarm sequence
                     // SCL_DIO2
-                    g_SystemMuxes.WriteExtendedGPIO(RLY_SAF,LOW);
-                    // CH1 write 0 - write 1 - wait 1 second - write 0
-                    delay(1000);
-                    g_SystemMuxes.WriteExtendedGPIO(RLY_SAF,HIGH);
-                    delay(1000);
-                    g_SystemMuxes.WriteExtendedGPIO(RLY_SAF,LOW);
-                    delay(1000);
+                    int count = 0;
+                    do {
+                        g_SystemMuxes.WriteExtendedGPIO(RLY_SAF,LOW);
+                        // CH1 write 0 - write 1 - wait 1 second - write 0
+                        delay(1000);
+                        g_SystemMuxes.WriteExtendedGPIO(RLY_SAF,HIGH);
+                        delay(1000);
+                        g_SystemMuxes.WriteExtendedGPIO(RLY_SAF,LOW);
+                        delay(1000);
+                        // now read RLY_STAT and make sure it is low
+                        // otherwise repeat
+                    } while ((g_SystemMuxes.ReadExtendedGPIO(RLY_STAT) == HIGH) && (count++ < 16));
+                    // now drive the pin HIGH to force shutdown
 	            m_pin.Write( 1 );
                 }
 
