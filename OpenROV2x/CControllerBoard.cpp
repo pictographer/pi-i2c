@@ -494,6 +494,8 @@ void CControllerBoard::SecretReportLine() {
 
            time_t current_time = time(NULL);
            char *c_time_string = ctime(&current_time);
+           // remove the CR from the end of the string
+           c_time_string[strlen(c_time_string)-1]='\0';
 
            if ((m_line == 0) || ((m_line%128) == 0)) {
               fprintf(m_fp,"date,batt %,current,temp A,leak,i2c err,p ext,p bal,relay\n");
