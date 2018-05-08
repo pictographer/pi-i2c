@@ -481,7 +481,8 @@ void CControllerBoard::Update( CCommand& commandIn )
                 NDataManager::m_capeData.UTIM = millis();
         }
 
-        if( reporttimer.HasElapsed( 6000 ) )
+        // dump data every minute
+        if( reporttimer.HasElapsed( 60000 ) )
         {
                SecretReportLine();
         }
