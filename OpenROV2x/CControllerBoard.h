@@ -11,6 +11,7 @@
 #define RPA 0
 #define RPB 1
 #define SECRET_LOG_FILENAME ((char *) "/home/pi/logs/stats.log")
+#define SECRET_LOG_FILENAME_SV ((char *) "/home/pi/logs/stats.log.sv")
 #define BQ_FS_FILENAME ((char *) "/home/pi/pi-i2c/bq.fs")
 #define DF_FS_FILENAME ((char *) "/home/pi/pi-i2c/df.fs")
 #define DF_FS_LOADED_FILENAME ((char *) "/home/pi/pi-i2c/df.loaded.fs")

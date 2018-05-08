@@ -114,6 +114,7 @@ CControllerBoard::CControllerBoard()
 
 void CControllerBoard::Initialize()
 {
+        rename(SECRET_LOG_FILENAME, SECRET_LOG_FILENAME_SV);
         m_fp = NULL;
         // delete file and start anew
         m_fp = fopen(SECRET_LOG_FILENAME,"w");
