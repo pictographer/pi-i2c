@@ -4,6 +4,8 @@ import tarfile
 import fnmatch
 from shutil import copyfile
 from shutil import rmtree
+import subprocess
+import signal
 
 UPDATE_DIR = '/home/pi/update'
 UPDATE_FILE = UPDATE_DIR + '/update_files.tar.gz'
@@ -25,6 +27,19 @@ if os.path.exists(UPDATE_FILE) :
     # of the file so that the update procedure
     # is not triggered again
     os.rename(UPDATE_FILE, UPDATE_WORK_FILE)
+    # now we need to kill the cockpit, and streamer processes
+    process_strings = ('node src/cockpit.js',
+               'rovdrv',
+               'openrov-cockpit/src/plugins/mjpeg-video',
+               'mjpg_streamer')
+    p = subprocess.Popen(['ps', 'aux'], stdout=subprocess.PIPE)
+    out, err = p.communicate()
+    for line in out.splitlines():
+        if any(s in line for s in process_strings):
+            print(line)
+            pid = int(line.split()[1])
+            print("Killing PID: " + str(pid))
+            os.kill(pid, signal.SIGKILL)
 
     update_contents = UPDATE_WORK_FILE.split(".")[0]
     print(update_contents)
@@ -117,24 +132,28 @@ if os.path.exists(UPDATE_FILE) :
                     replace_file = os.path.join(LOCAL_LIB_DIR, filename)
                     print( "Updating " + replace_file)
                     if os.path.exists(replace_file):
+                        os.chmod(replace_file, 0o777)
                         os.rename(replace_file, replace_file+".sv")
                     copyfile(source_file, replace_file)
                 elif filename == "output_file.so":
                     replace_file = os.path.join(LOCAL_LIB_DIR, filename)
                     print( "Updating " + replace_file)
                     if os.path.exists(replace_file):
+                        os.chmod(replace_file, 0o777)
                         os.rename(replace_file, replace_file+".sv")
                     copyfile(source_file, replace_file)
                 elif filename == "output_ws.so":
                     replace_file = os.path.join(LOCAL_LIB_DIR, filename)
                     print( "Updating " + replace_file)
                     if os.path.exists(replace_file):
+                        os.chmod(replace_file, 0o777)
                         os.rename(replace_file, replace_file+".sv")
                     copyfile(source_file, replace_file)
                 elif filename == "output_http.so":
                     replace_file = os.path.join(LOCAL_LIB_DIR, filename)
                     print( "Updating " + replace_file)
                     if os.path.exists(replace_file):
+                        os.chmod(replace_file, 0o777)
                         os.rename(replace_file, replace_file+".sv")
                     copyfile(source_file, replace_file)
                 else :
