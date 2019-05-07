@@ -21,6 +21,7 @@ fi
 cd /
 cd home/pi
 sudo python pin_toggler.py &
+#
 cd /
 cd home/pi/pi-i2c
 sleep 5

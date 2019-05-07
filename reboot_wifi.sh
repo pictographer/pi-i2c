@@ -13,3 +13,9 @@ then
   sleep 5
   /sbin/ifup --force 'wlan0'
 fi
+
+if [ -f /home/pi/pi-i2c/updater.py ]
+then
+  echo "Starting update..."
+  sudo python /home/pi/pi-i2c/updater.py
+fi
