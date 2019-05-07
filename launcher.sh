@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # launcher.sh
 #
 # Setup photo and video directories
@@ -21,15 +21,19 @@ fi
 cd /
 cd home/pi
 sudo python pin_toggler.py &
-exit
 cd /
 cd home/pi/pi-i2c
 sleep 5
 sudo ./rovdrv &
 cd /
 # If this is RPiA wait for RPiB to get its cameras up and running
-if [ "$HOSTNAME" != "${HOSTNAME%"B"*}" ]; then
+export HOSTNAME=`hostname`
+pat="*stir*A*"
+if [[ "$HOSTNAME" == $pat ]]; then
+    echo "STIR_A: " ${HOSTNAME}
     sleep 30
+else
+    echo "STIR_B: " ${HOSTNAME}
 fi
 sleep 5
 cd home/pi/openrov-cockpit
