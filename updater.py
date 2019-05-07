@@ -25,10 +25,10 @@ if os.path.exists(UPDATE_DIR) is False:
 if os.path.exists(UPDATE_FILE) :
     # Set the mode of numbering the pins.
     GPIO.setmode(GPIO.BCM)
-    # GPIO pin 45 is an output.
-    GPIO.setup(45, GPIO.OUT)
+    # GPIO pin 12 is an output.
+    GPIO.setup(12, GPIO.OUT)
     # turn on the LED flasher
-    GPIO.output(45, True)
+    GPIO.output(12, True)
 
     print("Update file exists: " + UPDATE_FILE)
     # in case the update takes a while change the name
@@ -175,7 +175,7 @@ if os.path.exists(UPDATE_FILE) :
     remove_dir = os.path.join(UPDATE_DIR,update_contents)
     rmtree(remove_dir)
     # turn off the LED flasher
-    GPIO.output(45, False)
+    GPIO.output(12, False)
 
 else :
     print("There is no update file: " + UPDATE_FILE)
