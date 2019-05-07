@@ -17,5 +17,5 @@ fi
 if [ -f /home/pi/pi-i2c/updater.py ]
 then
   echo "Starting update..."
-  python /home/pi/pi-i2c/updater.py
+  sudo python /home/pi/pi-i2c/updater.py
 fi
