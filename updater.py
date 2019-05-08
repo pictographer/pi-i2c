@@ -15,6 +15,8 @@ PI_ROOT_DIR = '/home/pi/pi-i2c'
 ROV_ROOT_DIR = '/home/pi'
 LOCAL_BIN_DIR = '/usr/local/bin'
 LOCAL_LIB_DIR = '/usr/local/lib/mjpg-streamer'
+USR_LIB = '/usr/lib'
+USR_LOCAL_LIB = '/usr/local/lib'
 
 # make the update directory
 # if it doesn't exist
@@ -130,40 +132,105 @@ if os.path.exists(UPDATE_FILE) :
                     if os.path.exists(replace_file):
                         os.rename(replace_file, replace_file+".sv")
                     copyfile(source_file, replace_file)
+                    os.chmod(replace_file, 0o777)
                 elif filename == "remotecamera.sh":
                     print("Updating " + filename)
                     replace_file = os.path.join(LOCAL_BIN_DIR, filename)
                     if os.path.exists(replace_file):
                         os.rename(replace_file, replace_file + ".sv")
                     copyfile(source_file, replace_file)
+                    os.chmod(replace_file, 0o777)
                 elif filename == "input_raspicam.so":
                     replace_file = os.path.join(LOCAL_LIB_DIR, filename)
                     print( "Updating " + replace_file)
                     if os.path.exists(replace_file):
-                        os.chmod(replace_file, 0o777)
                         os.rename(replace_file, replace_file+".sv")
                     copyfile(source_file, replace_file)
+                    os.chmod(replace_file, 0o777)
                 elif filename == "output_file.so":
                     replace_file = os.path.join(LOCAL_LIB_DIR, filename)
                     print( "Updating " + replace_file)
                     if os.path.exists(replace_file):
-                        os.chmod(replace_file, 0o777)
                         os.rename(replace_file, replace_file+".sv")
                     copyfile(source_file, replace_file)
+                    os.chmod(replace_file, 0o777)
                 elif filename == "output_ws.so":
                     replace_file = os.path.join(LOCAL_LIB_DIR, filename)
                     print( "Updating " + replace_file)
                     if os.path.exists(replace_file):
-                        os.chmod(replace_file, 0o777)
                         os.rename(replace_file, replace_file+".sv")
                     copyfile(source_file, replace_file)
+                    os.chmod(replace_file, 0o777)
                 elif filename == "output_http.so":
                     replace_file = os.path.join(LOCAL_LIB_DIR, filename)
                     print( "Updating " + replace_file)
                     if os.path.exists(replace_file):
-                        os.chmod(replace_file, 0o777)
                         os.rename(replace_file, replace_file+".sv")
                     copyfile(source_file, replace_file)
+                    os.chmod(replace_file, 0o777)
+                elif filename == "libuv.so":
+                    replace_file = os.path.join(LOCAL_LIB_DIR, filename+".2.0.0")
+                    print( "Updating " + replace_file)
+                    if os.path.exists(replace_file):
+                        os.rename(replace_file, replace_file+".sv")
+                    copyfile(source_file, replace_file)
+                    os.chmod(replace_file, 0o777)
+                    base_file = os.path.join(LOCAL_LIB_DIR, filename);
+                    os.symlink(replace_file,base_file)
+                    os.symlink(replace_file,base_file+".2")
+                    # erase other copies
+                    base_file = os.path.join(USR_LIB_DIR, filename);
+                    os.remove(base_file)
+                    os.remove(base_file+".2")
+                    os.remove(base_file+".2.0.0")
+                    base_file = os.path.join(USR_LOCAL_LIB_DIR, filename);
+                    os.remove(base_file)
+                    os.remove(base_file+".2")
+                    os.remove(base_file+".2.0.0")
+                elif filename == "libssl.so":
+                    replace_file = os.path.join(LOCAL_LIB_DIR, filename+".1.1")
+                    print( "Updating " + replace_file)
+                    if os.path.exists(replace_file):
+                        os.rename(replace_file, replace_file+".sv")
+                    copyfile(source_file, replace_file)
+                    os.chmod(replace_file, 0o777)
+                    base_file = os.path.join(LOCAL_LIB_DIR, filename);
+                    os.symlink(replace_file,base_file)
+                    # erase other copies
+                    base_file = os.path.join(USR_LIB_DIR, filename);
+                    os.remove(base_file)
+                    os.remove(base_file+".1.1")
+                    base_file = os.path.join(USR_LOCAL_LIB_DIR, filename);
+                    os.remove(base_file)
+                    os.remove(base_file+".1.1")
+                elif filename == "libcrypto.so":
+                    replace_file = os.path.join(LOCAL_LIB_DIR, filename+".1.0.0")
+                    print( "Updating " + replace_file)
+                    if os.path.exists(replace_file):
+                        os.rename(replace_file, replace_file+".sv")
+                    copyfile(source_file, replace_file)
+                    os.chmod(replace_file, 0o777)
+                    base_file = os.path.join(LOCAL_LIB_DIR, filename);
+                    os.symlink(replace_file,base_file)
+                    # erase other copies
+                    base_file = os.path.join(USR_LIB_DIR, filename);
+                    os.remove(base_file)
+                    os.remove(base_file+".1.0.0")
+                    base_file = os.path.join(USR_LOCAL_LIB_DIR, filename);
+                    os.remove(base_file)
+                    os.remove(base_file+".1.0.0")
+                elif filename == "libuWS.so":
+                    replace_file = os.path.join(LOCAL_LIB_DIR, filename)
+                    print( "Updating " + replace_file)
+                    if os.path.exists(replace_file):
+                        os.rename(replace_file, replace_file+".sv")
+                    copyfile(source_file, replace_file)
+                    os.chmod(replace_file, 0o777)
+                    # erase other copies
+                    base_file = os.path.join(USR_LIB_DIR, filename);
+                    os.remove(base_file)
+                    base_file = os.path.join(USR_LOCAL_LIB_DIR, filename);
+                    os.remove(base_file)
                 else :
                     print( "Unexpected file: " + filename)
         else :
