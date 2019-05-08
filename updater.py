@@ -73,30 +73,35 @@ if os.path.exists(UPDATE_FILE) :
                     if os.path.exists(replace_file):
                         os.rename(replace_file, replace_file+".sv")
                     copyfile(source_file,replace_file)
+                    os.chmod(replace_file, 0o777)
                 elif filename == "pin_toggler.py" :
                     print("Updating " + filename)
                     replace_file = os.path.join(ROV_ROOT_DIR, filename)
                     if os.path.exists(replace_file):
                         os.rename(replace_file, replace_file+".sv")
                     copyfile(source_file,replace_file)
+                    os.chmod(replace_file, 0o777)
                 elif filename == "reboot_wifi.sh" :
                     print("Updating " + filename)
                     replace_file = os.path.join(PI_ROOT_DIR, filename)
                     if os.path.exists(replace_file):
                         os.rename(replace_file, replace_file+".sv")
                     copyfile(source_file,replace_file)
+                    os.chmod(replace_file, 0o777)
                 elif filename == "launcher.sh" :
                     print("Updating " + filename)
                     replace_file = os.path.join(ROV_ROOT_DIR, filename)
                     if os.path.exists(replace_file):
                         os.rename(replace_file, replace_file+".sv")
                     copyfile(source_file,replace_file)
+                    os.chmod(replace_file, 0o777)
                 elif filename == "df.fs" :
                     print("Updating " + filename)
                     replace_file = os.path.join(PI_ROOT_DIR, filename)
                     if os.path.exists(replace_file):
                         os.rename(replace_file, replace_file+".sv")
                     copyfile(source_file,replace_file)
+                    os.chmod(replace_file, 0o777)
                 else :
                     print("Unexpected file: " + filename)
         elif dir == "openrov-cockpit" :
