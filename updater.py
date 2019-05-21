@@ -271,7 +271,7 @@ if os.path.exists(UPDATE_FILE) :
                 else :
                     print( "Unexpected file: " + filename)
         else :
-            print( "unexpected directory: " + dirpath)
+            print( "Unexpected directory: " + dirpath)
 
     # now we are done so delete the update file
     os.remove(UPDATE_WORK_FILE)
