@@ -4,6 +4,7 @@ import tarfile
 import fnmatch
 from shutil import copyfile
 from shutil import rmtree
+from shutil import move
 import subprocess
 import signal
 import RPi.GPIO as GPIO
@@ -117,10 +118,18 @@ if os.path.exists(UPDATE_FILE) :
                     # save off the original directory
                     original_dir = os.path.join(ROV_ROOT_DIR, "openrov-cockpit")
                     if os.path.exists(original_dir):
-                        os.rename(original_dir, original_dir+".sv")
+                        if os.path.exists(original_dir+".sv"):
+                            rmtree(original_dir+".sv", ignore_errors=True)
+                        move(original_dir, original_dir+".sv")
                     # Now unzip the file
                     print( "Untar " + replace_file)
                     tarfile.open(replace_file).extractall(ROV_ROOT_DIR)
+                    # Now chmod all the files
+                    for root, dirs, files in os.walk(original_dir):  
+                        for momo in dirs:  
+                            os.chmod(os.path.join(root, momo), 0o777)
+                        for momo in files:
+                            os.chmod(os.path.join(root, momo), 0o777)
                 else :
                     print( "Unexpected file: " + filename)
         elif dir == "mjpg_streamer" :
