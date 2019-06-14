@@ -18,6 +18,7 @@ LOCAL_BIN_DIR = '/usr/local/bin'
 LOCAL_LIB_DIR = '/usr/local/lib/mjpg-streamer'
 USR_LIB_DIR = '/usr/lib'
 USR_LOCAL_LIB_DIR = '/usr/local/lib'
+ETC_DIR = '/etc'
 
 # make the update directory
 # if it doesn't exist
