@@ -104,6 +104,13 @@ if os.path.exists(UPDATE_FILE) :
                         os.rename(replace_file, replace_file+".sv")
                     copyfile(source_file,replace_file)
                     os.chmod(replace_file, 0o777)
+                elif filename == "rovconfig.json" :
+                    print("Updating " + filename)
+                    replace_file = os.path.join(ETC_DIR, filename)
+                    if os.path.exists(replace_file):
+                        os.rename(replace_file, replace_file+".sv")
+                    copyfile(source_file,replace_file)
+                    os.chmod(replace_file, 0o777)                    
                 else :
                     print("Unexpected file: " + filename)
         elif dir == "openrov-cockpit" :
