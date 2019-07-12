@@ -87,6 +87,15 @@ if os.path.exists(UPDATE_FILE) :
                         os.rename(replace_file, replace_file+".sv")
                     copyfile(source_file,replace_file)
                     os.chmod(replace_file, 0o777)
+                elif filename == "updater.py" :
+                    f.write("Updating " + filename + "\n")
+                    replace_file = os.path.join(PI_ROOT_DIR, filename)
+                    if os.path.exists(replace_file):
+                        os.rename(replace_file, replace_file+".sv")
+                    copyfile(source_file,replace_file)
+                    os.chmod(replace_file, 0o777)
+                    # we need to be smarter here about
+                    # managing updating of the updater
                 elif filename == "reboot_wifi.sh" :
                     f.write("Updating " + filename + "\n")
                     replace_file = os.path.join(PI_ROOT_DIR, filename)
