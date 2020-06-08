@@ -29,6 +29,8 @@ GPIO.setup(19, GPIO.OUT)
 GPIO.setup(20, GPIO.OUT) 
 # GPIO pin 21 is an output. 
 GPIO.setup(21, GPIO.OUT) 
+# GPIO pin 32 is an output
+GPIO.setup(32, GPIO.OUT)
 # GPIO pin 34 is an output
 GPIO.setup(34, GPIO.OUT)
 # GPIO pin 35 is an output
