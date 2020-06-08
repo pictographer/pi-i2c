@@ -29,9 +29,11 @@ cd /
 # If this is RPiA wait for RPiB to get its cameras up and running
 export HOSTNAME=`hostname`
 pat="*stir*A*"
-if [[ "$HOSTNAME" == $pat ]]; then
+if [[ "$HOSTNAME" == $pat ]]; 
+then
     echo "STIR_A: " ${HOSTNAME}
-    sleep 40
+    echo "sleep 45"
+    sleep 45
 else
     echo "STIR_B: " ${HOSTNAME}
 fi
