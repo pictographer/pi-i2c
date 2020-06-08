@@ -17,6 +17,8 @@ GPIO.setup(4, GPIO.IN)
 input4 = GPIO.input(4);
 # GPIO pin 6 is an output. 
 GPIO.setup(6, GPIO.OUT) 
+# GPIO pin 12 is an output. 
+GPIO.setup(12, GPIO.OUT) 
 # GPIO pin 17 is an output. 
 GPIO.setup(17, GPIO.OUT) 
 # GPIO pin 18 is an output. 
@@ -31,6 +33,14 @@ GPIO.setup(21, GPIO.OUT)
 GPIO.setup(34, GPIO.OUT)
 # GPIO pin 35 is an output
 GPIO.setup(35, GPIO.OUT)
+# Initiallze pins low
+GPIO.output(12, False) 
+GPIO.output(17, False) 
+GPIO.output(18, False) 
+GPIO.output(19, False) 
+GPIO.output(32, False) 
+GPIO.output(34, False) 
+GPIO.output(35, False) 
 # Initialize 5V_OFF signals 
 GPIO.output(20, False) 
 GPIO.output(21, False) 
