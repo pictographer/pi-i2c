@@ -37,7 +37,7 @@ GPIO.setup(34, GPIO.OUT)
 GPIO.setup(35, GPIO.OUT)
 # Initiallze pins low
 GPIO.output(12, False) 
-GPIO.output(17, False) 
+# GPIO.output(17, False) 
 GPIO.output(18, False) 
 GPIO.output(19, False) 
 GPIO.output(32, False) 
